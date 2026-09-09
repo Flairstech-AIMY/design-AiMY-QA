@@ -5957,6 +5957,109 @@
         display: flex; flex-direction: column; gap: 14px;
       }
 
+      /* ── KPI audit panel, design ported from manual-audit.html ──────── */
+      .eval-panel.has-manual-audit > :not(.kpa-root) { display: none !important; }
+      .kpa-root { display: flex; flex-direction: column; gap: 12px; }
+      .kpa-summary {
+        background: var(--card-bg); border: 1px solid var(--wash-7);
+        border-radius: 16px; padding: 18px 20px; box-shadow: var(--shadow-md);
+      }
+      .kpa-summary-row { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+      .kpa-score-block { display: flex; align-items: baseline; gap: 10px; padding-right: 18px; border-right: 1px solid var(--wash-6); }
+      .kpa-score { color: var(--text-strong); font-size: 42px; font-weight: 800; letter-spacing: -0.04em; line-height: 0.95; font-variant-numeric: tabular-nums; }
+      .kpa-score-copy { display: flex; flex-direction: column; gap: 3px; }
+      .kpa-score-copy strong { font-size: 12px; color: var(--d100); }
+      .kpa-score-copy span { font-size: 11px; color: var(--d500); }
+      .kpa-stats { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+      .kpa-stat { display: flex; align-items: center; gap: 6px; color: var(--d400); font-size: 11.5px; white-space: nowrap; }
+      .kpa-stat b { color: var(--d50); font-size: 14px; font-variant-numeric: tabular-nums; }
+      .kpa-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--d500); }
+      .kpa-dot.ok { background: var(--ok); }
+      .kpa-dot.err { background: var(--err); }
+      .kpa-dot.warn { background: var(--warn); }
+      .kpa-conf { min-width: 165px; margin-left: auto; }
+      .kpa-conf-top { display: flex; justify-content: space-between; gap: 8px; color: var(--d500); font-size: 10px; margin-bottom: 6px; }
+      .kpa-conf-top b { color: var(--ok); font-variant-numeric: tabular-nums; }
+      .kpa-progress { display: block; height: 6px; border-radius: 999px; background: var(--wash-7); overflow: hidden; }
+      .kpa-progress span { display: block; height: 100%; border-radius: inherit; background: var(--ok); }
+      .kpa-toolbar { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+      .kpa-filter {
+        border: 1px solid var(--wash-7); border-radius: 999px; padding: 7px 13px;
+        background: var(--card-bg); color: var(--d400); font-family: "Urbanist", sans-serif;
+        font-size: 11px; font-weight: 750; cursor: pointer;
+        transition: color var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast);
+      }
+      .kpa-filter:hover { color: var(--d100); border-color: var(--wash-10); }
+      .kpa-filter.active { color: var(--qa-accent); background: var(--qa-accent-dim); border-color: rgba(var(--qa-accent-rgb), 0.28); }
+      .kpa-agree-all {
+        margin-left: auto; border: 1px solid var(--wash-8); border-radius: 8px; padding: 7px 12px;
+        background: var(--wash-4); color: var(--d300); font-family: "Urbanist", sans-serif;
+        font-size: 11px; font-weight: 750; cursor: pointer;
+        transition: color var(--transition-fast), background var(--transition-fast);
+      }
+      .kpa-agree-all:hover { background: var(--wash-8); color: var(--d50); }
+      .kpa-card {
+        border: 1px solid var(--wash-7); border-radius: 14px; background: var(--card-bg);
+        overflow: clip; box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        transition: border-color var(--transition-base), box-shadow var(--transition-base), transform var(--transition-base);
+      }
+      .kpa-card:hover { border-color: var(--wash-10); box-shadow: 0 8px 32px rgba(0,0,0,0.3); transform: translateY(-1px); }
+      .kpa-card.is-hidden { display: none; }
+      .kpa-card.is-reviewed { background: color-mix(in srgb, var(--card-bg) 96%, var(--ok) 4%); }
+      .kpa-card-head { padding: 13px 14px 9px; display: flex; align-items: flex-start; gap: 10px; }
+      .kpa-mark {
+        width: 28px; height: 28px; border-radius: 8px; display: grid; place-items: center;
+        flex-shrink: 0; font-weight: 900; font-size: 14px; margin-top: 1px;
+      }
+      .kpa-mark.pass { color: var(--ok); background: var(--ok-bg); }
+      .kpa-mark.fail { color: var(--err); background: var(--err-bg); }
+      .kpa-mark.pending { color: var(--warn); background: var(--warn-bg); }
+      .kpa-mark.na { color: var(--d400); background: var(--wash-7); }
+      .kpa-heading { min-width: 0; flex: 1; }
+      .kpa-title-row { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+      .kpa-title { margin: 0; color: var(--d50); font-size: 13px; font-weight: 800; letter-spacing: -0.01em; }
+      .kpa-code { font-size: 9px; font-weight: 800; letter-spacing: 0.06em; color: var(--d500); border: 1px solid var(--wash-6); padding: 2px 5px; border-radius: 5px; }
+      .kpa-question { margin: 3px 0 0; color: var(--d400); font-size: 11px; line-height: 1.4; }
+      .kpa-head-right { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+      .kpa-chip { display: inline-flex; align-items: center; gap: 5px; border-radius: 999px; padding: 4px 9px; font-size: 9.5px; font-weight: 800; border: 1px solid transparent; white-space: nowrap; }
+      .kpa-chip.pass { color: var(--ok); background: var(--ok-bg); border-color: rgba(23,178,106,0.24); }
+      .kpa-chip.fail { color: var(--err); background: var(--err-bg); border-color: rgba(240,68,56,0.24); }
+      .kpa-chip.pending { color: var(--warn); background: var(--warn-bg); border-color: rgba(247,144,9,0.24); }
+      .kpa-pts { color: var(--d500); font-size: 9.5px; font-weight: 700; }
+      .kpa-body { padding: 0 14px 12px 52px; }
+      .kpa-reading {
+        display: flex; align-items: start; justify-content: space-between; gap: 10px;
+        padding: 9px 11px; border-radius: 10px;
+        background: rgba(0,102,255,0.07); border: 1px solid rgba(0,102,255,0.22);
+      }
+      .kpa-reading p { margin: 0; color: var(--d300); font-size: 11px; line-height: 1.5; }
+      .kpa-reading p b { color: var(--d100); }
+      .kpa-reading-conf { color: var(--ai-text); font-size: 9.5px; white-space: nowrap; font-weight: 700; }
+      .kpa-evidence { margin: 8px 0 0; padding: 9px 11px; border: 1px solid var(--wash-6); border-left: 2px solid rgba(var(--qa-accent-rgb),0.5); border-radius: 0 9px 9px 0; background: var(--wash-3); }
+      .kpa-evidence figcaption { display: flex; gap: 8px; align-items: baseline; font-size: 10px; color: var(--d400); }
+      .kpa-evidence figcaption b { color: var(--d200); }
+      .kpa-evidence blockquote { margin: 5px 0 0; font-size: 11.5px; line-height: 1.55; color: var(--d100); }
+      .kpa-unscored { margin-top: 2px; display: flex; align-items: flex-start; gap: 7px; color: var(--warn); font-size: 11px; line-height: 1.5; }
+      .kpa-unscored .kpa-dot { margin-top: 5px; background: var(--warn); flex-shrink: 0; }
+      .kpa-actions { border-top: 1px solid var(--wash-5); display: flex; align-items: center; gap: 7px; padding: 9px 14px 9px 52px; flex-wrap: wrap; }
+      .kpa-action-label { color: var(--d500); font-size: 9px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; margin-right: 2px; }
+      .kpa-decision {
+        min-height: 30px; border: 1px solid var(--wash-7); background: transparent; color: var(--d400);
+        border-radius: 8px; padding: 0 11px; font-family: "Urbanist", sans-serif; font-size: 11px;
+        font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 5px;
+        transition: color var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast);
+      }
+      .kpa-decision:hover { background: var(--wash-4); color: var(--d100); }
+      .kpa-decision.selected.agree { color: var(--ok); background: var(--ok-bg); border-color: rgba(23,178,106,0.3); }
+      .kpa-decision.selected.disagree { color: var(--err); background: var(--err-bg); border-color: rgba(240,68,56,0.3); }
+      .kpa-decision.selected.na { color: var(--d200); background: var(--wash-7); border-color: var(--wash-10); }
+      .kpa-result { margin-left: auto; color: var(--d500); font-size: 10px; }
+      .kpa-result b { color: var(--d200); }
+      /* Audit-only frame: player and transcript removed, audit spans full width. */
+      #eval-detail-human .call-player { display: none; }
+      #eval-detail-human .eval-detail-grid { grid-template-columns: minmax(0, 1fr); }
+      #eval-detail-human .eval-detail-grid > div:first-child { display: none; }
+
       /* Result card, expanded variant for detail page */
       /* The summary strip. Everything that was three stacked cards, on two
          lines. The score still leads — it is the thing being confirmed —
@@ -10955,7 +11058,315 @@
             </div>
 
             <!-- Right: evaluation panel -->
-            <div class="eval-panel">
+            <div class="eval-panel has-manual-audit">
+              <div class="kpa-root" id="kpaRoot" aria-label="KPI audit results">
+                <div class="kpa-summary">
+                  <div class="kpa-summary-row">
+                    <div class="kpa-score-block">
+                      <strong class="kpa-score">52%</strong>
+                      <span class="kpa-score-copy"><strong>Provisional score</strong><span id="kpaSettled">0 reviewed · 6 remaining</span></span>
+                    </div>
+                    <div class="kpa-stats">
+                      <span class="kpa-stat"><span class="kpa-dot ok"></span>Passed <b>3</b></span>
+                      <span class="kpa-stat"><span class="kpa-dot err"></span>Failed <b>2</b></span>
+                      <span class="kpa-stat"><span class="kpa-dot warn"></span>Pending <b>1</b></span>
+                      <span class="kpa-stat"><span class="kpa-dot"></span>Unscored <b>1</b></span>
+                    </div>
+                    <div class="kpa-conf">
+                      <div class="kpa-conf-top"><span>AiMY confidence</span><b>91%</b></div>
+                      <span class="kpa-progress"><span style="width:91%"></span></span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="kpa-toolbar" role="group" aria-label="Filter KPI results">
+                  <button class="kpa-filter active" data-kpa-filter="all" type="button">All</button>
+                  <button class="kpa-filter" data-kpa-filter="needs" type="button">Needs action</button>
+                  <button class="kpa-filter" data-kpa-filter="fail" type="button">Failed</button>
+                  <button class="kpa-filter" data-kpa-filter="pass" type="button">Passed</button>
+                  <button class="kpa-filter" data-kpa-filter="na" type="button">N/A</button>
+                  <button class="kpa-agree-all" id="kpaAgreeAll" type="button">Agree with remaining</button>
+                </div>
+
+                <article class="kpa-card" data-kpa-verdict="fail">
+                  <div class="kpa-card-head">
+                    <span class="kpa-mark fail">×</span>
+                    <div class="kpa-heading">
+                      <div class="kpa-title-row"><h3 class="kpa-title">Follow-up confirmation</h3><span class="kpa-code">CR-041</span></div>
+                      <p class="kpa-question">Did the agent set clear next steps and a follow-up timeline?</p>
+                    </div>
+                    <div class="kpa-head-right"><span class="kpa-chip fail">AiMY Fail</span><span class="kpa-pts">18 pts</span></div>
+                  </div>
+                  <div class="kpa-body">
+                    <div class="kpa-reading"><p><b>Why AiMY scored this:</b> The customer asked who to contact if the refund did not clear. The call ended without a named contact, fallback route or follow-up time.</p><span class="kpa-reading-conf">96% confident</span></div>
+                    <figure class="kpa-evidence"><figcaption><b>Customer</b><span>10:11</span></figcaption><blockquote>Okay, thank you. But what if it doesn't? Who do I contact?</blockquote></figure>
+                    <figure class="kpa-evidence"><figcaption><b>Agent</b><span>10:12</span></figcaption><blockquote>You're all set. Is there anything else I can help you with today?</blockquote></figure>
+                  </div>
+                  <div class="kpa-actions">
+                    <span class="kpa-action-label">Manual review</span>
+                    <button class="kpa-decision agree" type="button">✓ Agree</button>
+                    <button class="kpa-decision disagree" type="button">× Disagree</button>
+                    <button class="kpa-decision na" type="button">– N/A</button>
+                    <span class="kpa-result">Not reviewed</span>
+                  </div>
+                </article>
+
+                <article class="kpa-card" data-kpa-verdict="fail">
+                  <div class="kpa-card-head">
+                    <span class="kpa-mark fail">×</span>
+                    <div class="kpa-heading">
+                      <div class="kpa-title-row"><h3 class="kpa-title">Resolution confirmation</h3><span class="kpa-code">CR-018</span></div>
+                      <p class="kpa-question">Did the agent confirm the issue was fully resolved?</p>
+                    </div>
+                    <div class="kpa-head-right"><span class="kpa-chip fail">AiMY Fail</span><span class="kpa-pts">16 pts</span></div>
+                  </div>
+                  <div class="kpa-body">
+                    <div class="kpa-reading"><p><b>Why AiMY scored this:</b> The agent escalated the refund and said "you're all set" but did not verify with the customer that the resolution was satisfactory.</p><span class="kpa-reading-conf">92% confident</span></div>
+                    <figure class="kpa-evidence"><figcaption><b>Agent</b><span>10:09</span></figcaption><blockquote>I'm escalating this now so it clears today. You'll receive an email confirmation within the hour.</blockquote></figure>
+                  </div>
+                  <div class="kpa-actions">
+                    <span class="kpa-action-label">Manual review</span>
+                    <button class="kpa-decision agree" type="button">✓ Agree</button>
+                    <button class="kpa-decision disagree" type="button">× Disagree</button>
+                    <button class="kpa-decision na" type="button">– N/A</button>
+                    <span class="kpa-result">Not reviewed</span>
+                  </div>
+                </article>
+
+                <article class="kpa-card" data-kpa-verdict="pending">
+                  <div class="kpa-card-head">
+                    <span class="kpa-mark pending">!</span>
+                    <div class="kpa-heading">
+                      <div class="kpa-title-row"><h3 class="kpa-title">Ticket categorization</h3><span class="kpa-code">CR-023</span></div>
+                      <p class="kpa-question">Did the agent log the ticket with correct category and tags?</p>
+                    </div>
+                    <div class="kpa-head-right"><span class="kpa-chip pending">AiMY Pending</span><span class="kpa-pts">10 pts</span></div>
+                  </div>
+                  <div class="kpa-body">
+                    <div class="kpa-reading"><p><b>Why AiMY scored this:</b> Tagged as "billing". A more precise categorization as "refund delay escalation" would improve routing accuracy.</p><span class="kpa-reading-conf">61% confident</span></div>
+                  </div>
+                  <div class="kpa-actions">
+                    <span class="kpa-action-label">Manual review</span>
+                    <button class="kpa-decision agree" type="button">✓ Agree</button>
+                    <button class="kpa-decision disagree" type="button">× Disagree</button>
+                    <button class="kpa-decision na" type="button">– N/A</button>
+                    <span class="kpa-result">Not reviewed</span>
+                  </div>
+                </article>
+
+                <article class="kpa-card" data-kpa-verdict="pass">
+                  <div class="kpa-card-head">
+                    <span class="kpa-mark pass">✓</span>
+                    <div class="kpa-heading">
+                      <div class="kpa-title-row"><h3 class="kpa-title">Empathy &amp; tone</h3><span class="kpa-code">CR-007</span></div>
+                      <p class="kpa-question">Did the agent demonstrate empathy during the interaction?</p>
+                    </div>
+                    <div class="kpa-head-right"><span class="kpa-chip pass">AiMY Pass</span><span class="kpa-pts">14 pts</span></div>
+                  </div>
+                  <div class="kpa-body">
+                    <div class="kpa-reading"><p><b>Why AiMY scored this:</b> Opened with an apology, acknowledged the delay and took immediate action. Tone remained steady throughout.</p><span class="kpa-reading-conf">94% confident</span></div>
+                  </div>
+                  <div class="kpa-actions">
+                    <span class="kpa-action-label">Manual review</span>
+                    <button class="kpa-decision agree" type="button">✓ Agree</button>
+                    <button class="kpa-decision disagree" type="button">× Disagree</button>
+                    <button class="kpa-decision na" type="button">– N/A</button>
+                    <span class="kpa-result">Not reviewed</span>
+                  </div>
+                </article>
+
+                <article class="kpa-card" data-kpa-verdict="pass">
+                  <div class="kpa-card-head">
+                    <span class="kpa-mark pass">✓</span>
+                    <div class="kpa-heading">
+                      <div class="kpa-title-row"><h3 class="kpa-title">Identity verification</h3><span class="kpa-code">CR-002</span></div>
+                      <p class="kpa-question">Did the agent verify customer identity before sharing details?</p>
+                    </div>
+                    <div class="kpa-head-right"><span class="kpa-chip pass">AiMY Pass</span><span class="kpa-pts">15 pts</span></div>
+                  </div>
+                  <div class="kpa-body">
+                    <div class="kpa-reading"><p><b>Why AiMY scored this:</b> Full identity verification completed before the account lookup.</p><span class="kpa-reading-conf">98% confident</span></div>
+                  </div>
+                  <div class="kpa-actions">
+                    <span class="kpa-action-label">Manual review</span>
+                    <button class="kpa-decision agree" type="button">✓ Agree</button>
+                    <button class="kpa-decision disagree" type="button">× Disagree</button>
+                    <button class="kpa-decision na" type="button">– N/A</button>
+                    <span class="kpa-result">Not reviewed</span>
+                  </div>
+                </article>
+
+                <article class="kpa-card" data-kpa-verdict="pass">
+                  <div class="kpa-card-head">
+                    <span class="kpa-mark pass">✓</span>
+                    <div class="kpa-heading">
+                      <div class="kpa-title-row"><h3 class="kpa-title">Survey promotion</h3><span class="kpa-code">CR-043</span></div>
+                      <p class="kpa-question">Did the agent promote the post-interaction survey?</p>
+                    </div>
+                    <div class="kpa-head-right"><span class="kpa-chip pass">AiMY Pass</span><span class="kpa-pts">12 pts</span></div>
+                  </div>
+                  <div class="kpa-body">
+                    <div class="kpa-reading"><p><b>Why AiMY scored this:</b> Survey mentioned at the close of the call.</p><span class="kpa-reading-conf">88% confident</span></div>
+                  </div>
+                  <div class="kpa-actions">
+                    <span class="kpa-action-label">Manual review</span>
+                    <button class="kpa-decision agree" type="button">✓ Agree</button>
+                    <button class="kpa-decision disagree" type="button">× Disagree</button>
+                    <button class="kpa-decision na" type="button">– N/A</button>
+                    <span class="kpa-result">Not reviewed</span>
+                  </div>
+                </article>
+
+                <article class="kpa-card" data-kpa-verdict="na">
+                  <div class="kpa-card-head">
+                    <span class="kpa-mark na">–</span>
+                    <div class="kpa-heading">
+                      <div class="kpa-title-row"><h3 class="kpa-title">Disposition code</h3><span class="kpa-code">CR-030</span></div>
+                      <p class="kpa-question">Was the interaction tagged with the correct disposition code?</p>
+                    </div>
+                    <div class="kpa-head-right"><span class="kpa-pts">Unscored</span></div>
+                  </div>
+                  <div class="kpa-body">
+                    <p class="kpa-unscored"><span class="kpa-dot"></span>I can't score this one. The disposition code is a CRM field, not something said on the call, and this voice transcript carries no record of it.</p>
+                  </div>
+                </article>
+
+                <script>
+                  (function () {
+                    var root = document.getElementById('kpaRoot');
+                    if (!root) return;
+                    var settled = document.getElementById('kpaSettled');
+                    var reviewable = 6;
+
+                    function paintSettled() {
+                      var reviewed = root.querySelectorAll('.kpa-card.is-reviewed').length;
+                      if (settled) settled.textContent = reviewed + ' reviewed · ' + (reviewable - reviewed) + ' remaining';
+                    }
+
+                    function applyFilter(kind) {
+                      root.querySelectorAll('.kpa-card').forEach(function (card) {
+                        var verdict = card.dataset.kpaVerdict;
+                        var reviewed = card.classList.contains('is-reviewed');
+                        var show =
+                          kind === 'all' ? true :
+                          kind === 'needs' ? ((verdict === 'fail' || verdict === 'pending') && !reviewed) :
+                          kind === 'fail' ? verdict === 'fail' :
+                          kind === 'pass' ? verdict === 'pass' :
+                          verdict === 'na';
+                        card.classList.toggle('is-hidden', !show);
+                      });
+                    }
+
+                    root.querySelectorAll('[data-kpa-filter]').forEach(function (btn) {
+                      btn.addEventListener('click', function () {
+                        root.querySelectorAll('[data-kpa-filter]').forEach(function (other) { other.classList.remove('active'); });
+                        btn.classList.add('active');
+                        applyFilter(btn.dataset.kpaFilter);
+                      });
+                    });
+
+                    function decide(card, btn) {
+                      card.querySelectorAll('.kpa-decision').forEach(function (other) { other.classList.remove('selected'); });
+                      btn.classList.add('selected');
+                      card.classList.add('is-reviewed');
+                      var result = card.querySelector('.kpa-result');
+                      if (result) result.innerHTML = 'Reviewed · <b>' + btn.textContent.replace(/^[✓×–]\s*/, '') + '</b>';
+                      paintSettled();
+                    }
+
+                    root.querySelectorAll('.kpa-card').forEach(function (card) {
+                      card.querySelectorAll('.kpa-decision').forEach(function (btn) {
+                        btn.addEventListener('click', function () { decide(card, btn); });
+                      });
+                    });
+
+                    var agreeAll = document.getElementById('kpaAgreeAll');
+                    if (agreeAll) agreeAll.addEventListener('click', function () {
+                      root.querySelectorAll('.kpa-card:not(.is-reviewed)').forEach(function (card) {
+                        var btn = card.querySelector('.kpa-decision.agree');
+                        if (btn) decide(card, btn);
+                      });
+                    });
+
+                    /* Audit metadata Q&A, mirrors the manual-audit prototype's composer. */
+                    var AUDIT_META = {
+                      agent: 'The agent is Omar Abdallah (omar.abdallah@flairstech.com), Product Support, 5 months tenure.',
+                      customer: 'The customer is an unknown caller — identity was verified in the secure pre-call IVR flow.',
+                      score: 'The provisional quality score is 52% (Fail). 2 KPIs failed: Follow-up confirmation and Resolution confirmation.',
+                      confidence: 'AiMY confidence for this evaluation is 91%: full transcript available, all goals answerable, no conflicting signals.',
+                      priority: 'This interaction is a refund status escalation handled in the Product Support queue.',
+                      queue: 'Queue: Product Support · Source: Voice call.',
+                      timeline: 'The call took place on 7 May 2026 at 10:05 and ran 8 minutes 34 seconds. Audited by Nour Wael on 12 May 2026.',
+                      duration: 'Call duration was 8 minutes 34 seconds (10:05–10:13, 7 May 2026).',
+                      evaluator: 'The evaluator is Nour Wael (Quality Auditor).',
+                      auditor: 'The evaluator is Nour Wael (Quality Auditor).',
+                      issue: 'Issue reported: the customer waited three days for a refund. The agent escalated it to clear the same day.',
+                      resolution: 'Resolution: the refund was escalated on the call, but the agent closed without confirming resolution or next steps — both KPIs failed.',
+                      verdict: 'Current verdict: Fail at 52%, awaiting your manual review of the remaining KPIs.',
+                      fail: 'Failed KPIs: Follow-up confirmation (CR-041, 18 pts) and Resolution confirmation (CR-018, 16 pts).'
+                    };
+
+                    function auditAnswer(text) {
+                      var lo = text.toLowerCase();
+                      for (var key in AUDIT_META) if (lo.indexOf(key) !== -1) return AUDIT_META[key];
+                      if (/who|name/.test(lo)) return AUDIT_META.agent;
+                      if (/when|date|time/.test(lo)) return AUDIT_META.timeline;
+                      if (/why|reason/.test(lo)) return AUDIT_META.resolution;
+                      return 'I could not match that question to the metadata in this audit. Try a field such as agent, customer, score, priority, or timeline. This preview searches the included audit data; it is not connected to an AI service.';
+                    }
+
+                    function detailIsOpen() {
+                      var page = document.getElementById('eval-detail-human');
+                      return page && page.classList.contains('open');
+                    }
+
+                    function postChat(text, isUser) {
+                      var thread = document.getElementById('overlayThread');
+                      if (!thread) return;
+                      var msg = document.createElement('div');
+                      msg.className = 'chat-msg ' + (isUser ? 'user' : 'aimy');
+                      msg.innerHTML = isUser
+                        ? '<div class="msg-bubble"></div><div class="msg-avatar user-av">NW</div>'
+                        : '<div class="msg-avatar aimy-av"><svg width="23" height="25" viewBox="0 0 18 20"><use href="#aimy-logo-small"/></svg></div><div class="msg-bubble"></div>';
+                      msg.querySelector('.msg-bubble').textContent = text;
+                      thread.appendChild(msg);
+                      thread.scrollTop = thread.scrollHeight;
+                    }
+
+                    function auditChatSubmit(input) {
+                      var text = (input.value || '').trim();
+                      if (!text) return;
+                      input.value = '';
+                      var overlay = document.getElementById('aimyOverlay');
+                      var bar = document.getElementById('aimyFloatBar');
+                      var suggestions = document.getElementById('overlaySuggestions');
+                      if (overlay) overlay.classList.add('open');
+                      if (bar) bar.classList.add('hidden');
+                      if (suggestions) suggestions.classList.add('hidden');
+                      postChat(text, true);
+                      setTimeout(function () { postChat(auditAnswer(text), false); }, 420);
+                    }
+
+                    document.addEventListener('keydown', function (e) {
+                      if (e.key !== 'Enter' || e.shiftKey || !detailIsOpen()) return;
+                      var input = e.target;
+                      if (input.id !== 'aimyFloatInput' && input.id !== 'overlayInput') return;
+                      e.preventDefault();
+                      e.stopPropagation();
+                      auditChatSubmit(input);
+                    }, true);
+
+                    document.addEventListener('click', function (e) {
+                      if (!detailIsOpen()) return;
+                      var send = e.target.closest && e.target.closest('#aimyFloatSend, #overlaySend');
+                      if (!send) return;
+                      e.preventDefault();
+                      e.stopPropagation();
+                      auditChatSubmit(document.getElementById(send.id === 'overlaySend' ? 'overlayInput' : 'aimyFloatInput'));
+                    }, true);
+                  })();
+                </script>
+              </div>
 
               <!-- Result card, expanded -->
               <div class="eval-result-card">
@@ -18444,7 +18855,7 @@
             passRate: '38%',
             ticketCount: 14,
             tickets: [
-              { date: 'Jun 2, 2026', channel: 'voice', type: 'Agent', score: 52, scoreClass: 'err', status: 'fail', summary: 'Failed to confirm resolution before closing. Customer escalated.', detailId: 'eval-detail-human' },
+              { date: 'May 7, 2026', channel: 'voice', type: 'Agent', score: 52, scoreClass: 'err', status: 'fail', summary: 'Failed to confirm resolution before closing. Customer escalated.', detailId: 'eval-detail-human' },
               { date: 'Jun 4, 2026', channel: 'voice', type: 'Agent', score: 67, scoreClass: 'warn', status: 'borderline', summary: 'Good empathy but missed follow-up SOP. Tone consistently professional.' },
               { date: 'Jun 5, 2026', channel: 'email', type: 'Agent', score: 71, scoreClass: 'warn', status: 'borderline', summary: 'Response time within SLA. Resolution confirmed but phrasing imprecise.' },
               { date: 'Jun 6, 2026', channel: 'chat', type: 'Agent', score: 48, scoreClass: 'err', status: 'fail', summary: 'Customer expressed frustration twice with no de-escalation attempt.' },
@@ -23185,6 +23596,7 @@
           var deep = fromUrl();
           paintFilters(); paintSort(); paintRows();
           if (deep) {
+            if (window.setView) window.setView("evals");
             var sec = document.getElementById("evalListAccountWide");
             if (sec) sec.scrollIntoView({ block: "start" });
           }

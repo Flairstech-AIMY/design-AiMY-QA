@@ -1,0 +1,30 @@
+{
+  "name": "aimy-qa",
+  "version": "1.0.0",
+  "description": "AiMY QA dashboard and documented UI system",
+  "main": "index.js",
+  "scripts": {
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build",
+    "test": "echo \"No automated tests configured\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/engyyasser24/AiMY-QA.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/engyyasser24/AiMY-QA/issues"
+  },
+  "homepage": "https://github.com/engyyasser24/AiMY-QA#readme",
+  "engines": {
+    "node": ">=24.20.0 <25"
+  },
+  "devDependencies": {
+    "@storybook/html-vite": "^10.6.0",
+    "storybook": "^10.6.0"
+  }
+}

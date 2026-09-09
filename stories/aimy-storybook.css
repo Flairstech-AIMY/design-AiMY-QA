@@ -1,0 +1,69 @@
+@import url('https://fonts.googleapis.com/css2?family=Urbanist:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+  --body-bg: #0f1215;
+  --card-bg: #141b24;
+  --card-border: rgba(255,255,255,.07);
+  --d50: #eef2f6;
+  --d100: #d8e0e8;
+  --d200: #c8d2dc;
+  --d300: #b0bcca;
+  --d400: #8b9aaa;
+  --d500: #637280;
+  --brand: #3369ff;
+  --brand-dim: rgba(51,105,255,.15);
+  --ok: #17b26a;
+  --warn: #f79009;
+  --err: #f04438;
+  --ok-bg: rgba(23,178,106,.12);
+  --warn-bg: rgba(247,144,9,.12);
+  --err-bg: rgba(240,68,56,.12);
+  --wash-3: rgba(255,255,255,.04);
+  --wash-6: rgba(255,255,255,.07);
+  --wash-8: rgba(255,255,255,.10);
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--body-bg); color: var(--d50); font-family: 'Urbanist', sans-serif; }
+button { font: inherit; }
+.sb-page { min-height: 100vh; padding: 32px; background: radial-gradient(ellipse at 20% 0%, rgba(51,105,255,.10), transparent 45%), var(--body-bg); }
+.sb-shell { max-width: 1180px; margin: 0 auto; }
+.sb-heading { margin-bottom: 22px; }
+.sb-eyebrow { color: var(--d500); font-size: 10px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+.sb-heading h1 { margin: 6px 0 5px; font-size: 24px; letter-spacing: -.02em; }
+.sb-heading p { margin: 0; color: var(--d400); font-size: 13px; }
+.sb-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 14px; padding: 18px; }
+.sb-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.sb-card-meta { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 22px; }
+.sb-label { color: var(--d400); font-size: 10px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+.sb-pill { border: 1px solid var(--wash-8); border-radius: 999px; padding: 4px 8px; color: var(--d300); font-size: 9px; font-weight: 800; }
+.sb-pill.ok { color: var(--ok); border-color: rgba(23,178,106,.3); background: var(--ok-bg); }
+.sb-pill.warn { color: var(--warn); border-color: rgba(247,144,9,.3); background: var(--warn-bg); }
+.sb-pill.err { color: var(--err); border-color: rgba(240,68,56,.3); background: var(--err-bg); }
+.sb-value { margin-bottom: 5px; color: var(--d50); font-size: 32px; font-weight: 800; letter-spacing: -.035em; line-height: 1; }
+.sb-value.ok { color: var(--ok); }
+.sb-value.warn { color: var(--warn); }
+.sb-value.err { color: var(--err); }
+.sb-caption, .sb-status { color: var(--d300); font-size: 11px; line-height: 1.4; }
+.sb-status { margin-top: 10px; color: var(--d400); font-weight: 700; }
+.sb-status.ok { color: var(--ok); }
+.sb-status.warn { color: var(--warn); }
+.sb-status.err { color: var(--err); }
+.sb-lens { display: flex; align-items: center; justify-content: space-between; gap: 18px; flex-wrap: wrap; }
+.sb-lens-copy { flex: 1 1 300px; }
+.sb-lens-copy strong { color: var(--d50); }
+.sb-lens-options { display: inline-flex; gap: 3px; padding: 3px; border: 1px solid var(--wash-6); border-radius: 10px; background: var(--wash-3); }
+.sb-lens button { border: 0; border-radius: 7px; padding: 7px 10px; color: var(--d400); background: transparent; cursor: pointer; font-size: 11px; font-weight: 700; }
+.sb-lens button.active { color: var(--d50); background: var(--brand-dim); }
+.sb-panel-title { margin: 0 0 3px; font-size: 17px; }
+.sb-panel-subtitle { margin: 0 0 18px; color: var(--d400); font-size: 12px; }
+.sb-portfolio { display: flex; flex-direction: column; gap: 14px; }
+.sb-portfolio-row { display: grid; grid-template-columns: 1fr auto; gap: 8px 14px; align-items: center; }
+.sb-portfolio-name { color: var(--d100); font-size: 12px; font-weight: 700; }
+.sb-portfolio-metrics { color: var(--d300); font-size: 11px; font-weight: 700; }
+.sb-portfolio-metrics strong { color: var(--warn); }
+.sb-track { grid-column: 1 / -1; height: 6px; overflow: hidden; border-radius: 999px; background: var(--wash-6); }
+.sb-fill { height: 100%; border-radius: inherit; background: var(--warn); }
+.sb-fill.ok { background: var(--ok); }
+@media (max-width: 900px) { .sb-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 600px) { .sb-page { padding: 18px; } .sb-grid { grid-template-columns: 1fr; } .sb-lens-options { width: 100%; } .sb-lens button { flex: 1; } }

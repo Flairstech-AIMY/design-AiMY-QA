@@ -6,3 +6,7 @@
 !.dev.vars.example
 .env*
 !.env.example
+
+# Storybook / Node build output
+node_modules/
+storybook-static/
