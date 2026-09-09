@@ -590,6 +590,41 @@
         gap: 12px;
         flex-shrink: 0;
       }
+      .content-view-toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 2px;
+        padding: 3px;
+        background: var(--wash-2);
+        border: 1px solid var(--wash-7);
+        border-radius: var(--r-pill);
+      }
+      .content-view-toggle button {
+        font-family: var(--font-sans);
+        font-size: 10px;
+        font-weight: 700;
+        color: var(--d400);
+        padding: 5px 9px;
+        border: 0;
+        border-radius: var(--r-pill);
+        background: transparent;
+        cursor: pointer;
+        transition: background-color var(--t-fast), color var(--t-fast);
+      }
+      .content-view-toggle button:hover { color: var(--d200); }
+      .content-view-toggle button.active {
+        color: var(--d50);
+        background: var(--brand-dim);
+      }
+      .content-view-toggle button:focus-visible {
+        outline: 2px solid var(--brand);
+        outline-offset: 2px;
+      }
+      .audit-only[hidden], .evaluation-only[hidden] { display: none !important; }
+      @media (max-width: 700px) {
+        .content-view-toggle { order: -1; }
+        .content-view-toggle button { padding-inline: 7px; }
+      }
 
       /* Notification bell */
       .topnav-bell {
@@ -2897,261 +2932,97 @@
         background: rgba(247, 144, 9, 0.18);
       }
 
-      /* AiMY Insights — replaces the ranked KPI feed with an insight model:
-         observation → interpretation → evidence → recommendation → action.
-         Everything reuses existing tokens (--card-bg, --wash-*, --ai-text,
-         semantic --ok/--warn/--err, --r-*, --t-fast) and existing primitives
-         (.work-state, .entry-action, #aimy-logo-small, #em-ico-*). */
+      /* AiMY Insights — compact KPI improvement cards.
+         Each card reads as: KPI + metric → short problem → short solution
+         with a work-state chip → one primary action. */
       .ai-insights {
         display: flex;
         flex-direction: column;
-        gap: 10px;
+        gap: 8px;
       }
       .ai-insights-summary {
         display: flex;
         align-items: center;
         gap: 8px;
-        padding: 4px 2px 6px;
+        padding: 2px 2px 4px;
         font-size: 11.5px;
         line-height: 1.5;
         color: var(--d300);
       }
-      .ai-insights-summary svg {
-        width: 14px;
-        height: 16px;
-        color: var(--ai-text);
-        opacity: 0.9;
-        flex-shrink: 0;
-      }
+      .ai-insights-summary svg { width: 12px; height: 14px; color: var(--ai-text); opacity: 0.9; flex-shrink: 0; }
       .ai-insights-summary b { color: var(--d100); font-weight: 700; }
 
       .ai-insight {
-        position: relative;
-        display: grid;
-        gap: 10px;
-        padding: 14px 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        padding: 12px 14px;
         background: var(--card-bg);
         border: 1px solid var(--card-border);
-        border-radius: var(--r-xl);
-        transition: border-color var(--t-base), background-color var(--t-base);
+        border-radius: var(--r-lg);
+        transition: border-color var(--t-base);
       }
       .ai-insight:hover { border-color: var(--card-border-hover); }
       .ai-insight:focus-within { outline: 2px solid var(--brand); outline-offset: 2px; }
 
-      /* Featured insight: a hair more AiMY provenance in the surface, plus
-         richer horizontal layout on desktop. Still primarily neutral. */
-      .ai-insight--featured {
-        padding: 18px 20px;
-        gap: 14px;
-        background:
-          linear-gradient(180deg, rgba(0, 102, 255, 0.05), transparent 55%),
-          var(--card-bg);
-        border-color: rgba(0, 102, 255, 0.20);
-      }
-
-      .ai-insight__eyebrow {
+      .ai-insight__row {
         display: flex;
-        align-items: center;
+        align-items: baseline;
         justify-content: space-between;
         gap: 10px;
       }
-      .ai-insight__id {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        font-family: var(--font-sans);
-        font-size: 10px;
-        font-weight: 700;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        color: var(--ai-text);
-      }
-      .ai-insight__mark { width: 12px; height: 14px; flex-shrink: 0; }
-      .ai-insight--featured .ai-insight__mark { width: 14px; height: 16px; }
-
-      /* Classification chip: what AiMY concluded about this KPI, replaces the
-         ranking number. Neutral by default; semantic modifiers only where the
-         data supports it. */
-      .ai-insight__class {
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        padding: 3px 9px;
-        border-radius: var(--r-pill);
-        font-size: 10px;
-        font-weight: 700;
-        letter-spacing: 0.06em;
-        text-transform: uppercase;
-        color: var(--d300);
-        background: var(--wash-3);
-        border: 1px solid var(--wash-7);
-        white-space: nowrap;
-      }
-      .ai-insight__class--critical  { color: var(--err);  background: var(--err-bg);  border-color: rgba(240, 68, 56, 0.24); }
-      .ai-insight__class--risk      { color: var(--warn); background: var(--warn-bg); border-color: rgba(247, 144, 9, 0.24); }
-      .ai-insight__class--improving { color: var(--ok);   background: var(--ok-bg);   border-color: rgba(23, 178, 106, 0.24); }
-
-      .ai-insight__kpi { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
       .ai-insight__name {
         margin: 0;
         font-family: var(--font-display);
-        font-size: 15px;
+        font-size: 14px;
         font-weight: 700;
         letter-spacing: -0.01em;
         line-height: 1.25;
         color: var(--d50);
       }
-      .ai-insight--featured .ai-insight__name { font-size: 19px; letter-spacing: -0.015em; }
-
-      .ai-insight__metric-line {
-        display: flex;
-        align-items: baseline;
-        gap: 10px;
-        flex-wrap: wrap;
-      }
       .ai-insight__metric {
         font-family: var(--font-display);
-        font-size: 34px;
+        font-size: 14px;
         font-weight: 800;
-        letter-spacing: -0.035em;
-        line-height: 1;
+        letter-spacing: -0.02em;
         color: var(--d50);
+        white-space: nowrap;
       }
       .ai-insight__metric--err  { color: var(--err); }
       .ai-insight__metric--warn { color: var(--warn); }
       .ai-insight__metric--ok   { color: var(--ok); }
-      .ai-insight__target { font-size: 11px; font-weight: 600; color: var(--d400); }
-      .ai-insight__target b { color: var(--d200); font-weight: 700; }
-      .ai-insight__gap { font-size: 12.5px; font-weight: 700; color: var(--d100); }
-      .ai-insight__gap b { color: var(--d50); }
+      .ai-insight__metric small { font-size: 11px; font-weight: 600; color: var(--d400); margin-left: 4px; }
 
-      /* Target visualization: current fill toward a target tick, on the same
-         0–100% scale as the KPI. Reuses the gap-meter idea already in the file
-         but scoped to the insight component. */
-      .ai-insight__meter {
-        position: relative;
-        height: 4px;
-        border-radius: 3px;
-        background: var(--wash-5);
-        margin-top: 2px;
-      }
-      .ai-insight__meter-fill {
-        height: 100%;
-        border-radius: 3px;
-        background: var(--d200);
-      }
-      .ai-insight__meter-fill--err  { background: var(--err); }
-      .ai-insight__meter-fill--warn { background: var(--warn); }
-      .ai-insight__meter-fill--ok   { background: var(--ok); }
-      .ai-insight__meter-target {
-        position: absolute;
-        top: -3px;
-        bottom: -3px;
-        width: 2px;
-        background: var(--d300);
-        border-radius: 1px;
-      }
-
-      .ai-insight__interp {
+      .ai-insight__problem {
         margin: 0;
-        font-size: 12.5px;
+        font-size: 12px;
         font-weight: 500;
-        line-height: 1.55;
-        color: var(--d100);
+        line-height: 1.5;
+        color: var(--d200);
       }
-      .ai-insight__interp b { color: var(--d50); font-weight: 700; }
+      .ai-insight__problem b { color: var(--d100); font-weight: 700; }
 
-      .ai-insight__evidence {
-        list-style: none;
-        margin: 0;
-        padding: 0;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 6px;
-      }
-      .ai-ev {
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        padding: 4px 9px;
-        border-radius: var(--r-pill);
-        font-size: 10.5px;
-        font-weight: 600;
-        color: var(--d300);
-        background: var(--wash-3);
-        border: 1px solid var(--wash-6);
-        white-space: nowrap;
-      }
-      .ai-ev__v { font-weight: 800; color: var(--d50); letter-spacing: -0.005em; }
-      .ai-ev--dn   { color: var(--err);  background: rgba(240, 68, 56, 0.07); border-color: rgba(240, 68, 56, 0.24); }
-      .ai-ev--up   { color: var(--ok);   background: rgba(23, 178, 106, 0.07); border-color: rgba(23, 178, 106, 0.24); }
-      .ai-ev--warn { color: var(--warn); background: rgba(247, 144, 9, 0.07); border-color: rgba(247, 144, 9, 0.24); }
-      .ai-ev--neu  { color: var(--d300); }
-      .ai-ev__arrow { font-weight: 800; }
-
-      /* Recommendation block: what AiMY suggests + the work state of what it
-         has already prepared. Kept quiet so semantic red still means red. */
-      .ai-insight__reco {
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-        padding: 10px 12px;
-        border-radius: var(--r-lg);
-        background: var(--wash-2);
-        border: 1px solid var(--wash-5);
-      }
-      .ai-insight__reco-label {
+      .ai-insight__solution {
         display: flex;
         align-items: center;
-        gap: 7px;
+        gap: 8px;
         flex-wrap: wrap;
-        font-family: var(--font-sans);
-        font-size: 10px;
-        font-weight: 700;
-        letter-spacing: 0.06em;
-        text-transform: uppercase;
-        color: var(--ai-text);
-      }
-      .ai-insight__reco-label .work-state { margin-left: auto; }
-      .ai-insight__reco-body {
         margin: 0;
         font-size: 12px;
         line-height: 1.5;
         color: var(--d100);
       }
-      .ai-insight__reco-body b { color: var(--d50); font-weight: 700; }
+      .ai-insight__solution svg { width: 12px; height: 14px; color: var(--ai-text); flex-shrink: 0; }
+      .ai-insight__solution .work-state { margin-left: auto; }
 
       .ai-insight__actions {
         display: flex;
-        align-items: center;
         gap: 8px;
-        flex-wrap: wrap;
+        margin-top: 2px;
       }
+      .ai-insight__actions .entry-action { flex: 0 0 auto; }
 
-      /* Desktop featured layout: KPI anchors the left column, interpretation
-         and evidence read across, recommendation + actions span the full
-         width. Compact insights keep the simple vertical stack. */
-      @media (min-width: 1024px) {
-        .ai-insight--featured {
-          grid-template-columns: minmax(220px, 260px) 1fr;
-          grid-template-areas:
-            "eyebrow  eyebrow"
-            "kpi      interp"
-            "kpi      evidence"
-            "reco     reco"
-            "actions  actions";
-          column-gap: 24px;
-        }
-        .ai-insight--featured .ai-insight__eyebrow  { grid-area: eyebrow; }
-        .ai-insight--featured .ai-insight__kpi      { grid-area: kpi; align-self: start; }
-        .ai-insight--featured .ai-insight__interp   { grid-area: interp; margin-top: 2px; }
-        .ai-insight--featured .ai-insight__evidence { grid-area: evidence; }
-        .ai-insight--featured .ai-insight__reco     { grid-area: reco; }
-        .ai-insight--featured .ai-insight__actions  { grid-area: actions; }
-      }
-
-      /* On-track summary. Kept as a single subdued line: three blocks to
-         report an absence is exactly the weight this model removes. */
+      /* On-track summary stays as one calm line. */
       .ai-insights-ontrack {
         display: flex;
         align-items: center;
@@ -3173,27 +3044,9 @@
       .ai-insights-ontrack .work-state { flex-shrink: 0; }
       .ai-insights-ontrack .entry-action { margin-left: auto; }
 
-      /* Small screens: keep primary action on its own row instead of wrapping
-         evidence and CTA into the same cramped line. */
       @media (max-width: 640px) {
-        .ai-insight { padding: 12px 14px; }
-        .ai-insight--featured { padding: 14px; }
-        .ai-insight__metric { font-size: 28px; }
-        .ai-insight--featured .ai-insight__name { font-size: 17px; }
+        .ai-insight__row { flex-wrap: wrap; }
         .ai-insight__actions .entry-action { width: 100%; justify-content: center; }
-      }
-
-      /* Light theme: the blue provenance wash needs a warmer, darker anchor
-         to remain readable on white cards. */
-      :root[data-theme="light"] .ai-insight--featured {
-        background:
-          linear-gradient(180deg, rgba(31, 95, 208, 0.06), transparent 55%),
-          var(--card-bg);
-        border-color: rgba(31, 95, 208, 0.22);
-      }
-      :root[data-theme="light"] .ai-insight__reco {
-        background: var(--wash-2);
-        border-color: var(--wash-5);
       }
 
       @media (prefers-reduced-motion: reduce) {
@@ -5182,13 +5035,13 @@
         align-items: flex-start;
         justify-content: space-between;
         gap: 12px;
-        padding: 16px 20px 16px;
+        padding: 10px 20px;
         border-bottom: 1px solid var(--wash-5);
       }
       .eval-header-left {
         display: flex;
-        flex-direction: column;
-        gap: 3px;
+        align-items: baseline;
+        gap: 10px;
       }
       .eval-title {
         font-size: 15px;
@@ -6623,12 +6476,13 @@
       .dashboard-section-head h2 { font-family:var(--font-display); font-size:17px; font-weight:800; color:var(--d50); letter-spacing:-.01em; }
       .dashboard-section-head span { font-size:11px; color:var(--d500); }
       .bcard-stat.is-word { font-size:25px; letter-spacing:-.02em; }
-      .eval-header-sub { margin-left:auto; font-size:11px; color:var(--d500); }
+      .eval-header-sub { margin-left:0; font-size:11px; color:var(--d300); }
       .eval-bars-section-label strong { color:var(--d300); }
       .eval-bars-section-label { display:flex; align-items:center; justify-content:space-between; gap:12px; }
       .eval-bars-column-label { font-size:9px; font-weight:700; letter-spacing:.07em; text-transform:uppercase; color:var(--d300); }
       @media (max-width:700px) {
-        .eval-header-sub { display:block; width:100%; margin:3px 0 0; }
+        .eval-header-left { align-items:flex-start; flex-direction:column; gap:3px; }
+        .eval-header-sub { display:block; width:auto; margin:0; }
       }
 
       /* Quality × CSAT quadrant bubble chart */
@@ -7443,6 +7297,10 @@
       <!-- Right side -->
       <div class="topnav-spacer"></div>
       <div class="topnav-right">
+        <div class="content-view-toggle" role="tablist" aria-label="Dashboard content view">
+          <button id="auditViewTab" class="active" type="button" role="tab" aria-selected="true" data-content-view="audit">Audit view</button>
+          <button id="evaluationViewTab" type="button" role="tab" aria-selected="false" data-content-view="evaluation">Evaluation view</button>
+        </div>
         <!-- V1 opens in a new tab so the two builds can be compared side by
              side. One link, not a segmented pair: you are on V2, so the only
              thing worth offering is the way out. The href is the placeholder,
@@ -8842,13 +8700,13 @@
                   <span class="type-label">Total audits</span>
                   <span class="priority-badge">P3 · Stable</span>
                 </div>
-                <div class="bcard-stat-line"><span class="bcard-stat">396</span><span class="bcard-stat-cap">of <b>550</b> eligible tickets</span></div>
+                <div class="bcard-stat-line"><span class="bcard-stat">396</span><span class="bcard-stat-cap">of <b>550</b> eligible interactions</span></div>
                 
                 <div class="aimy-done">
                   <svg class="aimy-done-mark" viewBox="0 0 18 20"><use href="#aimy-logo-small"/></svg>
                   <span class="work-state ws-completed" data-work-state="completed"><span class="ws-dot"></span>Completed</span><span class="aimy-done-text"><b>72% coverage</b> across <b>all products</b></span>
                   <span class="aimy-done-actions">
-                    <button data-entry-mode="investigate" class="aimy-done-link primary" data-aimy-review="Show the 396 audited tickets out of 550 eligible (72% coverage) by product." data-aimy-topic="audit-volume">Review audited tickets</button>
+                    <button data-entry-mode="investigate" class="aimy-done-link primary" data-aimy-review="Show the 396 audited interactions out of 550 eligible (72% coverage) by product." data-aimy-topic="audit-volume">Review audited interactions</button>
                   </span>
                 </div>
               </div>
@@ -8862,7 +8720,7 @@
                   <span class="priority-badge">P3 · Healthy</span>
                 </div>
                 <div class="bcard-stat-line"><span class="bcard-stat ok">7.3%</span><span class="bcard-stat-cap">of audits fail</span></div>
-                <div class="bcard-status">Out of 396 audited tickets</div>
+                <div class="bcard-status">Out of 396 audited interactions</div>
                 <div class="aimy-done">
                   <svg class="aimy-done-mark" viewBox="0 0 18 20"><use href="#aimy-logo-small"/></svg>
                   <span class="work-state ws-completed" data-work-state="completed"><span class="ws-dot"></span>Completed</span><span class="aimy-done-text">Within the <b>10% fail-rate threshold</b></span>
@@ -8881,18 +8739,18 @@
                   <span class="priority-badge">P3 · Positive</span>
                 </div>
                 <div class="bcard-stat-line"><span class="bcard-stat ok">Positive</span></div>
-                <div class="bcard-status ok">39 of <b>52</b> analyzed interactions this week · <b>75%</b></div>
+                <div class="bcard-status ok">39 of <b>52</b> analyzed interactions this week</div>
                 <div class="aimy-done">
                   <svg class="aimy-done-mark" viewBox="0 0 18 20"><use href="#aimy-logo-small"/></svg>
                   <span class="work-state ws-drafted" data-work-state="drafted"><span class="ws-dot"></span>Drafted</span><span class="aimy-done-text">Coaching drafted · <b>3 agents</b></span>
                   <span class="aimy-done-actions">
-                    <button data-entry-mode="investigate" class="aimy-done-link primary" data-aimy-review="Positive sentiment is holding this week, with 39 of 52 analyzed interactions positive (75%). Break this down by product and show which behaviors are driving the result, current versus previous week, and the playbook we should replicate." data-aimy-undo="the sentiment coaching notes" data-aimy-topic="sentiment">Read the positive sentiment notes</button>
+                    <button data-entry-mode="investigate" class="aimy-done-link primary" data-aimy-review="Positive sentiment is holding this week, with 39 of 52 analyzed interactions positive. Break this down by product and show which behaviors are driving the result, current versus previous week, and the playbook we should replicate." data-aimy-undo="the sentiment coaching notes" data-aimy-topic="sentiment">Read the positive sentiment notes</button>
                   </span>
                 </div>
               </div>
             </div>
 
-            <div class="bcard evaluation-only csat-card" role="region" tabindex="0">
+            <div class="bcard csat-card" role="region" tabindex="0">
               <div class="bcard-body">
                 <div class="bcard-meta">
                   <span class="type-label">CSAT</span>
@@ -8944,95 +8802,43 @@
               </div>
               <p class="ai-insights-summary">
                 <svg viewBox="0 0 18 20" aria-hidden="true"><use href="#aimy-logo-small"/></svg>
-                AiMY is watching <b>3 audit KPIs below target</b> and <b>1 slipping</b>. <b>Ticket status accuracy</b> is the highest-leverage fix.
+                <b>3 KPIs</b> below target, <b>1</b> slipping.
               </p>
               <div class="ai-insights">
-                <article class="ai-insight ai-insight--featured" data-classification="highest-impact" tabindex="0" aria-labelledby="ai-insight-status-name">
-                  <header class="ai-insight__eyebrow">
-                    <span class="ai-insight__id">
-                      <svg class="ai-insight__mark" viewBox="0 0 18 20" aria-hidden="true"><use href="#aimy-logo-small"/></svg>
-                      AiMY Insight
-                    </span>
-                    <span class="ai-insight__class ai-insight__class--critical">Highest impact</span>
-                  </header>
-                  <div class="ai-insight__kpi">
+                <article class="ai-insight" data-classification="highest-impact" tabindex="0" aria-labelledby="ai-insight-status-name">
+                  <div class="ai-insight__row">
                     <h3 class="ai-insight__name" id="ai-insight-status-name">Ticket status accuracy</h3>
-                    <div class="ai-insight__metric-line">
-                      <span class="ai-insight__metric ai-insight__metric--err">71%</span>
-                      <span class="ai-insight__target">Target <b>95%</b></span>
-                    </div>
-                    <div class="ai-insight__meter" role="img" aria-label="Current 71 percent versus target 95 percent">
-                      <div class="ai-insight__meter-fill ai-insight__meter-fill--err" style="width:71%"></div>
-                      <span class="ai-insight__meter-target" style="left:95%"></span>
-                    </div>
+                    <span class="ai-insight__metric ai-insight__metric--err">71%<small>of 95%</small></span>
                   </div>
-                  <p class="ai-insight__interp">
-                    Status accuracy is the biggest contributor to the current quality gap. The misses are concentrated in <b>Objectif Lune</b> and <b>Qvidian</b>, with <b>8 agents</b> responsible for the pattern.
+                  <p class="ai-insight__problem">Wrong status codes from <b>8 agents</b> in Objectif Lune &amp; Qvidian.</p>
+                  <p class="ai-insight__solution">
+                    <svg viewBox="0 0 18 20" aria-hidden="true"><use href="#aimy-logo-small"/></svg>
+                    Coach the 8 agents with a status-code reference.
+                    <span class="work-state ws-drafted" data-work-state="drafted"><span class="ws-dot"></span>Coaching drafted</span>
                   </p>
-                  <ul class="ai-insight__evidence" aria-label="Evidence">
-                    <li class="ai-ev"><span class="ai-ev__v">103</span>misses</li>
-                    <li class="ai-ev"><span class="ai-ev__v">8</span>agents</li>
-                    <li class="ai-ev ai-ev--dn"><span class="ai-ev__arrow" aria-hidden="true">&#8595;</span>Worsening this period</li>
-                  </ul>
-                  <div class="ai-insight__reco">
-                    <span class="ai-insight__reco-label">
-                      <svg class="ai-insight__mark" viewBox="0 0 18 20" aria-hidden="true"><use href="#aimy-logo-small"/></svg>
-                      AiMY recommendation
-                      <span class="work-state ws-drafted" data-work-state="drafted"><span class="ws-dot"></span>Coaching drafted</span>
-                    </span>
-                    <p class="ai-insight__reco-body">
-                      Coaching is ready for the <b>8 affected agents</b>. Approve to send with a status-code reference and a tracked next-20-tickets check.
-                    </p>
-                  </div>
                   <div class="ai-insight__actions">
-                    <button class="entry-action em-review"
+                    <button class="entry-action em-review ea-sm"
                             data-entry-mode="review"
                             data-aimy-topic="goal-status"
                             data-aimy-undo="the status-code coaching for 8 agents"
                             data-aimy-review="Show the status-code coaching I created for the 8 agents in Objectif Lune and Qvidian. Who it covers, what changed, and the tickets it targets.">
                       <svg class="em-ico" aria-hidden="true"><use href="#em-ico-review"/></svg>
-                      Review coaching (8 agents)
-                    </button>
-                    <button class="entry-action em-prompt ea-sm"
-                            data-entry-mode="prompt"
-                            data-aimy-topic="goal-status"
-                            data-aimy-ask="Walk me through why status accuracy is the highest-leverage fix right now, and what the 103 Objectif Lune misses have in common.">
-                      <svg class="em-ico" aria-hidden="true"><use href="#em-ico-prompt"/></svg>
-                      Why AiMY thinks this matters
+                      Review coaching
                     </button>
                   </div>
                 </article>
 
                 <article class="ai-insight" data-classification="persistent-gap" tabindex="0" aria-labelledby="ai-insight-grammar-name">
-                  <header class="ai-insight__eyebrow">
-                    <span class="ai-insight__id">
-                      <svg class="ai-insight__mark" viewBox="0 0 18 20" aria-hidden="true"><use href="#aimy-logo-small"/></svg>
-                      AiMY Insight
-                    </span>
-                    <span class="ai-insight__class">Persistent gap</span>
-                  </header>
-                  <div class="ai-insight__kpi">
+                  <div class="ai-insight__row">
                     <h3 class="ai-insight__name" id="ai-insight-grammar-name">Grammar &amp; clarity</h3>
-                    <span class="ai-insight__gap"><b>55</b> points off goal</span>
+                    <span class="ai-insight__metric ai-insight__metric--err">55<small>off goal</small></span>
                   </div>
-                  <p class="ai-insight__interp">
-                    The gap is persistent rather than worsening. It is concentrated across <b>InterFax</b> and <b>Second Street</b>, with <b>4 agents</b> driving the current misses.
+                  <p class="ai-insight__problem">Persistent gap across <b>4 agents</b> in InterFax &amp; Second Street.</p>
+                  <p class="ai-insight__solution">
+                    <svg viewBox="0 0 18 20" aria-hidden="true"><use href="#aimy-logo-small"/></svg>
+                    Send the writing-quality coaching with a clarity checklist.
+                    <span class="work-state ws-drafted" data-work-state="drafted"><span class="ws-dot"></span>Coaching drafted</span>
                   </p>
-                  <ul class="ai-insight__evidence" aria-label="Evidence">
-                    <li class="ai-ev"><span class="ai-ev__v">55</span>off goal</li>
-                    <li class="ai-ev"><span class="ai-ev__v">4</span>agents</li>
-                    <li class="ai-ev ai-ev--neu"><span class="ai-ev__arrow" aria-hidden="true">&rarr;</span>Stable, not improving</li>
-                  </ul>
-                  <div class="ai-insight__reco">
-                    <span class="ai-insight__reco-label">
-                      <svg class="ai-insight__mark" viewBox="0 0 18 20" aria-hidden="true"><use href="#aimy-logo-small"/></svg>
-                      AiMY recommendation
-                      <span class="work-state ws-drafted" data-work-state="drafted"><span class="ws-dot"></span>Coaching drafted</span>
-                    </span>
-                    <p class="ai-insight__reco-body">
-                      Writing-quality coaching and a clarity checklist are ready for review with the <b>4 affected agents</b>.
-                    </p>
-                  </div>
                   <div class="ai-insight__actions">
                     <button class="entry-action em-investigate ea-sm"
                             data-entry-mode="investigate"
@@ -9040,48 +8846,22 @@
                             data-aimy-undo="the grammar coaching for 4 agents"
                             data-aimy-review="Show the writing-quality coaching I drafted for the 4 agents in InterFax and Second Street, their worst responses and the clarity checklist I gave them.">
                       <svg class="em-ico" aria-hidden="true"><use href="#em-ico-review"/></svg>
-                      Review coaching (4 agents)
-                    </button>
-                    <button class="entry-action em-prompt ea-sm"
-                            data-entry-mode="prompt"
-                            data-aimy-topic="goal-grammar"
-                            data-aimy-ask="Show the evidence behind the grammar &amp; clarity gap and why it has stayed stable this period.">
-                      <svg class="em-ico" aria-hidden="true"><use href="#em-ico-prompt"/></svg>
-                      View evidence
+                      Review coaching
                     </button>
                   </div>
                 </article>
 
                 <article class="ai-insight" data-classification="improving" tabindex="0" aria-labelledby="ai-insight-cadence-name">
-                  <header class="ai-insight__eyebrow">
-                    <span class="ai-insight__id">
-                      <svg class="ai-insight__mark" viewBox="0 0 18 20" aria-hidden="true"><use href="#aimy-logo-small"/></svg>
-                      AiMY Insight
-                    </span>
-                    <span class="ai-insight__class ai-insight__class--improving">Improving</span>
-                  </header>
-                  <div class="ai-insight__kpi">
+                  <div class="ai-insight__row">
                     <h3 class="ai-insight__name" id="ai-insight-cadence-name">Update cadence</h3>
-                    <span class="ai-insight__gap"><b>47</b> points off goal &middot; trending up</span>
+                    <span class="ai-insight__metric ai-insight__metric--warn">47<small>off goal</small></span>
                   </div>
-                  <p class="ai-insight__interp">
-                    Cadence is closing the gap slowly. Misses concentrate in <b>Qvidian</b> and <b>RightAnswers</b> past the SLA window, held by <b>3 agents</b>. A four-hour follow-up nudge is already staged for the shift.
+                  <p class="ai-insight__problem"><b>3 agents</b> in Qvidian &amp; RightAnswers past the SLA update window.</p>
+                  <p class="ai-insight__solution">
+                    <svg viewBox="0 0 18 20" aria-hidden="true"><use href="#aimy-logo-small"/></svg>
+                    Launch a 4-hour follow-up nudge for the 3 agents.
+                    <span class="work-state ws-staged" data-work-state="staged"><span class="ws-dot"></span>Nudge staged</span>
                   </p>
-                  <ul class="ai-insight__evidence" aria-label="Evidence">
-                    <li class="ai-ev"><span class="ai-ev__v">47</span>off goal</li>
-                    <li class="ai-ev"><span class="ai-ev__v">3</span>agents</li>
-                    <li class="ai-ev ai-ev--up"><span class="ai-ev__arrow" aria-hidden="true">&#8593;</span>Improving <span class="ai-ev__v">3%</span></li>
-                  </ul>
-                  <div class="ai-insight__reco">
-                    <span class="ai-insight__reco-label">
-                      <svg class="ai-insight__mark" viewBox="0 0 18 20" aria-hidden="true"><use href="#aimy-logo-small"/></svg>
-                      AiMY recommendation
-                      <span class="work-state ws-staged" data-work-state="staged"><span class="ws-dot"></span>Nudge staged</span>
-                    </span>
-                    <p class="ai-insight__reco-body">
-                      A <b>4-hour follow-up nudge</b> is ready to launch for the 3 agents past the SLA update window.
-                    </p>
-                  </div>
                   <div class="ai-insight__actions">
                     <button class="entry-action em-review ea-sm"
                             data-entry-mode="review"
@@ -9089,55 +8869,22 @@
                             data-aimy-undo="the follow-up cadence for 3 agents"
                             data-aimy-review="Show the follow-up cadence I set for the 3 agents in Qvidian and RightAnswers. The tickets left past the SLA update window and the new nudge timing.">
                       <svg class="em-ico" aria-hidden="true"><use href="#em-ico-review"/></svg>
-                      Review the follow-up nudge
-                    </button>
-                    <button class="entry-action em-prompt ea-sm"
-                            data-entry-mode="prompt"
-                            data-aimy-topic="goal-cadence"
-                            data-aimy-ask="What is driving the 3% cadence improvement, and which agents are still off the SLA window?">
-                      <svg class="em-ico" aria-hidden="true"><use href="#em-ico-prompt"/></svg>
-                      View evidence
+                      Review nudge
                     </button>
                   </div>
                 </article>
 
                 <article class="ai-insight" data-classification="emerging-risk" tabindex="0" aria-labelledby="ai-insight-frt-name">
-                  <header class="ai-insight__eyebrow">
-                    <span class="ai-insight__id">
-                      <svg class="ai-insight__mark" viewBox="0 0 18 20" aria-hidden="true"><use href="#aimy-logo-small"/></svg>
-                      AiMY Insight
-                    </span>
-                    <span class="ai-insight__class ai-insight__class--risk">Emerging risk</span>
-                  </header>
-                  <div class="ai-insight__kpi">
+                  <div class="ai-insight__row">
                     <h3 class="ai-insight__name" id="ai-insight-frt-name">First response time</h3>
-                    <div class="ai-insight__metric-line">
-                      <span class="ai-insight__metric ai-insight__metric--warn">71%</span>
-                      <span class="ai-insight__target">Target <b>75%</b></span>
-                    </div>
-                    <div class="ai-insight__meter" role="img" aria-label="Current 71 percent versus target 75 percent">
-                      <div class="ai-insight__meter-fill ai-insight__meter-fill--warn" style="width:71%"></div>
-                      <span class="ai-insight__meter-target" style="left:75%"></span>
-                    </div>
+                    <span class="ai-insight__metric ai-insight__metric--warn">71%<small>of 75%</small></span>
                   </div>
-                  <p class="ai-insight__interp">
-                    Response time is slipping in <b>Objectif Lune</b> and <b>Adestra</b>, <b>4 points</b> under goal. A <b>2-agent shift rebalance</b> is queued to catch up before it hardens into a persistent gap.
+                  <p class="ai-insight__problem">Slipping in Objectif Lune &amp; Adestra, 4 pts under goal.</p>
+                  <p class="ai-insight__solution">
+                    <svg viewBox="0 0 18 20" aria-hidden="true"><use href="#aimy-logo-small"/></svg>
+                    Rebalance 2 agents into the busy shift.
+                    <span class="work-state ws-staged" data-work-state="staged"><span class="ws-dot"></span>Rebalance staged</span>
                   </p>
-                  <ul class="ai-insight__evidence" aria-label="Evidence">
-                    <li class="ai-ev"><span class="ai-ev__v">4</span>pts under goal</li>
-                    <li class="ai-ev"><span class="ai-ev__v">2</span>agents queued</li>
-                    <li class="ai-ev ai-ev--warn"><span class="ai-ev__arrow" aria-hidden="true">&#8595;</span>Declining <span class="ai-ev__v">2%</span></li>
-                  </ul>
-                  <div class="ai-insight__reco">
-                    <span class="ai-insight__reco-label">
-                      <svg class="ai-insight__mark" viewBox="0 0 18 20" aria-hidden="true"><use href="#aimy-logo-small"/></svg>
-                      AiMY recommendation
-                      <span class="work-state ws-staged" data-work-state="staged"><span class="ws-dot"></span>Rebalance staged</span>
-                    </span>
-                    <p class="ai-insight__reco-body">
-                      A <b>2-agent rebalance</b> for the shift is ready to launch as soon as you approve.
-                    </p>
-                  </div>
                   <div class="ai-insight__actions">
                     <button class="entry-action em-review ea-sm"
                             data-entry-mode="review"
@@ -9145,23 +8892,14 @@
                             data-aimy-undo="the 2-agent rebalance"
                             data-aimy-review="First response time is at 71%, 4 pts under the 75% goal and falling in Objectif Lune and Adestra. Show the queues driving the delay and the 2-agent rebalance I queued for the shift.">
                       <svg class="em-ico" aria-hidden="true"><use href="#em-ico-review"/></svg>
-                      Review the shift rebalance
-                    </button>
-                    <button class="entry-action em-prompt ea-sm"
-                            data-entry-mode="prompt"
-                            data-aimy-topic="goal-frt"
-                            data-aimy-ask="Why is first response time slipping in Objectif Lune and Adestra, and is the 2-agent rebalance the right move?">
-                      <svg class="em-ico" aria-hidden="true"><use href="#em-ico-prompt"/></svg>
-                      Why AiMY thinks this matters
+                      Review rebalance
                     </button>
                   </div>
                 </article>
 
-                <!-- On-track summary. One line replaces the three empty cards
-                     the old model would have produced. -->
                 <div class="ai-insights-ontrack" data-aimy-item="goals-on-track">
                   <span class="work-state ws-detected" data-work-state="detected"><span class="ws-dot"></span>On target</span>
-                  <p><b>3 audit KPIs are on target</b> &mdash; identity verification 82%, first-contact resolution 87%, script adherence 91%. Nothing needed.</p>
+                  <p><b>3 KPIs on target</b> &mdash; identity verification, first-contact resolution, script adherence.</p>
                   <button class="entry-action em-prompt ea-sm"
                           data-entry-mode="prompt"
                           data-aimy-topic="goals-on-track"
@@ -9178,13 +8916,13 @@
                 <div class="eval-header">
                   <div class="eval-header-left">
                     <span class="eval-title">Audit performance by product</span>
-                    <span class="eval-header-sub">audited tickets · trend</span>
+                    <span class="eval-header-sub">audited interactions · trend</span>
                   </div>
                 </div>
 
                 <!-- Top Products by Volume -->
                 <div class="eval-products-section" style="position:relative">
-                  <div class="eval-bars-section-label"><span>Audited tickets by product</span><span class="eval-bars-column-label">Quality score</span></div>
+                  <div class="eval-bars-section-label"><span>Audited interactions by product</span><span class="eval-bars-column-label">Quality score</span></div>
                   <div class="eval-bars">
                     <div class="eval-bar-row" data-segment="objectif-lune"
                       onmouseenter="evalHover('objectif-lune')" onmouseleave="scheduleEvalOut()"
@@ -13792,6 +13530,35 @@
           if (typeof window.appendAiMsg === "function") window.appendAiMsg(html, { source: "denied" });
         };
       })();
+    </script>
+    <script>
+      /* Audit/Evaluation content view switcher. The existing content markers
+         remain the source of truth; this only controls their visibility. */
+      (function () {
+        var tabs = document.querySelectorAll("[data-content-view]");
+        function setContentView(view) {
+          var isEvaluation = view === "evaluation";
+          document.body.setAttribute("data-content-view", view);
+          document.querySelectorAll(".audit-only").forEach(function (el) {
+            el.hidden = isEvaluation;
+          });
+          document.querySelectorAll(".evaluation-only").forEach(function (el) {
+            el.hidden = !isEvaluation;
+          });
+          tabs.forEach(function (tab) {
+            var active = tab.getAttribute("data-content-view") === view;
+            tab.classList.toggle("active", active);
+            tab.setAttribute("aria-selected", active ? "true" : "false");
+          });
+        }
+        tabs.forEach(function (tab) {
+          tab.addEventListener("click", function () {
+            setContentView(tab.getAttribute("data-content-view"));
+          });
+        });
+        setContentView("audit");
+      })();
+
     </script>
     <script>
       /* Director view: role toggle + multi-series portfolio chart (per-line hover). */
