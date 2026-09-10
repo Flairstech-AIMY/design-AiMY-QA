@@ -6,12 +6,11 @@
   <title>AiMY QA · KPI Audit</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Poppins:wght@500;600;700;800&family=Urbanist:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <script>
     try {
       const saved = localStorage.getItem('aimy-ds-theme');
       if (saved === 'light' || saved === 'dark') document.documentElement.dataset.theme = saved;
-      if (new URLSearchParams(location.search).get('embed') === '1') document.documentElement.classList.add('is-embedded');
     } catch (error) {}
   </script>
   <style>
@@ -112,20 +111,12 @@
       --radius: var(--r-xl);
       --radius-lg: 14px;
       --font-sans: "Urbanist", system-ui, sans-serif;
-      --font-display: "Poppins", "Urbanist", system-ui, sans-serif;
       --font-mono: "JetBrains Mono", ui-monospace, monospace;
       --t-fast: 150ms;
       --t-base: 200ms;
       --ease-out: cubic-bezier(.22,1,.36,1);
       --transition: var(--t-base) var(--ease-out);
-    
-        --err-strong: #f04438;
-        --ink-primary: var(--d50);
-        --ink-secondary: var(--d100);
-        --ink-muted: var(--d200);
-        --ink-placeholder: var(--d400);
-        --ink-rule: var(--d600);
-}
+    }
 
     :root[data-theme="light"] {
       color-scheme: light;
@@ -153,10 +144,10 @@
       --teal: #0d8f95;
       --teal-dim: rgba(111,223,226,.20);
       --ai-text: #1f5fd0;
-      --ok: #3f6b52;
-      --warn: #7a613c;
-      --err: #8a473f;
-      --info: #4d6b85;
+      --ok: #0e9257;
+      --warn: #b26205;
+      --err: #d92d20;
+      --info: #067dc2;
       --ok-bg: rgba(23,178,106,.14);
       --warn-bg: rgba(247,144,9,.14);
       --err-bg: rgba(240,68,56,.14);
@@ -197,9 +188,7 @@
       --shadow-lg: 0 8px 32px rgba(16,24,40,.12);
       --shadow-xl: 0 16px 48px rgba(16,24,40,.16);
       --shadow: var(--shadow-md);
-    
-        --err-strong: #d92d20;
-}
+    }
 
     body {
       height: 100vh;
@@ -1529,21 +1518,14 @@ body { overflow:hidden; padding-bottom:0; }
 .chat-speaker-insight { margin:0; flex:1; min-width:0; }
 .chat-identify-speaker { min-height:34px; font-size:12px; color:var(--qa-text); background:var(--qa-accent-dim); border-color:rgba(var(--qa-accent-rgb),.3); }
 
-.recording-available { display:inline-flex;align-items:center;gap:6px;color:var(--ok);font-size:10px;font-weight:700;padding:4px 8px;border:1px solid color-mix(in srgb,var(--ok) 24%,transparent);border-radius:var(--r-pill);background:var(--ok-bg); }
-.recording-available>span { width:6px;height:6px;background:var(--ok);border-radius:50%;box-shadow:0 0 0 3px color-mix(in srgb,var(--ok) 14%,transparent); }
-.recording-context .audio-player { grid-template-columns:auto minmax(0,1fr) auto;gap:14px;margin-top:12px;padding:14px;background:var(--card-raised);border:1px solid var(--card-border);border-radius:14px;box-shadow:inset 0 1px 0 var(--wash-4),var(--shadow-sm); }
-.recording-context .play-btn { width:40px;height:40px;box-shadow:0 6px 16px rgba(var(--brand-rgb),.28);transition:transform var(--transition),box-shadow var(--transition),background var(--transition); }
-.recording-context .play-btn:hover { background:#4d7fff;box-shadow:0 8px 20px rgba(var(--brand-rgb),.38);transform:translateY(-1px); }
-.recording-context .play-btn:active { transform:translateY(0) scale(.96); }
-.recording-track { --progress:0%;position:relative;min-width:0;height:48px;display:flex;align-items:center;padding:0 10px;border:1px solid var(--hairline);border-radius:10px;background:color-mix(in srgb,var(--card-bg) 72%,transparent);overflow:hidden; }
-.recording-wave { position:absolute;inset:8px 10px;display:flex;align-items:center;justify-content:space-between;gap:2px;pointer-events:none; }
-.recording-wave i { width:3px;flex:1;max-width:4px;border-radius:3px;background:color-mix(in srgb,var(--qa-accent) 70%,var(--d500));opacity:.72; }
-.recording-track .timeline-range { position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer; }
-.recording-track:focus-within { border-color:rgba(var(--qa-accent-rgb),.55);box-shadow:0 0 0 3px rgba(var(--qa-accent-rgb),.14); }
-.recording-time { display:flex;align-items:center;gap:5px;min-width:74px;justify-content:flex-end;font-family:var(--font-mono);font-size:10px;font-variant-numeric:tabular-nums; }
-.recording-time .time-code { color:var(--d200);font-size:inherit; }
-.recording-time-separator,.recording-time .duration { color:var(--d500);font-size:inherit; }
-@media(max-width:520px) { .recording-context .audio-player { grid-template-columns:auto minmax(0,1fr);gap:10px;padding:10px; } .recording-time { grid-column:2;justify-content:flex-start; } }
+.recording-available { display:inline-flex;align-items:center;gap:5px;color:var(--d400);font-size:10px;font-weight:600; }
+.recording-available>span { width:5px;height:5px;background:var(--ok);border-radius:50%; }
+.recording-context .audio-player { gap:12px;margin-top:10px;padding:12px;background:var(--wash-4);border:1px solid var(--hairline);border-radius:12px; }
+.recording-track { position:relative;flex:1;min-width:0;height:36px;display:flex;align-items:center; }
+.recording-wave { position:absolute;inset:0;display:flex;align-items:center;justify-content:space-between;gap:2px;pointer-events:none; }
+.recording-wave i { width:3px;flex:1;max-width:4px;border-radius:3px;background:var(--qa-accent);opacity:.5; }
+.recording-track .timeline-range { position:relative;width:100%;margin:0;opacity:.15;cursor:pointer; }
+.recording-track:focus-within { outline:2px solid var(--qa-accent);outline-offset:3px;border-radius:4px; }
 #pane-details #qaSpeakerInsights { margin-top:24px; }
 
 /* Activity filters sit directly on the conversation surface. */
@@ -1578,130 +1560,6 @@ body { overflow:hidden; padding-bottom:0; }
 .source-chat-heading p { margin-top:3px; }
 @media(max-width:900px) { #supportPane .support-head { padding:8px 12px 4px; } }
 @media(max-width:520px) { .source-chat-heading { gap:8px; } .source-chat-heading strong { font-size:15px; } .source-chat-heading > .activity-toggle { padding:8px 10px; font-size:11px; gap:5px; min-height:36px; } }
-
-/* Keep the manual audit in the same visual system as the dashboard. */
-body {
-  background: var(--grad-ellipse-1), var(--grad-ellipse-2), var(--body-bg);
-  background-attachment: fixed;
-}
-:root[data-theme="light"] body {
-  background: var(--grad-ellipse-1), var(--grad-ellipse-2), var(--body-bg);
-}
-.app-topnav,
-.app-sidebar,
-.main,
-.workspace {
-  background: transparent;
-}
-.app-topnav {
-  border-bottom: 1px solid var(--wash-6);
-}
-.app-sidebar {
-  border-right: 1px solid var(--wash-4);
-}
-.page-head {
-  background: transparent;
-  border-bottom-color: var(--card-border);
-  box-shadow: none;
-  backdrop-filter: none;
-}
-:root[data-theme="light"] .page-head {
-  background: transparent;
-  box-shadow: none;
-}
-.head-title,
-.score,
-.support-head strong,
-.interaction-title strong,
-.detail-toggle strong {
-  font-family: var(--font-display);
-}
-.panel {
-  background: color-mix(in srgb, var(--panel) 72%, transparent);
-  border-color: var(--card-border);
-  box-shadow: 0 12px 36px rgba(0,0,0,.24);
-  backdrop-filter: blur(14px) saturate(1.06);
-}
-.audit-summary,
-.kpi-card,
-.interaction-top,
-.mail-card,
-.chat-bubble,
-.detail-section,
-.log-card {
-  position: relative;
-  box-shadow: var(--shadow-sm);
-}
-.audit-summary::after,
-.kpi-card::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: linear-gradient(135deg, var(--wash-2) 0%, transparent 50%);
-  pointer-events: none;
-}
-.audit-summary {
-  background: var(--card-bg);
-  border-color: var(--card-border);
-}
-.kpi-card {
-  border-radius: var(--r-2xl);
-}
-.kpi-card:hover {
-  border-color: var(--card-border-hover);
-  box-shadow: 0 8px 32px rgba(0,0,0,.30), 0 0 0 1px var(--wash-4);
-  transform: translateY(-2px);
-}
-.kpi-card.is-active {
-  box-shadow: 0 0 0 2px rgba(var(--qa-accent-rgb),.10), var(--shadow-md);
-}
-html.is-embedded,
-html.is-embedded body {
-  height: 100%;
-  overflow: hidden;
-  background: transparent;
-}
-html.is-embedded .app-topnav,
-html.is-embedded .app-sidebar,
-html.is-embedded .page-head,
-html.is-embedded #qaDock,
-html.is-embedded #supportPane,
-html.is-embedded .restore-support-btn,
-html.is-embedded .support-backdrop,
-html.is-embedded .mobile-nav,
-html.is-embedded .source-global-btn {
-  display: none !important;
-}
-html.is-embedded .app {
-  position: static;
-  inset: auto;
-  display: block;
-  height: 100%;
-  min-height: 0;
-}
-html.is-embedded .main,
-html.is-embedded .workspace,
-html.is-embedded .audit-pane {
-  height: 100%;
-  min-height: 0;
-}
-html.is-embedded .workspace {
-  display: block;
-  padding: 0;
-  overflow: hidden;
-}
-html.is-embedded .audit-pane {
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  box-shadow: none;
-  backdrop-filter: none;
-}
-html.is-embedded .audit-scroll {
-  height: 100%;
-  padding: 0 4px 24px;
-}
 </style>
 </head>
 <body class="role-auditor">
@@ -1882,7 +1740,7 @@ html.is-embedded .audit-scroll {
 
     <main class="main">
       <section class="page-head">
-        <a class="back-btn" href="agent-scorecards.html?tbl=calls" aria-label="Back to evaluations" title="Back to evaluations"><svg class="icon icon-sm"><path d="M15 18l-6-6 6-6"></path></svg></a>
+        <button class="back-btn" type="button" aria-label="Back to evaluations" title="Back to evaluations"><svg class="icon icon-sm"><path d="M15 18l-6-6 6-6"></path></svg></button>
         <div class="head-copy">
           <span class="eyebrow">Interaction evaluation</span>
           <h1 class="head-title" id="pageTitle">Voice call · Omar Abdallah</h1>
@@ -2650,7 +2508,7 @@ html.is-embedded .audit-scroll {
     els.paneBadge.textContent = d.channel === 'call' ? 'Transcript' : d.channel === 'email' ? 'Email thread' : 'Chat';
     let content = '<div class="source-chat-heading"><span class="source-chat-logo">'+icons.spark+'</span><div><strong>'+(d.channel==='call'?'Full transcript & recording':d.channel==='email'?'Full email thread':'Full chat transcript')+'</strong><p>Source context for '+escapeHtml(d.id)+'</p></div></div><div class="interaction-top"><div class="interaction-title-row"><span class="channel-icon">' + icons[d.channel] + '</span><div class="interaction-title"><strong>' + escapeHtml(d.subject) + '</strong><span>' + escapeHtml(d.agent) + ' · ' + escapeHtml(d.date) + ' · ' + escapeHtml(d.product) + '</span></div><span class="visibility public">' + icons.globe + 'Customer-visible channel</span></div>';
     if (d.channel === 'call') {
-      content += '<div class="recording-context"><div class="recording-context-head"><strong>Call recording</strong><span class="recording-available"><span></span>Available</span></div><div class="audio-player" aria-label="Call recording preview"><button class="play-btn" id="playBtn" type="button" aria-label="Play recording preview"><span class="play-icon" id="playIcon">'+icons.play+'</span></button><div class="recording-track"><div class="recording-wave" aria-hidden="true">'+Array.from({length:56},(_,i)=>'<i style="height:'+(7+((i*17+i*i*3)%25))+'px"></i>').join('')+'</div><input class="timeline-range" id="audioRange" type="range" min="0" max="514" value="0" aria-label="Recording preview position" aria-valuetext="0:00 of 8:34"></div><span class="recording-time"><span class="time-code" id="playTime">0:00</span><span class="recording-time-separator">/</span><span class="duration">8:34</span></span></div></div>';
+      content += '<div class="recording-context"><div class="recording-context-head"><strong>Call recording</strong><span class="recording-available"><span></span>Available</span></div><div class="audio-player" aria-label="Call recording preview"><button class="play-btn" id="playBtn" type="button" aria-label="Play recording preview"><span class="play-icon" id="playIcon">'+icons.play+'</span></button><span class="time-code" id="playTime">0:00</span><div class="recording-track"><div class="recording-wave" aria-hidden="true">'+Array.from({length:56},(_,i)=>'<i style="height:'+(7+((i*17+i*i*3)%25))+'px"></i>').join('')+'</div><input class="timeline-range" id="audioRange" type="range" min="0" max="514" value="0" aria-label="Recording preview position"></div><span class="duration">8:34</span></div></div>';
     }
     content += '</div>';
     if (d.channel === 'call') content += renderTranscript(d);
@@ -2862,15 +2720,10 @@ html.is-embedded .audit-scroll {
 
   function seekAudio(sec) {
     const range = document.getElementById('audioRange');
-    if (range) {
-      range.value = sec;
-      const progress = Number(range.max) ? (sec / Number(range.max)) * 100 : 0;
-      range.parentElement.style.setProperty('--progress', progress + '%');
-    }
+    if (range) range.value = sec;
     const min = Math.floor(sec / 60), s = String(sec % 60).padStart(2,'0');
     const time = document.getElementById('playTime');
     if (time) time.textContent = min + ':' + s;
-    if (range) range.setAttribute('aria-valuetext', min + ':' + s + ' of 8:34');
   }
 
   let playTimer = null;
@@ -3166,6 +3019,7 @@ html.is-embedded .audit-scroll {
   els.sortSelect.addEventListener('change', () => { state.sort = els.sortSelect.value; renderKpis(); });
   document.querySelectorAll('.filter-btn[data-filter]').forEach(btn => btn.addEventListener('click', () => setFilter(btn.dataset.filter)));
   document.querySelectorAll('[data-nav]').forEach(btn => btn.addEventListener('click', () => navigate(btn.dataset.nav)));
+  document.querySelector('.back-btn').addEventListener('click', () => showToast('Evaluation queue', 'Back navigation is outside this single-file prototype; no audit state was discarded.'));
   document.getElementById('focusAuditBtn').addEventListener('click', () => setSupportPanelCollapsed(true, true));
   document.getElementById('restoreSupportBtn').addEventListener('click', () => setSupportPanelCollapsed(false, true));
   els.agreeAllBtn.addEventListener('click', () => {

@@ -48,12 +48,12 @@
         --d800: #1c2630;
         --d750: #233040;
         --d700: #2e3d50;
-        --d600: #4a5b6e;
-        --d500: #637280;
-        --d400: #8b9aaa;
-        --d300: #b0bcca;
-        --d100: #d8e0e8;
-        --d50: #eef2f6;
+        --d600: #8091a5;
+        --d500: #8394a8;
+        --d400: #93a2b4;
+        --d300: #a8b5c5;
+        --d100: #dee5ed;
+        --d50: #f5f7fb;
         --brand: #3369ff;
         --brand-dim: rgba(51, 105, 255, 0.15);
         /* QA product accent. TEMPORARY PLACEHOLDER (#8b4ff4 is Talent's purple).
@@ -61,14 +61,14 @@
         --qa-accent: #8b4ff4;
         --qa-accent-rgb: 139, 79, 244;
         --qa-accent-dim: rgba(139, 79, 244, 0.15);
-        --teal: #6fdfe2;
+        --teal: #45d3e6;
         --purple: #8b4ff4;
-        --ok: #7fae94;
-        --warn: #c0a47c;
-        --err: #d2827b;
-        --ok-bg: rgba(127, 174, 148, 0.14);
-        --warn-bg: rgba(192, 164, 124, 0.14);
-        --err-bg: rgba(210, 130, 123, 0.14);
+        --ok: #4ed6a1;
+        --warn: #f7c95c;
+        --err: #ff7282;
+        --ok-bg: rgba(78, 214, 161, 0.12);
+        --warn-bg: rgba(247, 201, 92, 0.13);
+        --err-bg: rgba(255, 114, 130, 0.12);
 
         /* Motion tokens, only two durations allowed. Longer motion
        (chart animation, skeleton shimmer) defines its own keyframe. */
@@ -97,11 +97,11 @@
        :root at ~5866 and are not repeated here. */
 
         /* Neutral ramp. --d200 was referenced across the file, never defined */
-        --d200: #c8d2dc;
+        --d200: #c3ceda;
 
         /* Semantic: info completes the ok/warn/err set (.ws-detected) */
-        --info: #8aa6bd;
-        --info-bg: rgba(138, 166, 189, 0.14);
+        --info: #7ea7ff;
+        --info-bg: rgba(126, 167, 255, 0.12);
 
         /* Accents are GLOBAL, one --accent per product, not per-product
        tokens. Aliased onto the existing --qa-accent trio rather than
@@ -6007,6 +6007,260 @@
         transition: color var(--transition-fast), background var(--transition-fast);
       }
       .kpa-agree-all:hover { background: var(--wash-8); color: var(--d50); }
+
+      /* KPI audit CTA cluster — completion hint + agree-all + primary Complete audit. */
+      .kpa-audit-actions { display: flex; align-items: center; gap: 8px; margin-left: auto; flex-wrap: wrap; }
+      .kpa-hint {
+        display: inline-flex; align-items: center; gap: 6px;
+        font-family: "Urbanist", sans-serif; font-size: 11px; font-weight: 700;
+        color: var(--d400);
+        padding: 4px 10px; border-radius: 999px;
+        background: var(--wash-3); border: 1px solid var(--wash-6);
+      }
+      .kpa-hint.is-ready { color: var(--ok); background: var(--ok-bg); border-color: color-mix(in srgb, var(--ok) 24%, transparent); }
+      .kpa-hint.is-done  { color: var(--ai-text); background: rgba(0,102,255,0.10); border-color: rgba(0,102,255,0.24); }
+      .kpa-complete {
+        display: inline-flex; align-items: center; gap: 6px;
+        font-family: "Urbanist", sans-serif; font-size: 12px; font-weight: 700;
+        padding: 8px 14px; border-radius: 8px;
+        background: var(--brand); color: #fff; border: 1px solid var(--brand);
+        cursor: pointer;
+        transition: background-color var(--transition-fast), border-color var(--transition-fast), opacity var(--transition-fast);
+      }
+      .kpa-complete:hover:not(:disabled) { background: #4d7fff; border-color: #4d7fff; }
+      .kpa-complete:disabled { opacity: 0.55; cursor: not-allowed; }
+      .kpa-complete svg { width: 12px; height: 12px; }
+
+      /* In-page conversation prompts — pre-fills the existing AiMY composer. */
+      .kpa-prompts {
+        display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+        padding: 8px 10px;
+        background: var(--wash-2); border: 1px solid var(--wash-6);
+        border-radius: 10px;
+      }
+      .kpa-prompts-label {
+        display: inline-flex; align-items: center; gap: 6px;
+        font-family: "Urbanist", sans-serif; font-size: 10px; font-weight: 800;
+        letter-spacing: 0.06em; text-transform: uppercase;
+        color: var(--ai-text);
+      }
+      .kpa-prompts-label svg { width: 12px; height: 14px; opacity: 0.9; }
+      .kpa-prompt {
+        font-family: "Urbanist", sans-serif; font-size: 11px; font-weight: 700;
+        color: var(--d200);
+        padding: 5px 10px; border-radius: 999px;
+        background: var(--card-bg); border: 1px solid var(--wash-7);
+        cursor: pointer;
+        transition: color var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast);
+      }
+      .kpa-prompt:hover { color: var(--d50); border-color: var(--wash-10); background: var(--wash-4); }
+
+      /* Audit conversation and source context. */
+      .audit-demo-controls {
+        display: flex; align-items: center; gap: 10px; margin-left: auto;
+        padding: 5px 7px 5px 12px; border: 1px solid var(--wash-7);
+        border-radius: 12px; background: var(--wash-3);
+      }
+      .audit-demo-label, .audit-control-label {
+        color: var(--d500); font-size: 10px; font-weight: 800;
+        letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap;
+      }
+      .audit-demo-label { color: var(--ai-text); }
+      .audit-control { display: flex; align-items: center; gap: 7px; }
+      .audit-control select, .audit-bottom-sort {
+        min-height: 34px; border: 1px solid var(--wash-7); border-radius: 8px;
+        padding: 0 30px 0 11px; background: var(--wash-5); color: var(--d100);
+        font: 700 11px "Urbanist", sans-serif; cursor: pointer;
+      }
+      .audit-bottom-bar {
+        position: fixed; left: calc(var(--sidebar-width) + 18px); right: 18px; bottom: 14px;
+        z-index: 58; display: none; justify-content: center; pointer-events: none;
+      }
+      #eval-detail-human.open .audit-bottom-bar { display: flex; }
+      .app-main:has(#eval-detail-human.open) #aimyFloatWrap { display: none; }
+      .audit-bottom-actions {
+        display: flex; align-items: center; gap: 8px; padding: 8px;
+        border: 1px solid var(--wash-7); border-radius: 12px;
+        background: color-mix(in srgb, var(--body-bg) 92%, transparent);
+        box-shadow: 0 12px 36px rgba(0,0,0,0.35); backdrop-filter: blur(18px);
+        pointer-events: auto;
+      }
+      .audit-toolbar-btn {
+        min-height: 38px; border: 1px solid var(--wash-8); border-radius: 8px;
+        padding: 0 13px; background: var(--wash-4); color: var(--d200);
+        font: 750 11px "Urbanist", sans-serif; cursor: pointer;
+      }
+      .audit-toolbar-btn:hover { color: var(--d50); background: var(--wash-7); }
+
+      .audit-support {
+        position: fixed; inset: var(--topbar-height) 0 0 var(--sidebar-width); z-index: 140;
+        display: flex; flex-direction: column; align-items: center;
+        background: color-mix(in srgb, var(--eval-detail-bg) 90%, transparent);
+        backdrop-filter: blur(24px) saturate(1.25); opacity: 0; visibility: hidden;
+        pointer-events: none; transform: translateY(14px);
+        transition: opacity var(--transition-base), transform var(--transition-base), visibility var(--transition-base);
+      }
+      .audit-support.open { opacity: 1; visibility: visible; pointer-events: auto; transform: translateY(0); }
+      .audit-support-head, .audit-support-body, .audit-composer-wrap { width: min(860px, calc(100% - 32px)); }
+      .audit-support-head {
+        display: flex; align-items: center; gap: 10px; flex-shrink: 0; padding: 18px 0 10px;
+      }
+      .audit-support-brand {
+        display: inline-flex; align-items: center; gap: 7px; padding: 5px 11px;
+        border: 1px solid var(--wash-7); border-radius: 999px; color: var(--d300);
+        font-size: 10px; font-weight: 800; letter-spacing: 0.06em;
+      }
+      .audit-support-brand svg { width: 16px; height: 18px; }
+      .audit-support-context { color: var(--d500); font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .audit-support-close {
+        width: 38px; height: 38px; margin-left: auto; display: grid; place-items: center;
+        border: 1px solid var(--wash-7); border-radius: 10px; background: var(--wash-4);
+        color: var(--d400); cursor: pointer;
+      }
+      .audit-support-close:hover { color: var(--d50); background: var(--wash-7); }
+      .audit-support-close svg { width: 16px; height: 16px; }
+      .audit-support-body { flex: 1; min-height: 0; overflow-y: auto; padding: 8px 0 24px; scrollbar-width: thin; }
+      .audit-support-view[hidden] { display: none; }
+      .audit-context-intro { position: relative; padding-right: 170px; margin: 0 0 22px 44px; color: var(--d300); font-size: 13px; line-height: 1.55; }
+      .audit-context-intro h2 { margin: 0 0 5px; color: var(--d50); font-size: 19px; letter-spacing: -0.01em; }
+      .audit-activity-toggle {
+        position: absolute; right: 0; top: 0; display: inline-flex; align-items: center; gap: 7px;
+        min-height: 36px; padding: 0 12px; border: 1px solid var(--wash-7); border-radius: 999px;
+        background: var(--wash-3); color: var(--d400); font: 700 11px "Urbanist", sans-serif; cursor: pointer;
+      }
+      .audit-activity-toggle svg { width: 14px; height: 14px; }
+      .audit-meta-card {
+        position: relative; margin: 0 0 16px 44px; border: 1px solid var(--wash-7);
+        border-radius: 4px 12px 12px 12px; background: var(--card-bg); overflow: hidden;
+      }
+      .audit-meta-avatar {
+        position: absolute; left: -44px; top: 2px; width: 32px; height: 32px;
+        display: grid; place-items: center; border: 1px solid rgba(var(--qa-accent-rgb),0.3);
+        border-radius: 9px; background: var(--qa-accent-dim); color: var(--ai-text);
+      }
+      .audit-meta-avatar svg { width: 17px; height: 19px; }
+      .audit-meta-summary {
+        width: 100%; display: flex; align-items: center; gap: 10px; padding: 14px 16px;
+        border: 0; background: transparent; color: var(--d100); font: 800 13px "Urbanist", sans-serif;
+        text-align: left; cursor: pointer;
+      }
+      .audit-meta-summary span { margin-left: auto; color: var(--d500); font-size: 11px; font-weight: 500; }
+      .audit-meta-summary svg { width: 14px; height: 14px; transition: transform var(--transition-fast); }
+      .audit-meta-card.collapsed .audit-meta-summary svg { transform: rotate(-90deg); }
+      .audit-meta-card.collapsed .audit-meta-grid { display: none; }
+      .audit-meta-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px 28px; padding: 14px 18px 18px; border-top: 1px solid var(--wash-6); }
+      .audit-meta-item span { display: block; margin-bottom: 4px; color: var(--d500); font-size: 9px; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+      .audit-meta-item strong { display: block; color: var(--d200); font-size: 12px; line-height: 1.5; }
+      .audit-meta-item.wide { grid-column: 1 / -1; }
+      .audit-chat-log { margin: 8px 0 0; }
+      .audit-chat-message { display: flex; align-items: flex-start; gap: 10px; margin: 14px 0; }
+      .audit-chat-message.user { flex-direction: row-reverse; }
+      .audit-chat-avatar {
+        width: 30px; height: 30px; flex: 0 0 auto; display: grid; place-items: center;
+        border-radius: 8px; border: 1px solid rgba(var(--qa-accent-rgb),0.28);
+        background: var(--qa-accent-dim); color: var(--d100); font-size: 9px; font-weight: 800;
+      }
+      .audit-chat-avatar svg { width: 16px; height: 18px; }
+      .audit-chat-bubble {
+        max-width: 680px; padding: 11px 14px; border: 1px solid var(--wash-7);
+        border-radius: 4px 12px 12px; background: var(--card-bg); color: var(--d200);
+        font-size: 13px; line-height: 1.55; white-space: pre-line;
+      }
+      .audit-chat-message.user .audit-chat-bubble { border-radius: 12px 4px 12px 12px; background: var(--qa-accent-dim); }
+      .audit-chat-prompts { display: flex; flex-wrap: wrap; gap: 6px; margin: 16px 0 0 44px; }
+      .audit-chat-prompts button {
+        border: 1px solid var(--wash-7); border-radius: 999px; padding: 7px 11px;
+        background: var(--wash-3); color: var(--d300); font: 700 11px "Urbanist", sans-serif; cursor: pointer;
+      }
+      .audit-view-title { display: flex; align-items: flex-start; gap: 11px; margin-bottom: 16px; }
+      .audit-view-icon { width: 34px; height: 34px; border-radius: 9px; display: grid; place-items: center; background: var(--qa-accent-dim); color: var(--ai-text); }
+      .audit-view-title h2 { margin: 0; color: var(--d50); font-size: 19px; }
+      .audit-view-title p { margin: 2px 0 0; color: var(--d500); font-size: 11px; }
+      .audit-source-card { border: 1px solid var(--wash-7); border-radius: 12px; background: var(--card-bg); padding: 14px; }
+      .audit-source-card .call-player { display: flex !important; margin: 12px 0 4px !important; }
+      .audit-transcript-list { margin-top: 12px; }
+      .audit-transcript-row { display: grid; grid-template-columns: 60px 145px minmax(0,1fr); gap: 12px; padding: 13px 8px; border-bottom: 1px solid var(--wash-5); color: var(--d300); font-size: 12px; line-height: 1.5; }
+      .audit-transcript-row time { color: var(--brand); font: 700 10px ui-monospace, monospace; }
+      .audit-transcript-row b { color: var(--d200); }
+      .audit-activity-list { display: grid; gap: 10px; }
+      .audit-activity-entry { display: grid; grid-template-columns: 96px 1fr; gap: 14px; padding: 13px 14px; border: 1px solid var(--wash-6); border-radius: 10px; background: var(--card-bg); }
+      .audit-activity-entry time { color: var(--d500); font-size: 10px; }
+      .audit-activity-entry strong { display: block; color: var(--d100); font-size: 12px; }
+      .audit-activity-entry p { margin: 3px 0 0; color: var(--d400); font-size: 11px; }
+      .audit-composer-wrap { flex-shrink: 0; padding: 10px 0 22px; }
+      .audit-composer { display: flex; align-items: center; gap: 8px; padding: 7px; border: 1px solid var(--wash-8); border-radius: 999px; background: var(--card-bg); box-shadow: 0 10px 30px rgba(0,0,0,0.35); }
+      .audit-composer:focus-within { border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-dim), 0 10px 30px rgba(0,0,0,0.35); }
+      .audit-composer-logo { width: 34px; height: 34px; border: 0; border-radius: 50%; display: grid; place-items: center; background: var(--qa-accent-dim); color: var(--ai-text); cursor: pointer; }
+      .audit-composer-logo svg { width: 17px; height: 19px; }
+      .audit-composer input { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; color: var(--d50); font: 500 13px "Urbanist", sans-serif; }
+      .audit-composer-hint { color: var(--d500); font-size: 10px; }
+      .audit-composer-send { width: 34px; height: 34px; border: 0; border-radius: 50%; display: grid; place-items: center; background: var(--brand); color: #fff; cursor: pointer; }
+      .audit-composer-send svg { width: 15px; height: 15px; }
+
+      @media (max-width: 900px) {
+        .audit-demo-controls { width: 100%; margin-left: 0; overflow-x: auto; }
+        .audit-bottom-bar { left: 10px; right: 10px; }
+        .audit-support { left: 0; }
+        .audit-support-head, .audit-support-body, .audit-composer-wrap { width: min(100% - 20px, 860px); }
+      }
+      @media (max-width: 620px) {
+        .audit-demo-label, .audit-control-label { display: none; }
+        .audit-context-intro { margin-left: 0; padding-right: 0; }
+        .audit-activity-toggle { position: static; margin-top: 12px; }
+        .audit-meta-card { margin-left: 38px; }
+        .audit-meta-grid { grid-template-columns: 1fr; }
+        .audit-meta-item.wide { grid-column: auto; }
+        .audit-bottom-actions { width: 100%; overflow-x: auto; justify-content: flex-start; }
+        .audit-transcript-row { grid-template-columns: 48px 92px minmax(0,1fr); }
+        .audit-composer-hint { display: none; }
+      }
+
+      /* Eval-detail top controls — role + sort switchers, right-aligned. */
+      .eval-detail-controls {
+        display: flex; align-items: center; gap: 8px; margin-left: auto; flex-wrap: wrap;
+      }
+      .eval-detail-controls .edc-group {
+        display: inline-flex; align-items: center; gap: 6px;
+        font-family: "Urbanist", sans-serif; font-size: 10px; font-weight: 800;
+        letter-spacing: 0.06em; text-transform: uppercase;
+        color: var(--d400);
+      }
+      .edc-switch {
+        display: inline-flex; align-items: center; gap: 2px;
+        padding: 3px;
+        background: var(--wash-2); border: 1px solid var(--wash-7);
+        border-radius: 999px;
+      }
+      .edc-switch button {
+        font-family: "Urbanist", sans-serif; font-size: 10px; font-weight: 700;
+        color: var(--d400);
+        padding: 5px 9px; border: 0; border-radius: 999px;
+        background: transparent; cursor: pointer;
+        transition: background-color var(--transition-fast), color var(--transition-fast);
+      }
+      .edc-switch button:hover { color: var(--d100); }
+      .edc-switch button.active { color: var(--d50); background: var(--brand-dim); }
+      .edc-switch button:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+
+      /* Role-scoped visibility inside eval-detail. Auditor sees everything. */
+      #eval-detail-human[data-eval-role="employee"] .auditor-only,
+      #eval-detail-human[data-eval-role="employee"] .ai-private { display: none !important; }
+      #eval-detail-human[data-eval-role="manager"] .auditor-only { display: none !important; }
+
+      /* Sort helpers on kpa-cards. */
+      #eval-detail-human[data-kpa-sort="weight"] .kpa-card { order: attr(data-kpa-weight number, 0); }
+      #eval-detail-human[data-kpa-sort="action"] .kpa-card.is-reviewed { order: 100; }
+      #eval-detail-human[data-kpa-sort="action"] .kpa-card:not(.is-reviewed) { order: 0; }
+
+      @media (max-width: 900px) {
+        .eval-detail-controls { gap: 6px; }
+        .kpa-audit-actions { width: 100%; }
+        .kpa-complete { flex: 1 0 auto; justify-content: center; }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .kpa-complete, .kpa-prompt, .edc-switch button, .kpa-hint { transition: none; }
+      }
       .kpa-card {
         border: 1px solid var(--wash-7); border-radius: 14px; background: var(--card-bg);
         overflow: clip; box-shadow: 0 1px 3px rgba(0,0,0,0.3);
@@ -6068,6 +6322,101 @@
       #eval-detail-human .call-player { display: none; }
       #eval-detail-human .eval-detail-grid { grid-template-columns: minmax(0, 1fr); }
       #eval-detail-human .eval-detail-grid > div:first-child { display: none; }
+
+      /* KPI audit experience: keep the scorecard shell, but let the review
+         workspace carry the same visual weight as the standalone audit. */
+      #eval-detail-human .eval-panel.has-manual-audit {
+        max-width: 1080px;
+        margin: 0 auto;
+        width: 100%;
+        gap: 16px;
+      }
+      #eval-detail-human .kpa-root {
+        gap: 14px;
+        padding-bottom: 84px;
+      }
+      #eval-detail-human .kpa-summary {
+        padding: 20px 24px;
+        border-radius: 16px;
+        background: color-mix(in srgb, var(--card-bg) 94%, var(--brand) 6%);
+        box-shadow: none;
+      }
+      #eval-detail-human .kpa-score {
+        font-size: 54px;
+        letter-spacing: -0.05em;
+      }
+      #eval-detail-human .kpa-toolbar {
+        position: sticky;
+        top: 0;
+        z-index: 5;
+        padding: 10px 0;
+        background: var(--body-bg);
+      }
+      #eval-detail-human .kpa-filter {
+        min-height: 38px;
+        padding-inline: 13px;
+      }
+      #eval-detail-human .kpa-prompts {
+        padding: 10px 12px;
+        border-radius: 12px;
+      }
+      #eval-detail-human .kpa-card {
+        border-radius: 14px;
+        overflow: hidden;
+        transition: border-color var(--transition-base), box-shadow var(--transition-base), transform var(--transition-base);
+      }
+      #eval-detail-human .kpa-card:hover {
+        border-color: var(--card-border-hover);
+        box-shadow: 0 8px 24px rgba(0,0,0,.16);
+        transform: translateY(-1px);
+      }
+      #eval-detail-human .kpa-card-head {
+        padding: 15px 16px 11px;
+      }
+      #eval-detail-human .kpa-body {
+        padding: 0 16px 14px 58px;
+      }
+      #eval-detail-human .kpa-reading {
+        border-radius: 10px;
+        padding: 11px 12px;
+        background: rgba(0,102,255,.07);
+        border-color: rgba(0,102,255,.22);
+      }
+      #eval-detail-human .kpa-evidence {
+        margin: 8px 0 0;
+        padding: 10px 12px;
+        border: 1px solid var(--wash-6);
+        border-left: 3px solid var(--brand);
+        border-radius: 9px;
+        background: var(--wash-2);
+      }
+      #eval-detail-human .kpa-evidence blockquote {
+        margin: 5px 0 0;
+        color: var(--d200);
+        font-size: 12px;
+        line-height: 1.5;
+      }
+      #eval-detail-human .kpa-actions {
+        min-height: 58px;
+        padding: 10px 16px 10px 58px;
+        gap: 8px;
+      }
+      #eval-detail-human .kpa-decision {
+        min-height: 38px;
+        padding-inline: 12px;
+        border-radius: 8px;
+      }
+      @media (max-width: 720px) {
+        #eval-detail-human .eval-panel.has-manual-audit { padding-inline: 8px; }
+        #eval-detail-human .kpa-summary { padding: 16px; }
+        #eval-detail-human .kpa-score-block { border-right: 0; padding-right: 0; }
+        #eval-detail-human .kpa-conf { min-width: 220px; margin-left: 0; flex: 1 1 220px; }
+        #eval-detail-human .kpa-body,
+        #eval-detail-human .kpa-actions { padding-left: 16px; }
+        #eval-detail-human .kpa-actions { flex-wrap: wrap; }
+        #eval-detail-human .kpa-action-label { width: 100%; }
+        #eval-detail-human .kpa-audit-actions { width: 100%; margin-left: 0; justify-content: flex-start; }
+      }
 
       /* Result card, expanded variant for detail page */
       /* The summary strip. Everything that was three stacked cards, on two
@@ -10955,12 +11304,29 @@
         <!-- ── EVALUATION DETAIL PAGE, Level 4 (Agent-handled) ──────────────
              Full-page route. Opens when supervisor clicks a human-handled eval row.
              Back button returns to agent scorecard / eval list. -->
-        <div class="eval-detail-page" id="eval-detail-human" role="main" aria-label="Evaluation detail">
+        <div class="eval-detail-page" id="eval-detail-human" role="main" aria-label="Evaluation detail" data-eval-role="auditor" data-kpa-sort="action">
           <div class="eval-detail-head">
             <button class="eval-detail-back" type="button" onclick="closeEvalDetail()">
               <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3L5 7l4 4"/></svg>
               <span id="evalDetailBackLabel">Back to agent</span>
             </button>
+            <div class="audit-demo-controls" role="group" aria-label="Demo controls">
+              <span class="audit-demo-label">Demo controls</span>
+              <label class="audit-control"><span class="audit-control-label">View as</span>
+                <select id="auditRoleSelect" aria-label="View evaluation as">
+                  <option value="auditor">Quality Auditor</option>
+                  <option value="employee">Employee</option>
+                  <option value="manager">Manager</option>
+                </select>
+              </label>
+              <label class="audit-control"><span class="audit-control-label">Sample</span>
+                <select id="auditSampleSelect" aria-label="Select sample interaction">
+                  <option value="call">Voice call</option>
+                  <option value="email">Email ticket</option>
+                  <option value="chat">Live chat</option>
+                </select>
+              </label>
+            </div>
           </div>
 
                 <!-- ══ CALL RECORDING ══════════════════════════════════
@@ -11094,7 +11460,29 @@
                   <button class="kpa-filter" data-kpa-filter="fail" type="button">Failed</button>
                   <button class="kpa-filter" data-kpa-filter="pass" type="button">Passed</button>
                   <button class="kpa-filter" data-kpa-filter="na" type="button">N/A</button>
-                  <button class="kpa-agree-all" id="kpaAgreeAll" type="button">Agree with remaining</button>
+                  <button class="kpa-filter" data-kpa-filter="dispute" type="button">Disputes</button>
+                  <div class="kpa-audit-actions">
+                    <button class="audit-toolbar-btn" id="auditFullSourceBtn" type="button">Full transcript &amp; recording</button>
+                    <button class="audit-toolbar-btn" id="kpaAgreeAll" type="button">Agree with remaining</button>
+                    <select class="audit-bottom-sort" id="auditSortSelect" aria-label="Sort KPI results">
+                      <option value="action">Needs action first</option>
+                      <option value="weight">Highest weight</option>
+                      <option value="order">Original order</option>
+                    </select>
+                    <span class="kpa-hint" id="kpaHint" role="status" aria-live="polite">6 KPIs remaining</span>
+                    <button class="kpa-complete" id="completeAuditBtn" type="button" disabled aria-describedby="kpaHint">
+                      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.5 3.5L5.5 10 2.5 7"/></svg>
+                      Complete audit
+                    </button>
+                  </div>
+                </div>
+
+                <div class="kpa-prompts" role="group" aria-label="Ask AiMY about this audit">
+                  <span class="kpa-prompts-label"><svg viewBox="0 0 18 20" aria-hidden="true"><use href="#aimy-logo-small"/></svg>Ask AiMY</span>
+                  <button type="button" class="kpa-prompt" data-kpa-prompt="Explain why the score is 52%.">Explain the score</button>
+                  <button type="button" class="kpa-prompt" data-kpa-prompt="Show the strongest evidence for each failed KPI.">Show failing evidence</button>
+                  <button type="button" class="kpa-prompt" data-kpa-prompt="Draft a coaching note for the agent based on these KPIs.">Draft coaching note</button>
+                  <button type="button" class="kpa-prompt" data-kpa-prompt="Summarize the timeline of this interaction.">Summarize timeline</button>
                 </div>
 
                 <article class="kpa-card" data-kpa-verdict="fail">
@@ -11241,7 +11629,7 @@
                 </article>
 
                 <script>
-                  (function () {
+                  document.addEventListener('DOMContentLoaded', function () {
                     var root = document.getElementById('kpaRoot');
                     if (!root) return;
                     var settled = document.getElementById('kpaSettled');
@@ -11256,11 +11644,13 @@
                       root.querySelectorAll('.kpa-card').forEach(function (card) {
                         var verdict = card.dataset.kpaVerdict;
                         var reviewed = card.classList.contains('is-reviewed');
+                        var disputed = card.classList.contains('has-open-dispute') || card.dataset.kpaDispute === 'open';
                         var show =
                           kind === 'all' ? true :
                           kind === 'needs' ? ((verdict === 'fail' || verdict === 'pending') && !reviewed) :
                           kind === 'fail' ? verdict === 'fail' :
                           kind === 'pass' ? verdict === 'pass' :
+                          kind === 'dispute' ? disputed :
                           verdict === 'na';
                         card.classList.toggle('is-hidden', !show);
                       });
@@ -11274,13 +11664,42 @@
                       });
                     });
 
+                    var page = document.getElementById('eval-detail-human');
+                    var hint = document.getElementById('kpaHint');
+                    var completeBtn = document.getElementById('completeAuditBtn');
+                    function paintHint() {
+                      if (!hint || !completeBtn) return;
+                      if (page && page.dataset.kpaCompleted === 'true') {
+                        hint.textContent = 'Audit completed';
+                        hint.className = 'kpa-hint is-done';
+                        completeBtn.disabled = true;
+                        return;
+                      }
+                      var pending = root.querySelectorAll('.kpa-card:not(.is-reviewed) .kpa-decision.agree').length;
+                      if (pending === 0) {
+                        hint.textContent = 'All KPIs reviewed · ready to complete';
+                        hint.className = 'kpa-hint is-ready';
+                        completeBtn.disabled = false;
+                      } else {
+                        hint.textContent = pending + (pending === 1 ? ' KPI remaining' : ' KPIs remaining');
+                        hint.className = 'kpa-hint';
+                        completeBtn.disabled = true;
+                      }
+                    }
+
                     function decide(card, btn) {
+                      if (page && page.dataset.kpaCompleted === 'true') return;
                       card.querySelectorAll('.kpa-decision').forEach(function (other) { other.classList.remove('selected'); });
                       btn.classList.add('selected');
                       card.classList.add('is-reviewed');
+                      card.classList.toggle('has-open-dispute', btn.classList.contains('disagree'));
+                      card.dataset.kpaDispute = btn.classList.contains('disagree') ? 'open' : '';
                       var result = card.querySelector('.kpa-result');
                       if (result) result.innerHTML = 'Reviewed · <b>' + btn.textContent.replace(/^[✓×–]\s*/, '') + '</b>';
                       paintSettled();
+                      paintHint();
+                      if (window.auditSortCards) window.auditSortCards();
+                      if (window.auditAddActivity) window.auditAddActivity('KPI reviewed', card.querySelector('.kpa-title').textContent + ' marked ' + btn.textContent.replace(/^[✓×–]\s*/, '') + '.');
                     }
 
                     root.querySelectorAll('.kpa-card').forEach(function (card) {
@@ -11297,7 +11716,20 @@
                       });
                     });
 
-                    /* Audit metadata Q&A, mirrors the manual-audit prototype's composer. */
+                    if (completeBtn) completeBtn.addEventListener('click', function () {
+                      if (completeBtn.disabled) return;
+                      if (page) page.dataset.kpaCompleted = 'true';
+                      root.classList.add('is-completed');
+                      root.querySelectorAll('.kpa-decision').forEach(function (btn) { btn.disabled = true; });
+                      if (agreeAll) agreeAll.disabled = true;
+                      paintHint();
+                      if (window.auditAddActivity) window.auditAddActivity('Audit completed', 'Nour Wael completed the manual review and locked the KPI decisions.');
+                      if (window.showToast) window.showToast({ title: 'Audit completed', sub: 'The KPI decisions are now locked and recorded in activity.' });
+                    });
+
+                    paintHint();
+
+                    /* Audit metadata Q&A and source views. */
                     var AUDIT_META = {
                       agent: 'The agent is Omar Abdallah (omar.abdallah@flairstech.com), Product Support, 5 months tenure.',
                       customer: 'The customer is an unknown caller — identity was verified in the secure pre-call IVR flow.',
@@ -11315,8 +11747,146 @@
                       fail: 'Failed KPIs: Follow-up confirmation (CR-041, 18 pts) and Resolution confirmation (CR-018, 16 pts).'
                     };
 
+                    var AUDIT_SAMPLES = {
+                      call: {
+                        label: 'Voice call', id: 'EV-0527-OMAR', title: 'Refund status escalation', channel: 'Voice',
+                        subject: 'Refund status escalation', customer: 'Unknown caller', date: '12 May 2026 · 10:42 AM GMT+3',
+                        sourceTitle: 'Full transcript & recording', sourceMeta: 'Omar Abdallah · 7 May 2026 · Product Support',
+                        resolution: 'The agent checked the refund queue and escalated the request, but ended the call without naming a fallback contact or confirming a follow-up time.',
+                        transcript: [
+                          ['00:00','Secure IVR','Customer identity verification completed in the secure pre-call flow. Sensitive responses are intentionally excluded from the transcript.'],
+                          ['00:05','Customer',"Hi, I've been waiting three days for a refund and still nothing. This is really frustrating."],
+                          ['00:31','Agent',"I'm sorry to hear that. Let me pull up your account and check the refund status right now."],
+                          ['02:14','Customer',"It says processing, but it has been three days. You said two business days last time."],
+                          ['03:06','Agent',"The refund was submitted on May 5. I'm escalating it now so it clears today."],
+                          ['06:48','Customer',"What if it doesn't? Who do I contact?"],
+                          ['07:32','Agent',"You're all set. Is there anything else I can help you with today?"]
+                        ]
+                      },
+                      email: {
+                        label: 'Email ticket', id: 'EV-0529-LINA', title: 'Duplicate charge dispute', channel: 'Email',
+                        subject: 'Duplicate charge dispute', customer: 'Maya Hassan', date: '14 May 2026 · 2:18 PM GMT+3',
+                        sourceTitle: 'Full email thread', sourceMeta: 'Lina Haddad · 14 May 2026 · Billing Support',
+                        resolution: 'The duplicate charge was identified and reversed. The response included the expected settlement window and case reference.',
+                        transcript: [
+                          ['09:12','Customer','I was charged twice for order 44718. Please confirm when the duplicate payment will be returned.'],
+                          ['09:34','Lina Haddad','I found the duplicate authorization and reversed it. Your bank should release it within three to five business days.'],
+                          ['09:36','Lina Haddad','Your reference is RF-44718. Reply to this thread if the credit is not visible by May 20.'],
+                          ['10:05','Customer','Thank you. That gives me what I need.']
+                        ]
+                      },
+                      chat: {
+                        label: 'Live chat', id: 'EV-0531-SARAH', title: 'Plan downgrade request', channel: 'Chat',
+                        subject: 'Plan downgrade request', customer: 'Amir Saleh', date: '16 May 2026 · 4:06 PM GMT+3',
+                        sourceTitle: 'Full chat transcript', sourceMeta: 'Sarah Reyes · 16 May 2026 · Account Services',
+                        resolution: 'The plan was changed at the next renewal date. The agent confirmed feature impact and received explicit customer approval.',
+                        transcript: [
+                          ['00:03','Customer','Can I move to the basic plan without losing my saved reports?'],
+                          ['00:18','Sarah Reyes','Your saved reports remain available, but scheduled exports will stop at renewal.'],
+                          ['01:04','Customer','That works. Please make the change.'],
+                          ['01:21','Sarah Reyes','Done. Basic begins June 1 and no data will be deleted. Is that the outcome you wanted?'],
+                          ['01:38','Customer','Yes, perfect.']
+                        ]
+                      }
+                    };
+                    var auditState = { sample: 'call', view: 'context', activities: [
+                      { time: '12 May · 10:42', title: 'Audit opened', detail: 'Nour Wael started a manual review.' },
+                      { time: '12 May · 10:43', title: 'AiMY analysis loaded', detail: 'Seven KPI results and 30 metadata fields became available.' }
+                    ] };
+                    var support = document.getElementById('auditSupport');
+                    var supportBody = document.getElementById('auditSupportBody');
+                    var sampleSelect = document.getElementById('auditSampleSelect');
+                    var roleSelect = document.getElementById('auditRoleSelect');
+                    var sortSelect = document.getElementById('auditSortSelect');
+                    var supportTrigger = null;
+
+                    function sample() { return AUDIT_SAMPLES[auditState.sample]; }
+
+                    function renderMetadata() {
+                      var item = sample();
+                      document.getElementById('auditSupportContext').textContent = item.id + ' · 30 metadata fields';
+                      document.getElementById('auditContextCopy').textContent = 'Here are all 30 metadata fields for ' + item.label + ' · ' + item.sourceMeta.split(' · ')[0] + '. Open the full source from the audit toolbar, explore activity, or ask about a field below.';
+                      var fields = [
+                        ['Interaction ID', item.id], ['Subject', item.subject], ['Status', 'Provisional · missing KPI data'],
+                        ['Audit date', item.date], ['Product', 'Product Support'], ['Customer', item.customer],
+                        ['Source', item.channel], ['Resolution summary', item.resolution, true]
+                      ];
+                      document.getElementById('auditMetaGrid').innerHTML = fields.map(function (field) {
+                        return '<div class="audit-meta-item' + (field[2] ? ' wide' : '') + '"><span>' + field[0] + '</span><strong>' + field[1] + '</strong></div>';
+                      }).join('');
+                    }
+
+                    function renderTranscript() {
+                      var item = sample();
+                      document.getElementById('auditSourceTitle').textContent = item.sourceTitle;
+                      document.getElementById('auditSourceSubtitle').textContent = 'Source context for ' + item.id;
+                      document.getElementById('auditFullSourceBtn').textContent = item.sourceTitle;
+                      document.getElementById('auditSourceCard').innerHTML =
+                        '<strong style="color:var(--d100);font-size:13px">' + item.title + '</strong>' +
+                        '<div style="color:var(--d500);font-size:11px;margin-top:3px">' + item.sourceMeta + '</div>' +
+                        (auditState.sample === 'call' ? '<div class="call-player" data-duration="514"><button class="cp-play" type="button" aria-label="Play recording"><svg viewBox="0 0 14 14" fill="currentColor"><path d="M4 2.5v9l7-4.5z"/></svg></button><span class="cp-time">0:00</span><div class="cp-track"><div class="cp-fill" style="width:0"></div><div class="cp-head" style="left:0"></div></div><span class="cp-time cp-dur">8:34</span></div>' : '');
+                      document.getElementById('auditTranscriptList').innerHTML = item.transcript.map(function (line) {
+                        return '<div class="audit-transcript-row"><time>' + line[0] + '</time><b>' + line[1] + '</b><span>' + line[2] + '</span></div>';
+                      }).join('');
+                    }
+
+                    function renderActivity() {
+                      var visible = auditState.activities.filter(function (entry) { return page.dataset.evalRole !== 'employee' || entry.title !== 'AiMY analysis loaded'; });
+                      document.getElementById('auditActivityList').innerHTML = visible.slice().reverse().map(function (entry) {
+                        return '<div class="audit-activity-entry"><time>' + entry.time + '</time><div><strong>' + entry.title + '</strong><p>' + entry.detail + '</p></div></div>';
+                      }).join('');
+                    }
+
+                    window.auditAddActivity = function (title, detail) {
+                      auditState.activities.push({ time: 'Just now', title: title, detail: detail });
+                      renderActivity();
+                    };
+
+                    function showAuditView(name) {
+                      auditState.view = name;
+                      support.querySelectorAll('[data-audit-view]').forEach(function (view) { view.hidden = view.dataset.auditView !== name; });
+                      if (name === 'transcript') renderTranscript();
+                      if (name === 'activity') renderActivity();
+                      supportBody.scrollTop = 0;
+                    }
+
+                    function setAuditSupport(open, view, trigger) {
+                      if (trigger && !support.contains(trigger)) supportTrigger = trigger;
+                      if (view) showAuditView(view);
+                      if (!open) {
+                        var returnTarget = supportTrigger || root.querySelector('.kpa-prompt') || document.getElementById('auditFullSourceBtn');
+                        if (returnTarget && returnTarget.focus) returnTarget.focus();
+                      }
+                      support.inert = !open;
+                      support.classList.toggle('open', open);
+                      support.setAttribute('aria-hidden', open ? 'false' : 'true');
+                      if (open) setTimeout(function () { document.getElementById('auditChatInput').focus(); }, 0);
+                    }
+                    window.closeAuditSupport = function () { setAuditSupport(false); };
+
+                    function addAuditMessage(text, isUser) {
+                      var message = document.createElement('div');
+                      message.className = 'audit-chat-message' + (isUser ? ' user' : '');
+                      message.innerHTML = '<div class="audit-chat-avatar">' + (isUser ? 'You' : '<svg viewBox="0 0 18 20" aria-hidden="true"><use href="#aimy-logo-small"/></svg>') + '</div><div class="audit-chat-bubble"></div>';
+                      message.querySelector('.audit-chat-bubble').textContent = text;
+                      document.getElementById('auditChatLog').appendChild(message);
+                      message.scrollIntoView({ block: 'end', behavior: 'smooth' });
+                    }
+
                     function auditAnswer(text) {
                       var lo = text.toLowerCase();
+                      var item = sample();
+                      if (/transcript|recording|email thread|chat transcript/.test(lo) && /show|view|open|full/.test(lo)) {
+                        showAuditView('transcript');
+                        return 'I opened the full source for ' + item.id + '.';
+                      }
+                      if (/activity|history|log/.test(lo)) {
+                        showAuditView('activity');
+                        return 'I opened the audit activity for ' + item.id + '.';
+                      }
+                      if (/coach|coaching/.test(lo)) return 'Coaching focus: confirm the customer accepts the resolution, name the fallback owner, and give a specific follow-up time before closing.';
+                      if (/evidence/.test(lo)) return auditState.sample === 'call' ? 'Strongest evidence: at 06:48 the customer asks who to contact if the refund does not clear; the agent closes at 07:32 without answering.' : item.transcript[item.transcript.length - 2][2];
+                      if (/summary|summarize/.test(lo)) return item.resolution;
                       for (var key in AUDIT_META) if (lo.indexOf(key) !== -1) return AUDIT_META[key];
                       if (/who|name/.test(lo)) return AUDIT_META.agent;
                       if (/when|date|time/.test(lo)) return AUDIT_META.timeline;
@@ -11329,37 +11899,77 @@
                       return page && page.classList.contains('open');
                     }
 
-                    function postChat(text, isUser) {
-                      var thread = document.getElementById('overlayThread');
-                      if (!thread) return;
-                      var msg = document.createElement('div');
-                      msg.className = 'chat-msg ' + (isUser ? 'user' : 'aimy');
-                      msg.innerHTML = isUser
-                        ? '<div class="msg-bubble"></div><div class="msg-avatar user-av">NW</div>'
-                        : '<div class="msg-avatar aimy-av"><svg width="23" height="25" viewBox="0 0 18 20"><use href="#aimy-logo-small"/></svg></div><div class="msg-bubble"></div>';
-                      msg.querySelector('.msg-bubble').textContent = text;
-                      thread.appendChild(msg);
-                      thread.scrollTop = thread.scrollHeight;
-                    }
-
                     function auditChatSubmit(input) {
                       var text = (input.value || '').trim();
-                      if (!text) return;
+                      if (!text) { setAuditSupport(true, 'context', input); return; }
                       input.value = '';
-                      var overlay = document.getElementById('aimyOverlay');
-                      var bar = document.getElementById('aimyFloatBar');
-                      var suggestions = document.getElementById('overlaySuggestions');
-                      if (overlay) overlay.classList.add('open');
-                      if (bar) bar.classList.add('hidden');
-                      if (suggestions) suggestions.classList.add('hidden');
-                      postChat(text, true);
-                      setTimeout(function () { postChat(auditAnswer(text), false); }, 420);
+                      setAuditSupport(true, 'context', input);
+                      addAuditMessage(text, true);
+                      setTimeout(function () { addAuditMessage(auditAnswer(text), false); }, 320);
                     }
 
+                    var cards = Array.from(root.querySelectorAll('.kpa-card'));
+                    cards.forEach(function (card, index) {
+                      card.dataset.kpaOrder = String(index);
+                      var points = card.querySelector('.kpa-pts');
+                      card.dataset.kpaWeight = String(parseInt(points ? points.textContent : '0', 10) || 0);
+                    });
+                    window.auditSortCards = function () {
+                      var mode = sortSelect.value;
+                      cards.slice().sort(function (a, b) {
+                        if (mode === 'weight') return Number(b.dataset.kpaWeight) - Number(a.dataset.kpaWeight);
+                        if (mode === 'action') return Number(a.classList.contains('is-reviewed')) - Number(b.classList.contains('is-reviewed')) || Number(a.dataset.kpaOrder) - Number(b.dataset.kpaOrder);
+                        return Number(a.dataset.kpaOrder) - Number(b.dataset.kpaOrder);
+                      }).forEach(function (card) { root.appendChild(card); });
+                      page.dataset.kpaSort = mode;
+                    };
+
+                    roleSelect.addEventListener('change', function () {
+                      page.dataset.evalRole = roleSelect.value;
+                      renderActivity();
+                      window.auditAddActivity('View changed', 'Evaluation opened as ' + roleSelect.options[roleSelect.selectedIndex].text + '.');
+                    });
+                    sampleSelect.addEventListener('change', function () {
+                      auditState.sample = sampleSelect.value;
+                      document.getElementById('auditChatLog').replaceChildren();
+                      renderMetadata();
+                      renderTranscript();
+                      window.auditAddActivity('Sample changed', sample().label + ' sample loaded.');
+                    });
+                    sortSelect.addEventListener('change', window.auditSortCards);
+                    document.getElementById('auditFullSourceBtn').addEventListener('click', function () { setAuditSupport(true, 'transcript', this); });
+                    document.getElementById('auditActivityBtn').addEventListener('click', function () { setAuditSupport(true, 'activity', this); });
+                    document.getElementById('auditContextBtn').addEventListener('click', function () { showAuditView('context'); });
+                    document.getElementById('auditSupportClose').addEventListener('click', function () { setAuditSupport(false); });
+                    document.getElementById('auditMetaToggle').addEventListener('click', function () {
+                      var card = document.getElementById('auditMetaCard');
+                      card.classList.toggle('collapsed');
+                      this.setAttribute('aria-expanded', card.classList.contains('collapsed') ? 'false' : 'true');
+                    });
+                    document.getElementById('auditChatForm').addEventListener('submit', function (event) { event.preventDefault(); auditChatSubmit(document.getElementById('auditChatInput')); });
+                    document.querySelectorAll('[data-audit-question]').forEach(function (btn) {
+                      btn.addEventListener('click', function () {
+                        var input = document.getElementById('auditChatInput');
+                        input.value = btn.dataset.auditQuestion;
+                        auditChatSubmit(input);
+                      });
+                    });
+
+                    root.querySelectorAll('.kpa-prompt').forEach(function (btn) {
+                      btn.addEventListener('click', function () {
+                        var input = document.getElementById('auditChatInput');
+                        input.value = btn.dataset.kpaPrompt || btn.textContent.trim();
+                        auditChatSubmit(input);
+                      });
+                    });
+
                     document.addEventListener('keydown', function (e) {
-                      if (e.key !== 'Enter' || e.shiftKey || !detailIsOpen()) return;
+                      if (e.key === 'Escape' && support.classList.contains('open')) {
+                        e.preventDefault(); e.stopPropagation(); setAuditSupport(false); return;
+                      }
+                      if (e.key !== 'Enter' || e.shiftKey || !detailIsOpen() || support.classList.contains('open')) return;
                       var input = e.target;
-                      if (input.id !== 'aimyFloatInput' && input.id !== 'overlayInput') return;
+                      if (input.id !== 'aimyFloatInput') return;
                       e.preventDefault();
                       e.stopPropagation();
                       auditChatSubmit(input);
@@ -11367,13 +11977,19 @@
 
                     document.addEventListener('click', function (e) {
                       if (!detailIsOpen()) return;
-                      var send = e.target.closest && e.target.closest('#aimyFloatSend, #overlaySend');
-                      if (!send) return;
+                      var trigger = e.target.closest && e.target.closest('#aimyFloatSend, #aimyFloatIcon');
+                      if (!trigger) return;
                       e.preventDefault();
                       e.stopPropagation();
-                      auditChatSubmit(document.getElementById(send.id === 'overlaySend' ? 'overlayInput' : 'aimyFloatInput'));
+                      if (trigger.id === 'aimyFloatIcon') setAuditSupport(true, 'context', trigger);
+                      else auditChatSubmit(document.getElementById('aimyFloatInput'));
                     }, true);
-                  })();
+
+                    renderMetadata();
+                    renderTranscript();
+                    renderActivity();
+                    window.auditSortCards();
+                  });
                 </script>
               </div>
 
@@ -11575,6 +12191,59 @@
 
             </div>
           </div>
+
+          <section class="audit-support" id="auditSupport" role="dialog" aria-modal="true" aria-label="AiMY audit conversation" aria-hidden="true">
+            <header class="audit-support-head">
+              <span class="audit-support-brand"><svg viewBox="0 0 18 20" aria-hidden="true"><use href="#aimy-logo-small"/></svg>AiMY</span>
+              <span class="audit-support-context" id="auditSupportContext">EV-0527-OMAR · 30 metadata fields</span>
+              <button class="audit-support-close" id="auditSupportClose" type="button" aria-label="Close audit conversation">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M3 3l10 10M13 3L3 13"/></svg>
+              </button>
+            </header>
+            <div class="audit-support-body" id="auditSupportBody">
+              <section class="audit-support-view" id="auditContextView" data-audit-view="context">
+                <div class="audit-context-intro">
+                  <h2>Your audit context, in one conversation.</h2>
+                  <p id="auditContextCopy">Here are all 30 metadata fields for this interaction. Open the full transcript, explore activity, or ask about a field below.</p>
+                  <button class="audit-activity-toggle" id="auditActivityBtn" type="button">
+                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M8 4.5V8l2.5 1.5"/></svg>
+                    Show activity log
+                  </button>
+                </div>
+                <article class="audit-meta-card" id="auditMetaCard">
+                  <span class="audit-meta-avatar"><svg viewBox="0 0 18 20" aria-hidden="true"><use href="#aimy-logo-small"/></svg></span>
+                  <button class="audit-meta-summary" id="auditMetaToggle" type="button" aria-expanded="true">
+                    Ticket overview <span>Identity and outcome</span>
+                    <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 5l4 4 4-4"/></svg>
+                  </button>
+                  <div class="audit-meta-grid" id="auditMetaGrid"></div>
+                </article>
+                <div class="audit-chat-log" id="auditChatLog" role="log" aria-live="polite"></div>
+                <div class="audit-chat-prompts">
+                  <button type="button" data-audit-question="Explain why the score is 52%.">Explain the score</button>
+                  <button type="button" data-audit-question="Show the strongest failing evidence.">Show failing evidence</button>
+                  <button type="button" data-audit-question="Summarize the interaction timeline.">Summarize timeline</button>
+                </div>
+              </section>
+              <section class="audit-support-view" id="auditTranscriptView" data-audit-view="transcript" hidden>
+                <div class="audit-view-title"><span class="audit-view-icon">✦</span><div><h2 id="auditSourceTitle">Full transcript &amp; recording</h2><p id="auditSourceSubtitle">Source context for EV-0527-OMAR</p></div></div>
+                <div class="audit-source-card" id="auditSourceCard"></div>
+                <div class="audit-transcript-list" id="auditTranscriptList"></div>
+              </section>
+              <section class="audit-support-view" id="auditActivityView" data-audit-view="activity" hidden>
+                <div class="audit-view-title"><span class="audit-view-icon">◷</span><div><h2>Audit activity</h2><p>Review history and workflow events for this interaction</p></div></div>
+                <div class="audit-activity-list" id="auditActivityList"></div>
+              </section>
+            </div>
+            <div class="audit-composer-wrap">
+              <form class="audit-composer" id="auditChatForm">
+                <button class="audit-composer-logo" id="auditContextBtn" type="button" aria-label="Show audit context"><svg viewBox="0 0 18 20" aria-hidden="true"><use href="#aimy-logo-small"/></svg></button>
+                <input id="auditChatInput" aria-label="Ask AiMY about this audit" placeholder="Ask AiMY about this audit…" autocomplete="off">
+                <span class="audit-composer-hint">Enter to send</span>
+                <button class="audit-composer-send" type="submit" aria-label="Send to AiMY"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M14 2L9.5 14l-2.3-5.2L2 6.5 14 2Z"/><path d="M7.2 8.8L14 2"/></svg></button>
+              </form>
+            </div>
+          </section>
         </div><!-- /eval-detail-human -->
 
         <!-- ── EVALUATION DETAIL PAGE, Level 4 (AI-handled) ─────────────────
@@ -11594,6 +12263,7 @@
             <div>
               <div class="eval-transcript-panel">
                 <div class="eval-transcript-header">
+
                   <div class="eval-transcript-title">
                     <span class="interaction-type-flag ai-flag" style="font-size:9px;padding:2px 7px;"><svg width="13" height="14" viewBox="0 0 18 20"><use href="#aimy-logo-small"/></svg>AiMY handled</span>
                     Chat · May 8, 2026 · 14:22 · 4m 11s
