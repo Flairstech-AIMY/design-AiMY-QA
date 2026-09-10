@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="en">
   <head>
     <script>
@@ -63,12 +63,12 @@
         --qa-accent-dim: rgba(139, 79, 244, 0.15);
         --teal: #6fdfe2;
         --purple: #8b4ff4;
-        --ok: #17b26a;
-        --warn: #f79009;
-        --err: #f04438;
-        --ok-bg: rgba(23, 178, 106, 0.12);
-        --warn-bg: rgba(247, 144, 9, 0.12);
-        --err-bg: rgba(240, 68, 56, 0.12);
+        --ok: #7fae94;
+        --warn: #c0a47c;
+        --err: #d2827b;
+        --ok-bg: rgba(127, 174, 148, 0.14);
+        --warn-bg: rgba(192, 164, 124, 0.14);
+        --err-bg: rgba(210, 130, 123, 0.14);
 
         /* Motion tokens, only two durations allowed. Longer motion
        (chart animation, skeleton shimmer) defines its own keyframe. */
@@ -100,8 +100,8 @@
         --d200: #c8d2dc;
 
         /* Semantic: info completes the ok/warn/err set (.ws-detected) */
-        --info: #0ea5e9;
-        --info-bg: rgba(14, 165, 233, 0.12);
+        --info: #8aa6bd;
+        --info-bg: rgba(138, 166, 189, 0.14);
 
         /* Accents are GLOBAL, one --accent per product, not per-product
        tokens. Aliased onto the existing --qa-accent trio rather than
@@ -175,7 +175,14 @@
         /* Strongest text. White on dark, near-black on light, the
        hardcoded #fff values that assumed a dark surface now use this. */
         --text-strong: #ffffff;
-      }
+      
+        --err-strong: #f04438;
+        --ink-primary: var(--d50);
+        --ink-secondary: var(--d100);
+        --ink-muted: var(--d200);
+        --ink-placeholder: var(--d400);
+        --ink-rule: var(--d600);
+}
 
       /* ══════════════════════════════════════════════════════════════════
          LIGHT THEME
@@ -215,14 +222,14 @@
 
         /* Semantic hues darkened one step, dark-mode mid-tones fail contrast
            as text on white. Tint backgrounds stay pale. */
-        --ok:   #0e9257;
-        --warn: #b26205;
-        --err:  #d92d20;
-        --info: #067dc2;
-        --ok-bg:   rgba(23,178,106,0.14);
-        --warn-bg: rgba(247,144,9,0.14);
-        --err-bg:  rgba(240,68,56,0.14);
-        --info-bg: rgba(14,165,233,0.14);
+        --ok:   #3f6b52;
+        --warn: #7a613c;
+        --err:  #8a473f;
+        --info: #4d6b85;
+        --ok-bg:   rgba(63,107,82,0.14);
+        --warn-bg: rgba(122,97,60,0.14);
+        --err-bg:  rgba(138,71,63,0.14);
+        --info-bg: rgba(138,166,189,0.14);
 
         /* Surfaces */
         --body-bg:           #f4f6f9;
@@ -275,7 +282,9 @@
         --brand-glow: rgba(51,105,255,0.20);
         --accent-glow: rgba(var(--accent-rgb), 0.20);
         /* --card-border-focus and --code-bg are identical in both themes */
-      }
+      
+        --err-strong: #d92d20;
+}
 
       /* ── Scoped chrome corrections ────────────────────────────────────
          design-system.md §4 allows "a small set of scoped chrome/component
@@ -305,7 +314,7 @@
       :root[data-theme="light"] .chat-msg.user .msg-bubble { background: var(--qa-accent-dim); color: var(--d50); }
       /* ── Solid semantic fills in light ────────────────────────────────
          These chips use DARK text on a bright fill, which reads well against
-         dark-theme --ok (#17b26a, 6.6:1). Light darkens --ok to #0e9257 for
+         dark-theme --ok (#7fae94, 6.6:1). Light darkens --ok to #3f6b52 for
          text legibility, and dark-on-dark-green drops to 3.5:1. White on the
          same fill is 4.1:1, so the text inverts rather than the fill, the
          chip keeps its meaning and its colour. */
@@ -333,7 +342,7 @@
       :root[data-theme="light"] .filter-chip:hover { color: rgba(16,24,40,0.92); }
 
       /* Solid-green confirm buttons: dark text works on dark-theme --ok
-         (#17b26a) but not on light's darker #0e9257. */
+         (#7fae94) but not on light's darker #3f6b52. */
       :root[data-theme="light"] .fbt-fb.yes,
       :root[data-theme="light"] .fbt-fb.yes:hover { color: #fff; }
 
@@ -4994,9 +5003,9 @@
         padding: 3px 9px; border-radius: 5px;
         letter-spacing: 0.03em;
       }
-      .eval-status.pass     { background: rgba(23,178,106,0.14); color: var(--ok); border: 1px solid rgba(23,178,106,0.25); }
-      .eval-status.fail     { background: rgba(240,68,56,0.12);  color: var(--err); border: 1px solid rgba(240,68,56,0.22); }
-      .eval-status.border   { background: rgba(247,144,9,0.12);  color: var(--warn); border: 1px solid rgba(247,144,9,0.22); }
+      .eval-status.pass     { background: rgba(63,107,82,0.14); color: var(--ok); border: 1px solid rgba(23,178,106,0.25); }
+      .eval-status.fail     { background: rgba(210,130,123,0.14);  color: var(--err); border: 1px solid rgba(240,68,56,0.22); }
+      .eval-status.border   { background: rgba(192,164,124,0.14);  color: var(--warn); border: 1px solid rgba(247,144,9,0.22); }
 
       /* Channel badge */
       .channel-badge {
@@ -5323,7 +5332,7 @@
       }
       /* Low-confidence rows get a subtle tint to aid scanning */
       .eval-row.low-conf-row {
-        border-color: rgba(240,68,56,0.12);
+        border-color: rgba(210,130,123,0.14);
         background: color-mix(in srgb, rgba(240,68,56,0.04) 100%, var(--card-bg));
       }
       .eval-row.selected {
@@ -6651,7 +6660,7 @@
         font-family: "Urbanist", sans-serif; cursor: pointer;
         transition: transform var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast), color var(--transition-fast), opacity var(--transition-fast);
       }
-      .eval-justify-btn:hover { background: rgba(240,68,56,0.14); }
+      .eval-justify-btn:hover { background: rgba(138,71,63,0.14); }
       .eval-justify-btn svg { width: 13px; height: 13px; }
       /* Disabled state for low confidence */
       .eval-justify-btn.dimmed {
@@ -13777,7 +13786,7 @@
         font-weight: 700;
       }
       .open-coach-action {
-        background: rgba(247, 144, 9, 0.12);
+        background: rgba(192, 164, 124, 0.14);
         border: 1px solid rgba(247, 144, 9, 0.25);
         color: var(--warn);
         font-family: "Urbanist", sans-serif;
@@ -14204,8 +14213,8 @@
         background: var(--d400);
       }
       /* Priority modifiers (Batch 3), piggyback on existing .loop-state pill */
-      .loop-state.prio-high { background: rgba(240,68,56,0.14); color: var(--err); border: 1px solid rgba(240,68,56,0.25); }
-      .loop-state.prio-med  { background: rgba(247,144,9,0.14); color: var(--warn); border: 1px solid rgba(247,144,9,0.25); }
+      .loop-state.prio-high { background: rgba(138,71,63,0.14); color: var(--err); border: 1px solid rgba(240,68,56,0.25); }
+      .loop-state.prio-med  { background: rgba(122,97,60,0.14); color: var(--warn); border: 1px solid rgba(247,144,9,0.25); }
       .loop-state.prio-low  { background: rgba(97,173,241,0.12); color: var(--ai-text); border: 1px solid rgba(97,173,241,0.25); }
       .loop-state.prio-high .ls-dot { background: var(--err); }
       .loop-state.prio-med  .ls-dot { background: var(--warn); }
@@ -15343,7 +15352,7 @@
         border: 1px solid transparent; flex-shrink: 0;
       }
       .coach-btn.accept {
-        background: rgba(23,178,106,0.12); color: var(--ok); border-color: rgba(23,178,106,0.25);
+        background: rgba(127,174,148,0.14); color: var(--ok); border-color: rgba(23,178,106,0.25);
       }
       .coach-btn.accept:hover { background: rgba(23,178,106,0.22); }
       .coach-btn.defer {
@@ -19956,7 +19965,7 @@
       .fb-detail-btn.ack { background:var(--ok); color:#06210f; }
       .fb-detail-btn.ack:hover { filter:brightness(1.08); }
       .fb-detail-btn.justify { background:rgba(240,68,56,0.08); color:var(--err); border-color:rgba(240,68,56,0.3); }
-      .fb-detail-btn.justify:hover { background:rgba(240,68,56,0.14); }
+      .fb-detail-btn.justify:hover { background:rgba(138,71,63,0.14); }
       .fb-detail-loop { display:flex; align-items:center; justify-content:center; gap:8px; width:100%; padding:9px; border-radius:8px; font-size:12px; font-weight:700; }
       .fb-detail-loop svg { width:14px; height:14px; }
       .fb-detail-loop.acknowledged { background:var(--ok-bg); color:var(--ok); }

@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="en">
   <head>
     <script>
@@ -67,12 +67,12 @@
         --qa-accent-dim: rgba(139, 79, 244, 0.15);
         --teal: #6fdfe2;
         --purple: #8b4ff4;
-        --ok: #17b26a;
-        --warn: #f79009;
-        --err: #f04438;
-        --ok-bg: rgba(23, 178, 106, 0.12);
-        --warn-bg: rgba(247, 144, 9, 0.12);
-        --err-bg: rgba(240, 68, 56, 0.12);
+        --ok: #7fae94;
+        --warn: #c0a47c;
+        --err: #d2827b;
+        --ok-bg: rgba(127, 174, 148, 0.14);
+        --warn-bg: rgba(192, 164, 124, 0.14);
+        --err-bg: rgba(210, 130, 123, 0.14);
 
         /* Motion tokens, only two durations allowed. Longer motion
        (chart animation, skeleton shimmer) defines its own keyframe. */
@@ -93,7 +93,14 @@
         --grad-avatar: linear-gradient(135deg,#7c3aed,#3369ff);
         --grad-ellipse-1: radial-gradient(ellipse at center, rgba(0,102,255,0.18) 0%, rgba(97,173,241,0.1) 28%, transparent 60%);
         --grad-ellipse-2: radial-gradient(ellipse at center, rgba(111,223,226,0.1) 0%, rgba(139,79,244,0.07) 38%, transparent 60%);
-      }
+      
+        --err-strong: #f04438;
+        --ink-primary: var(--d50);
+        --ink-secondary: var(--d100);
+        --ink-muted: var(--d200);
+        --ink-placeholder: var(--d400);
+        --ink-rule: var(--d600);
+}
 
       /* ── Accessibility: global focus-visible.
      Uses brand blue (not QA accent) because focus rings are a permanent
@@ -1598,7 +1605,7 @@
         animation: growScale 0.9s cubic-bezier(0.4, 0, 0.2, 1) both;
       }
       .driver-bar-fill.primary {
-        background: linear-gradient(90deg, #f04438, #fb7067);
+        background: linear-gradient(90deg, #d2827b, #fb7067);
         box-shadow: 0 0 8px rgba(240, 68, 56, 0.4);
       }
       .driver-bar-fill.secondary {
@@ -3980,14 +3987,14 @@
 
         /* Semantic hues darkened one step, dark-mode mid-tones fail contrast
            as text on white. Tint backgrounds stay pale. */
-        --ok:   #0e9257;
-        --warn: #b26205;
-        --err:  #d92d20;
-        --info: #067dc2;
-        --ok-bg:   rgba(23,178,106,0.14);
-        --warn-bg: rgba(247,144,9,0.14);
-        --err-bg:  rgba(240,68,56,0.14);
-        --info-bg: rgba(14,165,233,0.14);
+        --ok:   #3f6b52;
+        --warn: #7a613c;
+        --err:  #8a473f;
+        --info: #4d6b85;
+        --ok-bg:   rgba(63,107,82,0.14);
+        --warn-bg: rgba(122,97,60,0.14);
+        --err-bg:  rgba(138,71,63,0.14);
+        --info-bg: rgba(138,166,189,0.14);
 
         /* Surfaces */
         --body-bg:           #f4f6f9;
@@ -4036,7 +4043,9 @@
         --glass-bg: rgba(255,255,255,0.85);
         --glass-border: rgba(16,24,40,0.10);
         /* --card-border-focus and --code-bg are identical in both themes */
-      }
+      
+        --err-strong: #d92d20;
+}
 
       /* ── Scoped chrome corrections ────────────────────────────────────
          design-system.md §4 allows "a small set of scoped chrome/component
@@ -4066,7 +4075,7 @@
       :root[data-theme="light"] .chat-msg.user .msg-bubble { background: var(--qa-accent-dim); color: var(--d50); }
       /* ── Solid semantic fills in light ────────────────────────────────
          These chips use DARK text on a bright fill, which reads well against
-         dark-theme --ok (#17b26a, 6.6:1). Light darkens --ok to #0e9257 for
+         dark-theme --ok (#7fae94, 6.6:1). Light darkens --ok to #3f6b52 for
          text legibility, and dark-on-dark-green drops to 3.5:1. White on the
          same fill is 4.1:1, so the text inverts rather than the fill, the
          chip keeps its meaning and its colour. */
@@ -4094,7 +4103,7 @@
       :root[data-theme="light"] .filter-chip:hover { color: rgba(16,24,40,0.92); }
 
       /* Solid-green confirm buttons: dark text works on dark-theme --ok
-         (#17b26a) but not on light's darker #0e9257. */
+         (#7fae94) but not on light's darker #3f6b52. */
       :root[data-theme="light"] .fbt-fb.yes,
       :root[data-theme="light"] .fbt-fb.yes:hover { color: #fff; }
 
@@ -5255,11 +5264,11 @@
       .di-src-card.di-src-error {
         border-color: rgba(240,68,56,0.35);
         background: rgba(240,68,56,0.04);
-        box-shadow: 0 0 0 1px rgba(240,68,56,0.12), 0 4px 20px rgba(240,68,56,0.08);
+        box-shadow: 0 0 0 1px rgba(210,130,123,0.14), 0 4px 20px rgba(240,68,56,0.08);
       }
       .di-src-card.di-src-error:hover {
         border-color: rgba(240,68,56,0.52);
-        box-shadow: 0 0 0 1px rgba(240,68,56,0.2), 0 6px 24px rgba(240,68,56,0.12);
+        box-shadow: 0 0 0 1px rgba(240,68,56,0.2), 0 6px 24px rgba(210,130,123,0.14);
       }
       .di-src-card.di-src-error.di-src-selected {
         border-color: rgba(240,68,56,0.6);
@@ -5310,7 +5319,7 @@
       .di-src-card:hover .ic-freshdesk,
       .di-src-selected .ic-freshdesk { background: rgba(77,201,138,0.14); }
       .di-src-card:hover .ic-s3,
-      .di-src-selected .ic-s3       { background: rgba(247,144,9,0.14); }
+      .di-src-selected .ic-s3       { background: rgba(122,97,60,0.14); }
       .di-src-card:hover .ic-connect,
       .di-src-selected .ic-connect  { background: rgba(111,223,226,0.14); }
 
@@ -5343,8 +5352,8 @@
         flex-shrink: 0;
         white-space: nowrap;
       }
-      .pill-active { background: rgba(23,178,106,0.12); color: var(--ok); }
-      .pill-warn   { background: rgba(247,144,9,0.12);  color: var(--warn); }
+      .pill-active { background: rgba(127,174,148,0.14); color: var(--ok); }
+      .pill-warn   { background: rgba(192,164,124,0.14);  color: var(--warn); }
       .pill-error  { background: rgba(240,68,56,0.1);   color: var(--err); }
       .di-pill-dot {
         width: 5px; height: 5px;
@@ -5921,7 +5930,7 @@
         gap: 14px;
         padding: 14px 16px;
         background: rgba(240,68,56,0.04);
-        border: 1px solid rgba(240,68,56,0.14);
+        border: 1px solid rgba(138,71,63,0.14);
         border-radius: 10px;
         margin-bottom: 8px;
         margin-top: 8px;
@@ -5992,9 +6001,9 @@
       }
       .di-pb-error .di-pb-inner {
         background: rgba(240,68,56,0.06);
-        border-top: 1px solid rgba(240,68,56,0.12);
-        border-bottom: 1px solid rgba(240,68,56,0.12);
-        border-left: 1px solid rgba(240,68,56,0.12);
+        border-top: 1px solid rgba(210,130,123,0.14);
+        border-bottom: 1px solid rgba(210,130,123,0.14);
+        border-left: 1px solid rgba(210,130,123,0.14);
                 border-radius: 10px 0 0 10px;
 
 
@@ -6425,7 +6434,7 @@
         margin-top: 20px;
         padding: 16px 18px;
         background: rgba(240,68,56,0.04);
-        border: 1px solid rgba(240,68,56,0.12);
+        border: 1px solid rgba(210,130,123,0.14);
         border-radius: 10px;
       }
       .di-danger-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--err); margin-bottom: 12px; }
@@ -6483,7 +6492,7 @@
         margin-bottom: 18px;
         padding: 12px 14px;
         background: rgba(240,68,56,0.05);
-        border: 1px solid rgba(240,68,56,0.14);
+        border: 1px solid rgba(138,71,63,0.14);
         border-radius: 9px;
       }
       .di-del-stat { display: flex; flex-direction: column; gap: 2px; }

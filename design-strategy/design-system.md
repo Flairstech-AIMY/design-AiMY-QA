@@ -15,6 +15,10 @@ The shared foundation for the Aimy ecosystem — one token layer, one component 
 | **Theme-aware** | Every surface works in light and dark. Test both before shipping. |
 | **AI-native** | AI states (thinking, streaming, citations, suggestions) are first-class components, not afterthoughts. AI never applies changes silently — always review (accept/reject). |
 | **Accessible by default** | `:focus-visible` rings, `prefers-reduced-motion`, AA contrast in both themes. Status is always carried by color **and** text/icon, never color alone. |
+| **Color is a family, not a signal** | Six hues at one chroma and one lightness, so a screen of labels reads as one voice. A hue names **what kind of thing this is** — and because none of them shouts, that is a flavour rather than an alarm. What a hue may never name is a **position**: a rung on a ladder, a stage in a pipeline. Those are read by order, and colouring them is how five steps end up the same green. See §1. |
+| **A tag is a name, not a sentence** | A label pill carries the NAME of a state, so it is capitalised like one: sentence case, and both words capitalised when there are exactly two — "Meeting Set" is a thing, "meeting set" is something that happened. Past two words it is a phrase and stays sentence case. Full capitals were doing volume rather than meaning, and they cost legibility at 12px because every word becomes the same rectangle. The one role that keeps capitals is the section marker, of which there is one per group. See §2. |
+| **A label has a fill; a control has an edge; a link has neither** | A hairline border is this system's signature for something you can press. Tags and status labels take a ground and no border; buttons and chips take a border and no ground; a link is coloured text with neither. Anything carrying both a fill and an edge is a control impersonating a label, or the reverse — and a **verb** wearing the link's clothes is the third mistake, which is how an actions row ends up reading as a row of URLs. See §2, *Hierarchy*. |
+| **A rank is a set of differences** | A rank differs from its neighbour in at least **two of {size, weight, ink}**. One axis is not a level: 14 against 16 at the same weight in the same grey is two things a reader cannot separate, and it reads as noise rather than as order. Both products wrote this rule for themselves before it was written here. See §2, *Hierarchy*. |
 
 ---
 
@@ -40,7 +44,23 @@ The shared foundation for the Aimy ecosystem — one token layer, one component 
 | `--d900` | `#0d1117` | `#eef2f6` |
 | `--d950` | `#080b10` | `#f7fafc` |
 
-Roles: `--d50` primary text · `--d400` secondary/muted · `--d500` tertiary/placeholder · `--d600` faint labels/separators.
+### Ink — three values, and they sit close together
+
+Muted text tested badly in the products: readers skipped it. That is not hierarchy, it is text
+nobody reads — so the band that may carry type is narrow, and every value in it is legible on its
+own. Hierarchy at the small end is carried by **weight and position**, not by fading the words.
+
+| Role | Token | Use |
+|---|---|---|
+| `--ink-primary` | `--d50` | Anything you read: figures, headlines, names, body |
+| `--ink-secondary` | `--d100` | The supporting line under it |
+| `--ink-muted` | `--d200` | **The floor for type.** Slightly quiet, still read. Nothing fainter carries a word |
+| the family | §1 | A word *inside a sentence* may take a family hue when the word **is** the status — "**Callback** — they asked to be called back, 29 Aug." The rest of the line stays in the ink band |
+| `--ink-placeholder` | `--d400` | The one exception — a hint that must not read as a value |
+| `--ink-rule` | `--d600` | **NON-TEXT.** Hairlines, dots, dividers, disabled marks. Never type |
+
+`--d300` and below are for rules, dots and disabled states. If a piece of text feels like it wants
+`--d400`, the question is whether it needs to be on the screen at all.
 
 ### Brand & accent
 
@@ -56,16 +76,76 @@ Roles: `--d50` primary text · `--d400` secondary/muted · `--d500` tertiary/pla
 
 Rule: **focus is always `--brand`**, never the product accent — focus stays consistent across every Aimy product.
 
-### Semantic status
+### Semantic status — a family of six, and a licence
 
-Text/icon hues darken one step in light mode (dark-mode mid-tones fail contrast on white). Tint backgrounds stay pale.
+**The rule has two halves.** A hue names *what kind of thing this is*; it never names a *position*.
+A rung on a ladder and a stage in a pipeline are read by order, and colouring them is how a product
+ends up with five steps in the same green. A kind — a dinner against a demo, a callback against a
+no-answer — is exactly what a hue is good for.
 
-| Token | Dark | Light | Bg token |
-|---|---|---|---|
-| `--ok` | `#17b26a` | `#0e9257` | `--ok-bg` green @ 12–14% |
-| `--warn` | `#f79009` | `#b26205` | `--warn-bg` amber @ 12–14% |
-| `--err` | `#f04438` | `#d92d20` | `--err-bg` red @ 12–14% |
-| `--info` | `#0ea5e9` | `#067dc2` | `--info-bg` cyan @ 12–14% |
+**The other half is chroma.** The first cut of this licence took every hue off every label, and the
+result was worse in a different way: a wall of grey pills is not calm, it is undifferentiated, and
+a screen loses its bearings along with its noise. The fix was never fewer colours — it was quieter
+ones. At a quarter of the old saturation a tone stops being a signal and becomes a flavour, and six
+of them can sit on one screen without any of them raising its voice.
+
+**Why the old set failed.** Not because there were six, but because they were #17b26a, #f79009,
+#f04438 and #0ea5e9 — a green, an amber and a red at full strength, which is a traffic light
+whatever you attach it to. Amber between the other two was the worst of it, and it was spent on
+"owed", "late" and "gatekeeper", none of which is a warning.
+
+The evidence for the change: across Sales, QA and Knowledge the ecosystem makes ~7,500 references
+to a hue-bearing token, and the two most-used are `--err` (1,414) and `--ok` (1,087) — both ahead
+of `--brand` (942). Red and green were the busiest colours in the system. Astro UXDS names the
+failure: overusing a hue for two unrelated jobs "stripped the color of its attention-getting power".
+
+| Token | Dark | Light | Means | HSL (dark) | On card |
+|---|---|---|---|---|---|
+| `--ok` | `#7fae94` | `#3f6b52` | decided, and decided well | H147 S22 L59 | 6.92:1 |
+| `--err` | `#d2827b` | `#8a473f` | decided badly, or a door shut for good | H5 S49 L65 | 5.96:1 |
+| `--info` | `#8aa6bd` | `#4d6b85` | provenance — this came from AiMY | H207 S28 L64 | 6.82:1 |
+| `--warn` | `#c0a47c` | `#7a613c` | needs attention, not an alarm | H35 S35 L62 | 7.30:1 |
+| `--err-strong` | `#f04438` | `#d92d20` | **not in the family** — see below | — | — |
+| `--accent-label` | `#a892bf` | `#5f5079` | the accent, at the family's chroma | H269 S26 L66 | 6.21:1 |
+| `--teal-label` | `#84b3b0` | `#3f6b68` | the teal, at the family's chroma | H176 S24 L61 | 7.47:1 |
+
+One chroma, one lightness, one voice. `--err` carries about twenty points more saturation than the
+rest, deliberately: the six are not used equally often, and a verdict should still reach you first.
+
+**`--err-strong` is the exception, and it is a control, not a label.** The family is for words that
+describe something, and it is quiet on purpose. A filled control that stops something already *in
+flight* is not describing anything — it is an alarm, and an alarm is the one place a full chroma is
+correct. Hanging up on a person mid-call is the case it exists for; a mispress costs you the call,
+and muted it read as a suggestion. It is never a badge ground, never a border, never text: if a red
+is being used to say what something **is**, it is `--err`.
+`--accent-label` and `--teal-label` exist because `--accent` and `--teal` are identity tokens a
+product re-themes — a product that re-themes `--accent` should revisit its label rendering with it.
+
+The two survivors share one chroma and one lightness so they read as a pair rather than as two
+signals. The negative carries about ten points more saturation than the positive, deliberately:
+they are not used equally often, and the rarer, costlier one gets the louder half of a quiet pair.
+Measured 5.96:1 and 7.19:1 on the card, 7.33:1 and 6.4:1 on white — a step darker on white, as
+every hue here is.
+
+**And a third hue, for provenance.** The two poles say how something *ended*. `--info` says who it
+came *from*: AiMY noticed it, AiMY has an opinion about it, AiMY wrote it. That is the thing a
+reader most needs to know before trusting a line, it is worth a colour of its own, and it never
+sits on the same object as a verdict — so the three cannot collide. It is pulled to the poles'
+chroma so it joins the family rather than starting a second one.
+
+Three status hues in the whole ecosystem, then: **decided well · decided badly · came from AiMY.**
+Everything else is the neutral ramp.
+
+**What keeps its colour on top of that.** `--brand` is focus and the primary action; `--accent` is
+selection and the nav mark; `--ai` is the AI *surface* — the canvas, the streaming cursor, the
+model dot — and stays the full gradient it always was. Identity and affordance are not verdicts,
+and none of them was what the traffic-light reading was about.
+
+**Adopting it in a product.** Change values, not call sites. `tag-warn` and `tag-info` still exist
+and still resolve — they simply stop being hues. Where a product used a hue to distinguish
+categories (five kinds of appointment, six pipeline stages), that distinction moves to the word and
+to position; where it used one hue for several states, only the state that is genuinely an outcome
+keeps it.
 
 ### Surfaces & helpers
 
@@ -91,15 +171,88 @@ Text/icon hues darken one step in light mode (dark-mode mid-tones fail contrast 
 
 Tokens: `--font-sans` (Urbanist) · `--font-display` (Poppins) · `--font-mono` · `--fst-normal` / `--fst-italic`.
 
-### Scale (`--fs-*`)
-`2xs` 10 · `xs` 11 · `sm` 12 · `base` 13 · `md` 14 · `lg` 16 · `xl` 18 · `2xl` 22 · `3xl` 28 · `4xl` 34 · `5xl` 46 (px)
+### Scale (`--fs-*`) — three sizes, and each one names what it is for
+
+`2xs` 12 · `xs` 14 · `sm` 16 · `base` 16 · `md` 16 · `lg` 18 · `xl` 20 · `2xl` 24 · `3xl` 30 · `4xl` 38 · `5xl` 46 (px)
+
+**12 — minimal components.** Tags, status labels, work states, and the metadata that sits beside
+something else: a timestamp, a count, a unit, an attribution. Things you *recognise* rather than
+read, three or four words at most. At 14 a tag stops behaving like a mark and starts competing with
+the name next to it.
+
+**14 — the smallest sentence.** A supporting line, help text, a dense cell, a control's label.
+Anything with a verb in it starts here.
+
+**16 — the working minimum.** Body, row text, card text, anything primary. Most of the product
+lives here.
+
+**Nothing is smaller than 12, and 12 is never a paragraph.** The old scale put four steps below 14
+and body at 13, which is how the reference implementation alone accumulated **540 sites of sub-14px
+type**; 341 of them were marks and 199 were ordinary text set too small. The upper steps moved up
+with the base to keep the intervals — a heading one step above 16 has to be 18, not the 16 it used
+to be.
+
+### Every step is even, and the interval is +2
+
+A scale that reads 12 · 14 · 16 · 18 has a decision in it. One that also holds 13, 15 and 17 has
+none: nothing distinguishes the odd values from the even ones except which file they happened to be
+typed in, and a 12 sitting beside a 15 is two components that were never compared. **A size is even
+or it is a mistake** — round up, never down, because the floor is the thing being protected.
+
+The rule is what makes the scale enforceable. "Under 14 is too small" catches nine and eleven and
+lets thirteen through; "even, and never below twelve" catches all three, and a sweep can apply it
+without a human deciding case by case. The one thing it cannot decide is whether something is a
+mark or a sentence, so anything under 12 lands on **14** rather than 12 — 12 belongs to the
+components that ask for it by name, and a sweep must not hand it out.
+
+Three products ran on four scales — the shell's `--fs-*`, Sales's own `--fs-*` and `--ty-*`, and
+Sales's surface scale `--t-*` — which is how 13 and 15 survived a floor that had already been
+agreed. All four are now even.
+
+### Case — a tag is a name, a control is a verb
+
+**Label pills** — `.tag`, `.work-state`, `.s-meta-st`, `.signal-badge`, `.trust-state`,
+`.conf-badge`, `.model-tag`, `.ver-tag`, `.entry-mode-tag`, `.tc-approval` — are **sentence
+case**, with **both words capitalised when there are exactly two**. A two-word label is the name of
+a state ("Meeting Set", "Handed Over", "Not Saved"); at three words or more it has become a phrase
+and title-casing it turns it into a headline, so it stays sentence case ("Do not call", "Up to
+date"). A count is a measurement rather than a name and is left alone ("6 assets").
+
+Full capitals were doing two jobs and only one was real: *this is a label, not prose* — which the
+ground, the weight and the size already say. The other was volume, and a label has no business
+being the loudest thing on a card. Capitals also cost legibility at 12px, because every word
+becomes the same rectangle and the reader has to spell it.
+
+**The tracking goes with the case.** `--ls-wide` is a correction *for* capitals; on sentence case it
+is not a correction, it is gaps. A pill that drops `text-transform` drops `letter-spacing` in the
+same edit.
+
+**Where the rule is applied matters.** The same string is often a tag on one screen and a button or
+a filter on another — `called['handed-over'].label` is all three in Sales. Title case belongs at the
+render site, in a `tagCase()` helper, never on the table the string came from: in a tag it is a
+name, and everywhere else it is doing a verb's work and takes sentence case.
+
+**The one role that keeps capitals** is the section marker — `.b-cmeta-cap`, `.st-cap`,
+`.menu-label`, a table head. There is one of them per group, it labels a region rather than an
+object, and it is the single job `--ls-wide` exists for.
 
 ### Weights (`--fw-*`)
 light 300 · regular 400 · medium 500 · semibold 600 · bold 700 · extrabold 800
 
 ### Line height (`--lh-*`) / tracking (`--ls-*`)
 lh: none 1 · tight 1.2 · snug 1.4 · base 1.55 · relaxed 1.75
-ls: tighter −0.03em · tight −0.02em · normal 0 · wide 0.04em · wider 0.08em
+ls: tighter −0.03em · tight −0.02em · normal 0 · wide 0.06em · wider 0.08em
+
+`--ls-wide` is the tracking for **capitals**, and capitals need 5–12%. It shipped at 4% — uppercase
+with the correction left out — while the roles table below asked for +0.1em on the same runs, so
+the token and the documentation disagreed and every component reading the token lost. Raised to
+0.06em; `--ls-wider` is unchanged above it.
+
+**The caption floor.** `--fs-2xs` is the smallest step in the system and no product may lower it.
+It was 10px in the shell and 11px in Sales, on the argument that type that small is capitals and
+tracked or it is not that size — which was the caps rule being used to justify the size rather than
+the other way round. Both are 12 now, in every product, and the components that read the token got
+the correction for free.
 
 ### Roles
 
@@ -107,14 +260,78 @@ ls: tighter −0.03em · tight −0.02em · normal 0 · wide 0.04em · wider 0.0
 |---|---|---|
 | Hero H1 | Poppins | 46 / 800 / −0.03em |
 | Section H2 | Poppins | 24 / 800 / −0.02em |
-| Sub-heading H3 | Poppins | 14 / 700 |
-| Page title | Urbanist | 15 / 700 / −0.01em |
-| Body | Urbanist | 13 / 500 |
-| Card title | Urbanist | 12 / 600 |
-| Nav item | Urbanist | 13 / 600 |
-| Label / eyebrow | Urbanist | 10 / 700 / +0.1em, uppercase |
-| Badge / pill | Urbanist | 9–10 / 700, uppercase |
-| Mono | JetBrains | 11–12 / 400–500 |
+| Sub-heading H3 | Poppins | 18 / 700 |
+| Page title | Urbanist | 20 / 700 / −0.01em |
+| Body | Urbanist | 16 / 500 |
+| Card title | Urbanist | 16 / 700 |
+| Nav item | Urbanist | 16 / 600 |
+| Label / eyebrow | Urbanist | 14 / 700 / +0.06em, uppercase — the one role that keeps capitals |
+| Tag / status / work state | Urbanist | **12** / 700 / sentence case, both words capitalised at two words, 16px line box |
+| Meta beside something | Urbanist | 12 / 500–600 — a timestamp, a count, a unit, an attribution |
+| Mono | JetBrains | 16 / 400–500 — inline `<code>` needs `font-size: 1em`, or the browser sets it to 13 |
+
+### Hierarchy — a rank is a set of differences
+
+The table above names the roles. This is how to combine them, and it is the
+half that a type floor puts under pressure.
+
+**A rank differs from its neighbour in at least two of {size, weight, ink}.**
+One axis is not a level. 14 against 16 at the same weight in the same grey is
+two things a reader cannot separate — the difference is there, and it reads as
+noise rather than as order. Two axes moving together is what makes a hierarchy
+read at a glance instead of on inspection.
+
+**The floor compressed the size axis, so the other two have to absorb it.**
+Before it, a product could spend five steps inside six pixels — 16 · 13 · 13 ·
+12 · 12 · 12 · 10 was a real card in Sales. On even steps with a 12 floor there
+are four: 12 · 14 · 16 · 18. Weight has five values and was carrying almost
+nothing; ink has three that may hold type. Anything that used to be a size
+difference is now a weight or an ink difference, and the ranks have to be
+re-spread deliberately — **a floor applied without a hierarchy pass flattens
+every card it touches.** Sales's queue card came out of the sweep with eleven of
+seventeen runs at 16px, its name and its status sentence both 16/800/primary: a
+card with two L1s that looked identical.
+
+**Flatness is measurable, so measure it.** Take every text run in a block,
+reduce it to the triple {size, weight, ink}, and count how many runs share the
+commonest one. Above about **0.4 — nearly half the block wearing one face —
+there is no hierarchy**, however carefully each treatment was chosen. Run it
+across every surface in every role rather than judging by eye: it found four
+blocks in Sales that reading the stylesheets had not.
+
+The measure is a proxy and it misfires in one direction, so read the result
+before acting on it. **A band is meant to be uniform** — a row of facts,
+company · industry · city · headcount, is one rank and should wear one face,
+and it scores high without being wrong. What the number is good at is finding
+two *different* ranks that have collapsed onto one treatment.
+
+**Three traps it found, none of them visible in the source:**
+
+- **A demotion to a value the element already has is a no-op.** Sales's
+  `.b-feed-meta` pushes an attribution to `--ink-muted` — and `--ink-muted` is
+  `--d200`, which is what the line it sits in already sets. Written to move the
+  bookkeeping a step down; after the ink band narrowed, moving it to exactly
+  where it was. Seventeen of forty-two runs on a page came out identical
+  because of it. **After narrowing a ramp, re-check every rule that demotes
+  into it.**
+- **One element, one rule.** Two rules set the same card title at two different
+  tokens, same specificity, and the later one won — so the name rendered 16
+  under a comment documenting it at 18. A second rule for an element is not an
+  override, it is a coin toss decided by file order.
+- **Emphasis inside a line needs the line not to be bold already.** A 700 line
+  whose `<b>` runs inherit `bolder` gives you 700 and 800 in one sentence: two
+  weights doing the work of none, and over two lines the mass of it outranks a
+  larger heading above. Set the line a step down and let the emphasis be the
+  step.
+
+**A fact that is a door is still a fact.** A phone number, an email, a website,
+a company name — values you read that happen to navigate. They take their row's
+size, and colour carries that they are pressable; giving them their own size
+makes a facts row alternate 16 · 14 · 16 · 16 on whether each fact happens to
+be a link. A **verb** is not one of these. It is a control and takes the
+control's edge — give it the link treatment and an actions row reads as a list
+of URLs, which is what happened on a record where no primary was rendered at
+all.
 
 ---
 
@@ -142,8 +359,8 @@ ls: tighter −0.03em · tight −0.02em · normal 0 · wide 0.04em · wider 0.0
 ### Components (base)
 | Component | Classes | Notes |
 |---|---|---|
-| Buttons | `.btn` + `.btn-brand/ghost/err/warn/ok/accent`, `.btn-sm/.btn-lg` | Contextual color; 13/700; radius `--r-md` |
-| Tags & badges | `.tag` + `tag-ok/warn/err/info/teal/ai/accent/neutral`, `.signal-badge` | Uppercase 700; semantic color + border tint |
+| Buttons | `.btn` + `.btn-brand/ghost/err/warn/ok/accent`, `.btn-sm/.btn-lg` | Contextual color; 13/700; radius `--r-md`. **A control, never a label:** a hairline border and no ground, except the one filled primary per surface |
+| Tags & badges | `.tag` + `tag-ok/warn/err/info/teal/ai/accent/neutral`, `.signal-badge` | **A label, never a control.** One ground and a transparent border for every tone; uppercase 700 at `--fs-2xs` / `--ls-wide` in a 16px line box. Only `tag-ok` and `tag-err` colour the word and add a 15% tint of their own hue — the rest are identical to `tag-neutral` by design. Never give it a visible border: that is what a control wears |
 | Chips & filters | `.chip` (`default/active/brand/ok/warn/err`), `.afs` strip | Active = accent |
 | Dropdown | `.v2-dropdown` + `-btn`/`-panel`/`-option`, `.dd-label-text` | **The only select control.** Custom listbox: full keyboard model, typeahead, focus return, `aria-haspopup="listbox"` / `role="listbox"` / `aria-selected`. Never use a native `<select>`, and never rebuild this pattern by hand |
 | Cards | `.card`, `.bcard`, `.narrative-card`, `.finding` | One `.tier-primary` per view |
@@ -183,19 +400,13 @@ Field & states `.ds-field/.field-input` (`.is-error/.is-success` + `.field-help`
 ### AiMY Canvas (shared chat shell)
 Float input bar `.aimy-float-bar/-input/-send` (thinking state) · Filter tray `.filter-tray/.filter-chip` · Canvas overlay `.aimy-overlay(.open)` · Chat messages `.chat-msg.user/.aimy` + `.msg-bubble` · AiMY toast `.aimy-toast` · AiMY badge `.aimy-badge`. Follows the theme (dark glass in dark, light glass in light). User bubble = accent tint; AiMY bubble = card surface.
 
-The overlay is **`position: fixed` and full width** — top `--topbar-height`, then `left/right/bottom: 0` — and lays out as a **row**: `.overlay-chats` beside `.overlay-main`. Fixed rather than absolute because an absolute overlay is a child of the surface it sits above, and anything that scrolls or grows `.app-main` carries the canvas away with it. The centred bottom-pinned stack the design system used to put on `.aimy-overlay` moves to `.overlay-main` unchanged, which is what everything absolutely positioned inside the canvas now measures against.
-
-**Conversation column** — `.overlay-chats` (240px, hidden below 900px) holding `.ov-chat-new` · `.ov-chat-find/.ov-chat-input` · `.ov-chat-group/.ov-chat-cap` · `.ov-chat(.is-here)/.ov-chat-name/.ov-chat-n` · `.ov-chat-none`. Anchor `#canvas-overlay`. Behaviour lives in `assets/aimy-canvas.css` + `assets/aimy-canvas.js`, shared by all six pages — the first shared assets in this repo, because sessions have to be the same list everywhere or they are not sessions. One flat list captioned `Recent` or `Found`, ordered by **when something was last said in each** — opening one does *not* reorder the column. A list you are choosing from cannot rearrange itself as you choose: the row you clicked would jump to the top and everything you were about to click next would move under your cursor. Starting a conversation does move it to the top, because that is an act rather than a read. The search matches titles **and every turn**, and never hides the conversation you have open. Ported from AiMY Sales, where it was built first.
-
-Switching conversations **moves the surface, not just the thread**: each session stores the page it was had on and the query string it was had at, and picking one lays that back over the URL (navigating, if it belongs to another page). Doctrine §4 calls this the continuity half of the context handoff contract. Turns persist under `aimy-qa-chats` as **data, never rendered HTML** — an answer drawn by a named renderer stores the renderer’s name and is rebuilt by calling it, so controls inside a rehydrated turn keep working. A page opts in by setting `window.AIMY_SURFACE` (`SCALAR`/`MULTI`/`DEFAULTS`/`read()`/`apply()`), where `apply` receives the **whole** surface and must clear anything it does not name.
-
 ### AiMY Doctrine Primitives
 
 Components required by the **Knowledge-to-Action Doctrine**. These are not optional garnish — the doctrine's review gate fails a surface that omits them (see §9).
 
 | Component | Classes | Anchor | Doctrine rule |
 |---|---|---|---|
-| **Work state** | `.work-state` + `.ws-detected/-recommended/-drafted/-staged/-completed/-failed`, `.ws-dot`; pipeline `.ws-track/.ws-step(.is-past/.is-current)/.ws-sep` | `#work-state` | §2.3 — a **required field** on every surfaced item. Canonical value lives on `data-work-state`; `handled`/`blocked` are display aliases for `completed`/`failed` only |
+| **Work state** | `.work-state` + `.ws-detected/-recommended/-drafted/-staged/-completed/-failed`, `.ws-dot`; pipeline `.ws-track/.ws-step(.is-past/.is-current)/.ws-sep` | `#work-state` | §2.3 — a **required field** on every surfaced item. Canonical value lives on `data-work-state`; `handled`/`blocked` are display aliases for `completed`/`failed` only. **Four of the six are positions, not verdicts:** detected · recommended · drafted · staged all take the plain pill, and only `completed` and `failed` carry a hue. What separates the four is the **dot** — hollow while AiMY is still working on it, filled once the thing is real. On the pipeline, the current step is carried by ink at the top of the ramp, not by a hue |
 | **Confidence badge** | `.conf-badge` + `.conf-high/-medium/-low`, `.conf-meter`, `.conf-val` | `#sc-conf-badge` | §5.7, Level 5 — show where confidence changes interpretation. Medium and low must also state *what limits them* |
 | **Briefing card (extended)** | `.bcard-ack-row`, `.bcard-ack-btn(.is-acked)`, `.bcard-dismiss-picker(.open)`, `.bcard-dismiss-reason` | `#bcard-extended` | §5.9 — every item is dismissible with a captured reason; reversible dismissals offer Undo |
 | **Entry modes** | `.entry-action` + `.em-direct/-investigate/-prompt/-review`, `.em-ico`; spec tag `.entry-mode-tag` | `#entry-modes` | §3 — classification is **mandatory and explicit** at design time. An unclassified action fails review |
@@ -386,4 +597,130 @@ Second audit, against the revised direction document. Its three declared gaps we
 ### 10.8 Closed since the audit
 
 - **`--qa-accent`** — withdrawn. Accents are **global**: one `--accent` token re-themed per product (§1). There is no QA-specific accent token, so there was nothing to swap and no Talent collision to resolve. The doctrine's open flag has been retracted.
+
+---
+
+## 11. The label, type and colour sweep — September 2026
+
+Sections 1 and 2 state the rules. This section records what was actually changed to make the code
+agree with them, so the next person can tell a deliberate exception from a site that was missed.
+
+### What started it
+
+A sales lead looked at a status column and said it looked like **traffic lights**. It did. The
+system was carrying `#17b26a`, `#f79009` and `#f04438` — a green, an amber and a red at full
+strength — and every tag wore a tinted ground *and* a border in the same hue, under full capitals.
+Four amplifiers, applied together, to a component that appears eight times on a screen.
+
+Colour was also being spent on the wrong thing. A count across the products found roughly **7,500
+references to the three status hues**, with `--err` at 1,414 and `--ok` at 1,087 — both ahead of
+`--brand` at 942. The loudest colours in the system were the most common ones.
+
+### What changed
+
+**The hues.** Three signals at roughly 75% saturation became a **family of six** at 22–49%
+saturation and 59–66% lightness, reading 5.96–7.47:1 on the card. `--err` keeps about twenty
+points more chroma than its siblings, deliberately, so a verdict still arrives first.
+
+**The alarm.** `--err` had been carrying both a verdict and a control. `--err-strong` (#f04438 in
+dark, #d92d20 in light) was added **outside** the family for one thing only: a control that stops
+something already in flight. The muted red on an End-call button read as a suggestion.
+
+**The pill.** Every tone brought its own tinted ground *and* its own border. Now there is one
+ground — `color-mix(in srgb, var(--hue) 15%, transparent)` — and no border at all, because a
+bordered capsule is the same object as a ghost button.
+
+**The case.** `text-transform: uppercase` with `--ls-wide` became sentence case, with both words
+capitalised when there are exactly two. The tracking left with the capitals that asked for it.
+
+**The ink.** `--d300` through `--d700` were all being used for type. An **ink band** now says which
+values may: `--ink-primary`, `--ink-secondary` and `--ink-muted`, with `--ink-placeholder` as the
+single exception and `--ink-rule` and below reserved for non-text.
+
+**The scale.** Four steps sat under 14 with body at 13, and 13, 15 and 17 were all in circulation
+across four separate scales. Even steps only now, floor 12, body 16, and the four scales
+reconciled.
+
+### Where it was applied
+
+Three repositories, one pass: **design-system** (`index.html`, this document), **Sales**
+(`aimy-ds.css`, `sales.css`, `bdr.css`, `bdr.js`) and **Knowledge** (`aimy-ds.css`,
+`knowledge.css`, `knowledge.js`, `settings.css`).
+
+The rewrite was **rule-aware, not regex-over-file**: each stylesheet is walked, every innermost
+declaration block is matched against its own selector *and its ancestors*, and the change happens
+inside the block or not at all. A regex cannot see a selector, and three surfaces were explicitly
+out of scope.
+
+- **415** font sizes, **634** ink references and **80** raw `rgba()` hues rewritten in the first pass.
+- **69** shell rules adopted the reference implementation's size. The floor had been applied to
+  `index.html` — which *is* the shell, inlined — and never propagated back to the copies each
+  product ships, so `.pop-text` was 16px in the reference and 12px in both products. The doc and
+  the code disagreed about a rule the doc already stated.
+- **20** sizes in `rem`. Knowledge writes its own stylesheets against a fluid root
+  (`html { font-size: max(1rem, calc(100vw / 96)) }`), so a px-shaped sweep walked straight past 9,
+  10, 10.5, 11 and 13 pixels of type. Fixed **in rem** — converting to px would freeze those
+  elements while everything around them still scales.
+- **27** label-pill blocks lost their capitals, their tracking and their borders, across every
+  pill in the system and not just `.tag`: `.work-state`, `.s-meta-st`, `.signal-badge`,
+  `.trust-state`, `.conf-badge`, `.model-tag`, `.ver-tag`, `.entry-mode-tag`, `.tc-approval`,
+  `.ws-track .ws-step`.
+- **74** stale light-mode literals — the old saturated ramp, hard-coded inside
+  `:root[data-theme="light"]` rules — replaced by the tokens, which already resolve to the light
+  values in that context.
+- In the products' JavaScript, a `tagCase()` helper at **16** render sites. It is at the render
+  site on purpose: the same string is a tag on one screen and a button or a filter on another.
+
+### The override is the last word, so it is the first place a floor has to reach
+
+Everything above was applied to stylesheets and verified by reading them, and the products still
+rendered body at 14px and meta at 13px. Reading a file is not the same as reading a screen.
+
+**A product may re-declare a library token, and then the library's value never renders.** Three
+places were doing it, none of them reached by a sweep over declarations:
+
+- `Sales/sales.css` re-declares the whole `--fs-*` scale as 12 · 13 · 13 · 14 · 14, sitting after
+  the shell in the cascade. The shell had been corrected to 12 · 14 · 16 and the product put it
+  back.
+- `Knowledge/knowledge.css` declares its own role scale, `--ty-*`, at 17 · 15 · 13 — three odd
+  steps standing on a 12px floor.
+- `Knowledge/knowledge.css` also keeps a **copy of the library's `--fs-*` scale in rem**, under a
+  comment reading *"nothing here changes a value; every number is the library's own, divided by
+  16."* That was true when the library's bottom step was 10px. It is 12px now, and the copy was
+  still handing out 10 — so `.tc-approval` rendered at 10px through a shell that had already been
+  corrected. A stale copy of a token is worse than no copy: it looks correct at both ends and is
+  wrong in the middle.
+
+Nineteen further sites in Knowledge wrote `0.875rem` as a literal where the token beside it held
+the same value; those now read `var(--ty-meta)`, and its type-scale audit went from 21 findings to
+3, all deliberate.
+
+**And the shell was shipping unstamped.** `aimy-ds.css` was linked with no `?v=` in Sales's
+`index.html` and both of Knowledge's pages, while every other asset carried one — so every shell
+change since the stamps began has reached returning users only when their cache happened to expire.
+Stamped, and all three products' stamps bumped together.
+
+**The check that catches this is a runtime one.** Walk every rendered element, read its computed
+`font-size`, exclude the carved-out surfaces by class, and assert that nothing is odd and nothing
+is under 12. It found all three overrides in one pass, after the file-level sweep had reported
+clean. The reference page, Sales and Knowledge now return 12 · 14 · 16 · 18 · 20 · 24 · 28 · 30 ·
+32 · 34 · 40 · 46 · 54 and nothing else.
+
+### What was deliberately left alone
+
+**The top navigation, the chat input and the AiMY canvas.** Those three surfaces are shared chrome
+with their own decisions, and **384 blocks** were carved out of the main sweep by selector. If a size or
+an ink looks wrong there, it was skipped, not missed.
+
+### Still open
+
+- **QA runs the old pattern.** The screenshot that started this — saturated red and amber pills
+  with matching borders, stacked in a column — is still live in QA, whose surfaces are standalone
+  HTML files with inline styles rather than the shared shell. It is the same fix, in a different
+  shape, and it has not been done.
+- **`.form-summary`** carries a 3px `border-left` in `--err`. It is the one place a left-border
+  stripe survives, and it should be a ground.
+- **White on the unread badge is 3.76:1**, under the 4.5:1 small-text minimum. It has always been, on both the old `--err` and `--err-strong`; a filled alarm carrying two digits wants a darker ground or darker text, and that is a decision rather than a sweep.
+- **Two orphaned rule bodies** in Sales's `sales.css` — declarations with no selector, leaving the
+  file two braces short. Pre-existing, and unrelated to this sweep.
 - **`.ds-select` vs `.v2-dropdown`** — resolved in favour of the custom dropdown; see §10.3.
