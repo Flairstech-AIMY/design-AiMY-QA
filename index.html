@@ -6683,7 +6683,7 @@
          It replaces the 83% hero. A score is orientation you already had; this
          is what moved while you were away. */
       .slv { background:linear-gradient(120deg, rgba(var(--accent-rgb),0.10), rgba(0,102,255,0.04)); border:1px solid rgba(var(--accent-rgb),0.2); border-radius:16px; padding:18px 20px; margin-bottom:18px; box-shadow:var(--elev-1); }
-      .slv-layout { display:grid; grid-template-columns:minmax(0,1fr) 360px; align-items:start; gap:16px; margin-bottom:18px; }
+      .slv-layout { display:grid; grid-template-columns:minmax(0,1fr) 280px; align-items:start; gap:16px; margin-bottom:18px; }
       .slv-layout > .slv { margin-bottom:0; }
       .slv-head { display:flex; align-items:center; gap:9px; margin-bottom:9px; }
       .slv-head svg { width:18px; height:20px; }
@@ -6701,53 +6701,52 @@
          Deliberately NOT named .v2-stat-value/.v2-stat-delta: applyRangeToChart
          indexes those class names document-wide by position, so reusing them
          here would make the chart's range tabs write into the opener. */
-       .slv-score { display:grid; grid-template-columns:minmax(140px,0.95fr) minmax(0,1.05fr); grid-template-areas:"cap cap" "value sub" "value trend" "toggle toggle";
-         align-items:center; column-gap:16px; row-gap:4px; min-width:0; padding:22px 20px 18px; border:1px solid rgba(var(--qa-accent-rgb),0.30); border-radius:var(--r-2xl);
-           background:linear-gradient(135deg, rgba(var(--qa-accent-rgb),0.48) 0%, rgba(76,46,132,0.34) 44%, rgba(20,24,31,0.98) 100%);
-           box-shadow:inset 0 1px 0 rgba(255,255,255,0.05), 0 0 25.8px rgba(var(--qa-accent-rgb),0.25); overflow:hidden; }
-       .slv-score-cap { grid-area:cap; font-family:var(--font-display); font-size:13px; font-weight:800; letter-spacing:0.1em; text-transform:uppercase; color:var(--d300); }
-       .slv-score-val { grid-area:value; font-family:var(--font-display); font-size:clamp(46px,4.5vw,70px); font-weight:800; line-height:0.95; letter-spacing:-0.05em;
+       .slv-score { display:grid; grid-template-columns:minmax(0,1fr) minmax(150px,1.15fr); grid-template-areas:"cap toggle" "value toggle" "sub toggle" "trend toggle";
+         align-items:center; column-gap:14px; row-gap:3px; min-width:0; padding:14px 16px; border:0; border-radius:16px;
+           background:transparent; box-shadow:none; }
+       .slv-score-cap { grid-area:cap; font-size:10px; font-weight:800; letter-spacing:0.1em; text-transform:uppercase; color:var(--d300); }
+       .slv-score-val { grid-area:value; font-size:44px; font-weight:800; line-height:1; letter-spacing:-0.035em;
                color:var(--warn); font-variant-numeric:tabular-nums; text-shadow:0 0 22px rgba(247,144,9,0.16); }
-       .slv-score-sub { grid-area:sub; font-size:13px; line-height:1.35; color:var(--d300); }
+       .slv-score-sub { grid-area:sub; font-size:11px; color:var(--d300); }
        .slv-score-sub strong { color:var(--d100); font-weight:800; }
-       .slv-score-trend { grid-area:trend; font-size:13px; line-height:1.35; font-weight:600; color:var(--d400); font-variant-numeric:tabular-nums; }
+       .slv-score-trend { grid-area:trend; font-size:11px; font-weight:600; color:var(--d400); font-variant-numeric:tabular-nums; }
       .slv-score-trend .trend-positive { color:var(--ok); font-weight:800; }
-            .slv-score-toggle { grid-area:toggle; width:100%; min-width:0; margin-top:12px; display:grid; grid-template-columns:1fr;
-              grid-template-areas:"action" "chart" "source"; align-items:center; gap:6px;
-              background:transparent;
-              border:0; border-radius:0;
-              padding:0; font-size:11px; font-weight:600; color:var(--d300);
+            .slv-score-toggle { grid-area:toggle; width:100%; min-width:0; margin-top:0; display:grid; grid-template-columns:1fr auto;
+              grid-template-areas:"label action" "chart chart" "source source"; align-items:center; gap:3px 10px;
+              background:var(--wash-2);
+              border:0; border-radius:var(--r-lg);
+              padding:7px 10px 6px; font-size:11px; font-weight:600; color:var(--d300);
               font-family:inherit; cursor:pointer; text-align:left;
               box-shadow:none;
               transition:background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast); }
       .slv-score-toggle:hover,
-            .slv-score-toggle:focus-visible { background:transparent; color:var(--d100); box-shadow:none; }
-      .slv-score-toggle-label { display:none; }
-      .slv-score-toggle-action { grid-area:action; justify-self:end; display:inline-flex; align-items:center; gap:7px; color:var(--qa-accent); font-size:13px; font-weight:700; white-space:nowrap; }
+            .slv-score-toggle:focus-visible { background:var(--wash-4); color:var(--d100); box-shadow:none; }
+      .slv-score-toggle-label { grid-area:label; font-size:10px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--d300); }
+      .slv-score-toggle-action { grid-area:action; display:inline-flex; align-items:center; gap:5px; color:var(--qa-accent); font-size:10px; font-weight:700; white-space:nowrap; }
       .slv-score-toggle-action-label { opacity:1; transition:color var(--transition-fast); }
       .slv-score-toggle:hover .slv-score-toggle-action-label,
       .slv-score-toggle:focus-visible .slv-score-toggle-action-label,
       .slv-score-toggle[aria-expanded="true"] .slv-score-toggle-action-label { color:var(--d50); }
-      .slv-score-expand { width:15px; height:15px; flex-shrink:0; }
-      .slv-score-mini-chart { grid-area:chart; display:block; width:100%; height:58px; overflow:visible; background:rgba(var(--qa-accent-rgb),0.09); filter:drop-shadow(0 0 25.8px rgba(var(--qa-accent-rgb),0.25)); }
+      .slv-score-expand { width:13px; height:13px; flex-shrink:0; }
+      .slv-score-mini-chart { grid-area:chart; display:block; width:100%; height:26px; overflow:visible; }
       .slv-score-mini-target { stroke:var(--wash-9); stroke-width:1; stroke-dasharray:3 3; }
       .slv-score-mini-fill { fill:rgba(var(--qa-accent-rgb),.09); }
       .slv-score-mini-path { fill:none; stroke:var(--qa-accent); stroke-width:2.25; stroke-linecap:round; stroke-linejoin:round; }
       .slv-score-mini-end { fill:var(--qa-accent); stroke:var(--body-bg); stroke-width:2; }
-      .slv-score-mini-source { grid-area:source; display:flex; align-items:center; gap:6px; font-size:11px; font-weight:600; color:var(--d300); }
+      .slv-score-mini-source { grid-area:source; display:flex; align-items:center; gap:5px; font-size:9px; font-weight:600; color:var(--d500); }
       .slv-score-mini-source::before { content:""; width:5px; height:5px; border-radius:50%; background:var(--ok); box-shadow:0 0 0 2px var(--ok-bg); flex-shrink:0; }
       @media (prefers-reduced-motion: reduce) { .slv-score-toggle-action-label { transition:none; } }
       /* Narrow: the score drops below the narrative rather than squeezing it. */
       @media (max-width: 900px) {
         .slv-layout { grid-template-columns:1fr; gap:12px; }
-         .slv-score { grid-template-columns:minmax(132px,0.9fr) minmax(0,1.1fr); grid-template-areas:
+         .slv-score { grid-template-columns:minmax(112px,0.9fr) minmax(0,1.1fr); grid-template-areas:
            "cap cap" "value sub" "value trend" "toggle toggle";
                align-items:center; column-gap:18px; row-gap:2px; padding:16px 18px; }
         .slv-score-cap { grid-area:cap; }
         .slv-score-val { grid-area:value; align-self:center; }
         .slv-score-sub { grid-area:sub; }
         .slv-score-trend { grid-area:trend; }
-        .slv-score-toggle { grid-area:toggle; margin-top:10px; }
+        .slv-score-toggle { grid-area:toggle; margin-top:0; }
       }
 
       /* ── Resume pill, the prior-thread cue (§4 continuity) ─────────────
