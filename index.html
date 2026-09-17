@@ -2962,10 +2962,15 @@
       .ai-insights-summary b { color: var(--d100); font-weight: 700; }
 
       .ai-insight {
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-        padding: 12px 14px;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        grid-template-areas:
+          "title metric"
+          "problem action";
+        column-gap: 16px;
+        row-gap: 4px;
+        align-items: center;
+        padding: 14px 16px;
         background: var(--card-bg);
         border: 1px solid var(--card-border);
         border-radius: var(--r-lg);
@@ -2974,24 +2979,60 @@
       .ai-insight:hover { border-color: var(--card-border-hover); }
       .ai-insight:focus-within { outline: 2px solid var(--brand); outline-offset: 2px; }
 
+      /* The two highest-priority opportunities use the same soft glass
+         treatment as the summary card, with a restrained error tint. */
+      .ai-insight[data-severity="critical"] {
+        background:
+          linear-gradient(135deg, color-mix(in srgb, var(--err) 11%, transparent), transparent 68%),
+          color-mix(in srgb, var(--card-bg) 90%, transparent);
+        border-color: color-mix(in srgb, var(--err) 30%, var(--card-border));
+        box-shadow:
+          inset 0 1px 0 color-mix(in srgb, var(--err) 12%, var(--wash-6)),
+          0 8px 24px color-mix(in srgb, var(--err) 8%, transparent);
+        backdrop-filter: blur(18px) saturate(1.2);
+        -webkit-backdrop-filter: blur(18px) saturate(1.2);
+      }
+      .ai-insight[data-severity="critical"]:hover {
+        border-color: color-mix(in srgb, var(--err) 46%, var(--card-border));
+      }
+      .ai-insight[data-severity="warning"] {
+        background:
+          linear-gradient(135deg, color-mix(in srgb, var(--warn) 11%, transparent), transparent 68%),
+          color-mix(in srgb, var(--card-bg) 90%, transparent);
+        border-color: color-mix(in srgb, var(--warn) 30%, var(--card-border));
+        box-shadow:
+          inset 0 1px 0 color-mix(in srgb, var(--warn) 12%, var(--wash-6)),
+          0 8px 24px color-mix(in srgb, var(--warn) 8%, transparent);
+        backdrop-filter: blur(18px) saturate(1.2);
+        -webkit-backdrop-filter: blur(18px) saturate(1.2);
+      }
+      .ai-insight[data-severity="warning"]:hover {
+        border-color: color-mix(in srgb, var(--warn) 46%, var(--card-border));
+      }
+      .ai-insight[data-rank="1"] { order: 1; }
+      .ai-insight[data-rank="2"] { order: 2; }
+      .ai-insight[data-rank="3"] { order: 3; }
+      .ai-insight[data-rank="4"] { order: 4; }
+      .ai-insights-ontrack { order: 5; }
+
       .ai-insight__row {
-        display: flex;
-        align-items: baseline;
-        justify-content: space-between;
-        gap: 10px;
+        display: contents;
       }
       .ai-insight__name {
+        grid-area: title;
         margin: 0;
         font-family: var(--font-display);
-        font-size: 14px;
-        font-weight: 700;
-        letter-spacing: -0.01em;
+        font-size: 16px;
+        font-weight: 800;
+        letter-spacing: -0.02em;
         line-height: 1.25;
         color: var(--d50);
       }
       .ai-insight__metric {
+        grid-area: metric;
+        justify-self: end;
         font-family: var(--font-display);
-        font-size: 14px;
+        font-size: 16px;
         font-weight: 800;
         letter-spacing: -0.02em;
         color: var(--d50);
@@ -3003,16 +3044,18 @@
       .ai-insight__metric small { font-size: 11px; font-weight: 600; color: var(--d400); margin-left: 4px; }
 
       .ai-insight__problem {
+        grid-area: problem;
         margin: 0;
-        font-size: 12px;
+        min-width: 0;
+        font-size: 13px;
         font-weight: 500;
-        line-height: 1.5;
+        line-height: 1.45;
         color: var(--d200);
       }
       .ai-insight__problem b { color: var(--d100); font-weight: 700; }
 
       .ai-insight__solution {
-        display: flex;
+        display: none;
         align-items: center;
         gap: 8px;
         flex-wrap: wrap;
@@ -3025,11 +3068,30 @@
       .ai-insight__solution .work-state { margin-left: auto; }
 
       .ai-insight__actions {
+        grid-area: action;
         display: flex;
+        justify-content: flex-end;
         gap: 8px;
-        margin-top: 2px;
+        margin: 0;
       }
-      .ai-insight__actions .entry-action { flex: 0 0 auto; }
+      .ai-insight__actions .entry-action {
+        flex: 0 0 auto;
+        min-width: 116px;
+        justify-content: center;
+        color: var(--d200);
+        background: var(--glass-bg, rgba(255, 255, 255, 0.06));
+        border-color: var(--glass-border, rgba(255, 255, 255, 0.12));
+        box-shadow: inset 0 1px 0 var(--wash-8), 0 4px 14px rgba(0, 0, 0, 0.16);
+        backdrop-filter: blur(16px) saturate(1.35);
+        -webkit-backdrop-filter: blur(16px) saturate(1.35);
+      }
+      .ai-insight__actions .entry-action:hover {
+        color: var(--d50);
+        background: var(--wash-7);
+        border-color: var(--card-border-hover);
+        box-shadow: inset 0 1px 0 var(--wash-8), 0 5px 14px rgba(0, 0, 0, 0.18);
+      }
+      .ai-insight__actions .entry-action .em-ico { color: var(--d300); }
 
       /* On-track summary stays as one calm line. */
       .ai-insights-ontrack {
@@ -3054,8 +3116,14 @@
       .ai-insights-ontrack .entry-action { margin-left: auto; }
 
       @media (max-width: 640px) {
-        .ai-insight__row { flex-wrap: wrap; }
-        .ai-insight__actions .entry-action { width: 100%; justify-content: center; }
+        .ai-insight {
+          grid-template-areas:
+            "title metric"
+            "problem problem"
+            "action action";
+          row-gap: 8px;
+        }
+        .ai-insight__actions { justify-content: flex-start; }
       }
 
       @media (prefers-reduced-motion: reduce) {
@@ -5044,19 +5112,19 @@
         align-items: flex-start;
         justify-content: space-between;
         gap: 12px;
-        padding: 10px 20px;
+        padding: 16px 20px;
         border-bottom: 1px solid var(--wash-5);
       }
       .eval-header-left {
         display: flex;
         align-items: baseline;
-        gap: 10px;
+        gap: 16px;
       }
       .eval-title {
-        font-size: 15px;
-        font-weight: 700;
+        font-size: 18px;
+        font-weight: 800;
         color: var(--d50);
-        letter-spacing: -0.01em;
+        letter-spacing: -0.02em;
       }
       .eval-subtitle {
         font-size: 11px;
@@ -6481,8 +6549,8 @@
       .dir-cards { display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; margin-bottom:16px; }
       @media (max-width: 1100px){ .dir-cards { grid-template-columns:1fr; } }
 
-      .dashboard-section-head { display:flex; align-items:baseline; gap:10px; margin:18px 0 10px; }
-      .dashboard-section-head h2 { font-family:var(--font-display); font-size:17px; font-weight:800; color:var(--d50); letter-spacing:-.01em; }
+      .dashboard-section-head { display:flex; align-items:baseline; gap:16px; margin:18px 0 10px; }
+      .dashboard-section-head h2 { flex-shrink:0; white-space:nowrap; font-family:var(--font-display); font-size:18px; font-weight:800; color:var(--d50); letter-spacing:-.02em; }
       .dashboard-section-head span { font-size:11px; color:var(--d500); }
       .bcard-stat.is-word { font-size:25px; letter-spacing:-.02em; }
       .eval-header-sub { margin-left:0; font-size:11px; color:var(--d300); }
@@ -6615,7 +6683,7 @@
          It replaces the 83% hero. A score is orientation you already had; this
          is what moved while you were away. */
       .slv { background:linear-gradient(120deg, rgba(var(--accent-rgb),0.10), rgba(0,102,255,0.04)); border:1px solid rgba(var(--accent-rgb),0.2); border-radius:16px; padding:18px 20px; margin-bottom:18px; box-shadow:var(--elev-1); }
-      .slv-layout { display:grid; grid-template-columns:minmax(0,1fr) 280px; align-items:stretch; gap:16px; margin-bottom:18px; }
+      .slv-layout { display:grid; grid-template-columns:minmax(0,1fr) 280px; align-items:start; gap:16px; margin-bottom:18px; }
       .slv-layout > .slv { margin-bottom:0; }
       .slv-head { display:flex; align-items:center; gap:9px; margin-bottom:9px; }
       .slv-head svg { width:18px; height:20px; }
@@ -6633,31 +6701,46 @@
          Deliberately NOT named .v2-stat-value/.v2-stat-delta: applyRangeToChart
          indexes those class names document-wide by position, so reusing them
          here would make the chart's range tabs write into the opener. */
-      .slv-score { display:flex; flex-direction:column; align-items:flex-start; justify-content:center; gap:3px;
-           min-width:0; padding:18px 20px; border:1px solid rgba(var(--accent-rgb),0.3); border-radius:16px;
-           background:linear-gradient(145deg, rgba(var(--accent-rgb),0.13), rgba(15,18,21,0.28));
-           box-shadow:inset 0 1px 0 rgba(255,255,255,0.05), 0 8px 24px rgba(0,0,0,0.14); }
-      .slv-score-cap { font-size:10px; font-weight:800; letter-spacing:0.1em; text-transform:uppercase; color:var(--d300); }
-      .slv-score-val { font-size:44px; font-weight:800; line-height:1; letter-spacing:-0.035em;
+       .slv-score { display:grid; grid-template-columns:minmax(0,1fr) minmax(150px,1.15fr); grid-template-areas:"cap toggle" "value toggle" "sub toggle" "trend toggle";
+         align-items:center; column-gap:14px; row-gap:3px; min-width:0; padding:14px 16px; border:0; border-radius:16px;
+           background:transparent; box-shadow:none; }
+       .slv-score-cap { grid-area:cap; font-size:10px; font-weight:800; letter-spacing:0.1em; text-transform:uppercase; color:var(--d300); }
+       .slv-score-val { grid-area:value; font-size:44px; font-weight:800; line-height:1; letter-spacing:-0.035em;
                color:var(--warn); font-variant-numeric:tabular-nums; text-shadow:0 0 22px rgba(247,144,9,0.16); }
-      .slv-score-sub { font-size:11px; color:var(--d300); }
-      .slv-score-sub strong { color:var(--d100); font-weight:800; }
-      .slv-score-trend { font-size:11px; font-weight:600; color:var(--d400); font-variant-numeric:tabular-nums; }
+       .slv-score-sub { grid-area:sub; font-size:11px; color:var(--d300); }
+       .slv-score-sub strong { color:var(--d100); font-weight:800; }
+       .slv-score-trend { grid-area:trend; font-size:11px; font-weight:600; color:var(--d400); font-variant-numeric:tabular-nums; }
       .slv-score-trend .trend-positive { color:var(--ok); font-weight:800; }
-      .slv-score-toggle { margin-top:10px; display:inline-flex; align-items:center; gap:5px;
-                          background:var(--wash-3); border:1px solid var(--wash-7); border-radius:var(--r-pill);
-                          padding:5px 11px; font-size:11px; font-weight:600; color:var(--d300);
-                          font-family:inherit; cursor:pointer;
-                          transition:background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast); }
-      .slv-score-toggle:hover { background:var(--wash-6); border-color:var(--wash-10); color:var(--d100); }
-      .slv-score-chev { width:12px; height:12px; transition:transform var(--transition-fast); }
-      .slv-score-toggle[aria-expanded="true"] .slv-score-chev { transform:rotate(180deg); }
-      @media (prefers-reduced-motion: reduce) { .slv-score-chev { transition:none; } }
+            .slv-score-toggle { grid-area:toggle; width:100%; min-width:0; margin-top:0; display:grid; grid-template-columns:1fr auto;
+              grid-template-areas:"label action" "chart chart" "source source"; align-items:center; gap:3px 10px;
+              background:var(--wash-2);
+              border:0; border-radius:var(--r-lg);
+              padding:7px 10px 6px; font-size:11px; font-weight:600; color:var(--d300);
+              font-family:inherit; cursor:pointer; text-align:left;
+              box-shadow:none;
+              transition:background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast); }
+      .slv-score-toggle:hover,
+            .slv-score-toggle:focus-visible { background:var(--wash-4); color:var(--d100); box-shadow:none; }
+      .slv-score-toggle-label { grid-area:label; font-size:10px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--d300); }
+      .slv-score-toggle-action { grid-area:action; display:inline-flex; align-items:center; gap:5px; color:var(--qa-accent); font-size:10px; font-weight:700; white-space:nowrap; }
+      .slv-score-toggle-action-label { opacity:1; transition:color var(--transition-fast); }
+      .slv-score-toggle:hover .slv-score-toggle-action-label,
+      .slv-score-toggle:focus-visible .slv-score-toggle-action-label,
+      .slv-score-toggle[aria-expanded="true"] .slv-score-toggle-action-label { color:var(--d50); }
+      .slv-score-expand { width:13px; height:13px; flex-shrink:0; }
+      .slv-score-mini-chart { grid-area:chart; display:block; width:100%; height:26px; overflow:visible; }
+      .slv-score-mini-target { stroke:var(--wash-9); stroke-width:1; stroke-dasharray:3 3; }
+      .slv-score-mini-fill { fill:rgba(var(--qa-accent-rgb),.09); }
+      .slv-score-mini-path { fill:none; stroke:var(--qa-accent); stroke-width:2.25; stroke-linecap:round; stroke-linejoin:round; }
+      .slv-score-mini-end { fill:var(--qa-accent); stroke:var(--body-bg); stroke-width:2; }
+      .slv-score-mini-source { grid-area:source; display:flex; align-items:center; gap:5px; font-size:9px; font-weight:600; color:var(--d500); }
+      .slv-score-mini-source::before { content:""; width:5px; height:5px; border-radius:50%; background:var(--ok); box-shadow:0 0 0 2px var(--ok-bg); flex-shrink:0; }
+      @media (prefers-reduced-motion: reduce) { .slv-score-toggle-action-label { transition:none; } }
       /* Narrow: the score drops below the narrative rather than squeezing it. */
       @media (max-width: 900px) {
         .slv-layout { grid-template-columns:1fr; gap:12px; }
-        .slv-score { display:grid; grid-template-columns:minmax(112px,0.9fr) minmax(0,1.1fr); grid-template-areas:
-               "cap cap" "value sub" "value trend" "value toggle";
+         .slv-score { grid-template-columns:minmax(112px,0.9fr) minmax(0,1.1fr); grid-template-areas:
+           "cap cap" "value sub" "value trend" "toggle toggle";
                align-items:center; column-gap:18px; row-gap:2px; padding:16px 18px; }
         .slv-score-cap { grid-area:cap; }
         .slv-score-val { grid-area:value; align-self:center; }
@@ -7550,9 +7633,8 @@
               <svg class="em-ico"><use href="#em-ico-investigate"/></svg>Read the 2 drafted replies
             </button>
           </div>
-            </div>
-
           </div>
+        </div>
         </div>
         <div class="slv-score" aria-label="Quality score summary">
           <span class="slv-score-cap">Quality score</span>
@@ -7561,12 +7643,24 @@
           <span class="slv-score-trend"><span class="trend-positive">&#8593; 5.2%</span> vs last period</span>
           <button class="slv-score-toggle" id="qsChartToggle" type="button"
                   aria-expanded="false" aria-controls="qsChartPanel"
+                  aria-label="Open Quality Score trend" title="Open trend"
                   onclick="toggleQualityChart(this)">
-            <span class="slv-score-toggle-label">Show the trend</span>
-            <svg class="slv-score-chev" viewBox="0 0 12 12" fill="none" stroke="currentColor"
-                 stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M3 4.5L6 7.5L9 4.5"/>
+            <span class="slv-score-toggle-label">Quality trend</span>
+            <span class="slv-score-toggle-action">
+              <span class="slv-score-toggle-action-label">Open trend</span>
+              <svg class="slv-score-expand" viewBox="0 0 16 16" fill="none" stroke="currentColor"
+                   stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M6 3H3v3M10 3h3v3M6 13H3v-3M10 13h3v-3"/>
+              </svg>
+            </span>
+            <svg class="slv-score-mini-chart" viewBox="0 0 220 46" preserveAspectRatio="none"
+                 aria-hidden="true" focusable="false">
+              <line class="slv-score-mini-target" id="qsMiniTrendTarget" x1="2" x2="218" y1="12" y2="12"/>
+              <path class="slv-score-mini-fill" id="qsMiniTrendFill"/>
+              <path class="slv-score-mini-path" id="qsMiniTrendPath"/>
+              <circle class="slv-score-mini-end" id="qsMiniTrendEnd" r="3"/>
             </svg>
+            <span class="slv-score-mini-source" id="qsMiniTrendSource">Real audit data · YTD</span>
           </button>
         </div>
         </div>
@@ -8806,18 +8900,14 @@
           <div class="tier-2-grid audit-only">
             <div class="layout-column">
               <div class="dashboard-section-head">
-                <h2>AiMY Insights</h2>
+                <h2>Improvement opportunities</h2>
                 <span>Patterns, risks, and recommended actions from your audited interactions</span>
               </div>
-              <p class="ai-insights-summary">
-                <svg viewBox="0 0 18 20" aria-hidden="true"><use href="#aimy-logo-small"/></svg>
-                <b>3 KPIs</b> below target, <b>1</b> slipping.
-              </p>
               <div class="ai-insights">
-                <article class="ai-insight" data-classification="highest-impact" tabindex="0" aria-labelledby="ai-insight-status-name">
+                <article class="ai-insight" data-classification="highest-impact" data-severity="critical" data-rank="1" tabindex="0" aria-labelledby="ai-insight-status-name">
                   <div class="ai-insight__row">
                     <h3 class="ai-insight__name" id="ai-insight-status-name">Ticket status accuracy</h3>
-                    <span class="ai-insight__metric ai-insight__metric--err">71%<small>of 95%</small></span>
+                    <span class="ai-insight__metric ai-insight__metric--err">71%<small>of 369</small></span>
                   </div>
                   <p class="ai-insight__problem">Wrong status codes from <b>8 agents</b> in Objectif Lune &amp; Qvidian.</p>
                   <p class="ai-insight__solution">
@@ -8832,15 +8922,15 @@
                             data-aimy-undo="the status-code coaching for 8 agents"
                             data-aimy-review="Show the status-code coaching I created for the 8 agents in Objectif Lune and Qvidian. Who it covers, what changed, and the tickets it targets.">
                       <svg class="em-ico" aria-hidden="true"><use href="#em-ico-review"/></svg>
-                      Review coaching
+                      Review ticket status accuracy
                     </button>
                   </div>
                 </article>
 
-                <article class="ai-insight" data-classification="persistent-gap" tabindex="0" aria-labelledby="ai-insight-grammar-name">
+                <article class="ai-insight" data-classification="persistent-gap" data-severity="warning" data-rank="3" tabindex="0" aria-labelledby="ai-insight-grammar-name">
                   <div class="ai-insight__row">
                     <h3 class="ai-insight__name" id="ai-insight-grammar-name">Grammar &amp; clarity</h3>
-                    <span class="ai-insight__metric ai-insight__metric--err">55<small>off goal</small></span>
+                    <span class="ai-insight__metric ai-insight__metric--warn">55%<small>of 369</small></span>
                   </div>
                   <p class="ai-insight__problem">Persistent gap across <b>4 agents</b> in InterFax &amp; Second Street.</p>
                   <p class="ai-insight__solution">
@@ -8855,15 +8945,15 @@
                             data-aimy-undo="the grammar coaching for 4 agents"
                             data-aimy-review="Show the writing-quality coaching I drafted for the 4 agents in InterFax and Second Street, their worst responses and the clarity checklist I gave them.">
                       <svg class="em-ico" aria-hidden="true"><use href="#em-ico-review"/></svg>
-                      Review coaching
+                      Review grammar &amp; clarity
                     </button>
                   </div>
                 </article>
 
-                <article class="ai-insight" data-classification="improving" tabindex="0" aria-labelledby="ai-insight-cadence-name">
+                <article class="ai-insight" data-classification="improving" data-severity="warning" data-rank="4" tabindex="0" aria-labelledby="ai-insight-cadence-name">
                   <div class="ai-insight__row">
                     <h3 class="ai-insight__name" id="ai-insight-cadence-name">Update cadence</h3>
-                    <span class="ai-insight__metric ai-insight__metric--warn">47<small>off goal</small></span>
+                    <span class="ai-insight__metric ai-insight__metric--warn">47%<small>of 369</small></span>
                   </div>
                   <p class="ai-insight__problem"><b>3 agents</b> in Qvidian &amp; RightAnswers past the SLA update window.</p>
                   <p class="ai-insight__solution">
@@ -8878,15 +8968,15 @@
                             data-aimy-undo="the follow-up cadence for 3 agents"
                             data-aimy-review="Show the follow-up cadence I set for the 3 agents in Qvidian and RightAnswers. The tickets left past the SLA update window and the new nudge timing.">
                       <svg class="em-ico" aria-hidden="true"><use href="#em-ico-review"/></svg>
-                      Review nudge
+                      Review update cadence
                     </button>
                   </div>
                 </article>
 
-                <article class="ai-insight" data-classification="emerging-risk" tabindex="0" aria-labelledby="ai-insight-frt-name">
+                <article class="ai-insight" data-classification="emerging-risk" data-severity="critical" data-rank="2" tabindex="0" aria-labelledby="ai-insight-frt-name">
                   <div class="ai-insight__row">
                     <h3 class="ai-insight__name" id="ai-insight-frt-name">First response time</h3>
-                    <span class="ai-insight__metric ai-insight__metric--warn">71%<small>of 75%</small></span>
+                    <span class="ai-insight__metric ai-insight__metric--err">71%<small>of 369</small></span>
                   </div>
                   <p class="ai-insight__problem">Slipping in Objectif Lune &amp; Adestra, 4 pts under goal.</p>
                   <p class="ai-insight__solution">
@@ -8901,7 +8991,7 @@
                             data-aimy-undo="the 2-agent rebalance"
                             data-aimy-review="First response time is at 71%, 4 pts under the 75% goal and falling in Objectif Lune and Adestra. Show the queues driving the delay and the 2-agent rebalance I queued for the shift.">
                       <svg class="em-ico" aria-hidden="true"><use href="#em-ico-review"/></svg>
-                      Review rebalance
+                      Review first response time
                     </button>
                   </div>
                 </article>
@@ -9501,9 +9591,10 @@
         if (opening) panel.removeAttribute("hidden");
         else panel.setAttribute("hidden", "");
         btn.setAttribute("aria-expanded", opening ? "true" : "false");
-        btn.querySelector(".slv-score-toggle-label").textContent = opening
-          ? "Hide the trend"
-          : "Show the trend";
+        btn.setAttribute("aria-label", opening ? "Close Quality Score trend" : "Open Quality Score trend");
+        btn.setAttribute("title", opening ? "Close trend" : "Open trend");
+        const actionLabel = btn.querySelector(".slv-score-toggle-action-label");
+        if (actionLabel) actionLabel.textContent = opening ? "Close trend" : "Open trend";
       }
 
       // ── Quality Score Chart ───────────────────────────────────
@@ -9578,9 +9669,50 @@
         return d;
       }
 
+      function renderQualityMiniTrend(data, range) {
+        const path = document.getElementById('qsMiniTrendPath');
+        const fill = document.getElementById('qsMiniTrendFill');
+        const end = document.getElementById('qsMiniTrendEnd');
+        const target = document.getElementById('qsMiniTrendTarget');
+        const source = document.getElementById('qsMiniTrendSource');
+        if (!path || !fill || !end || !target || !data || !data.scores.length) return;
+
+        const width = 220;
+        const height = 46;
+        const padX = 2;
+        const padY = 5;
+        const rawMin = Math.min(...data.scores, 90);
+        const rawMax = Math.max(...data.scores, 90);
+        const min = Math.max(0, rawMin - 3);
+        const max = Math.min(100, rawMax + 3);
+        const span = Math.max(1, max - min);
+        const xStep = data.scores.length === 1 ? 0 : (width - padX * 2) / (data.scores.length - 1);
+        const yFor = score => padY + ((max - score) / span) * (height - padY * 2);
+        const points = data.scores.map((score, index) => [padX + index * xStep, yFor(score)]);
+
+        let d = `M${points[0][0]},${points[0][1]}`;
+        for (let index = 1; index < points.length; index++) {
+          const previous = points[index - 1];
+          const current = points[index];
+          const control = (current[0] - previous[0]) * 0.4;
+          d += ` C${previous[0] + control},${previous[1]} ${current[0] - control},${current[1]} ${current[0]},${current[1]}`;
+        }
+
+        const last = points[points.length - 1];
+        path.setAttribute('d', d);
+        fill.setAttribute('d', `${d} L${last[0]},${height - padY} L${points[0][0]},${height - padY} Z`);
+        end.setAttribute('cx', last[0]);
+        end.setAttribute('cy', last[1]);
+        const targetY = yFor(90);
+        target.setAttribute('y1', targetY);
+        target.setAttribute('y2', targetY);
+        if (source) source.textContent = `Real audit data · ${range}`;
+      }
+
       function applyRangeToChart(range) {
         const data = RANGE_DATA[range];
         if (!data) return;
+        renderQualityMiniTrend(data, range);
         const csatPeriodLabel = document.getElementById('csatPeriodLabel');
         const csatPeriods = {
           YTD: 'Year to date',
