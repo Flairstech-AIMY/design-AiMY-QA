@@ -1023,6 +1023,57 @@
         background-size: 200% 100%;
         animation: glassShimmer 4s linear 2;
       }
+      .interaction-type-filter {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 12px;
+        min-width: 0;
+      }
+      .interaction-type-label {
+        color: var(--d300);
+        font-size: 11px;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+      .interaction-type-toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 2px;
+        padding: 3px;
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: var(--r-pill);
+        box-shadow: inset 0 1px 0 var(--wash-3);
+        min-width: 0;
+      }
+      .interaction-type-option {
+        border: 1px solid transparent;
+        border-radius: var(--r-pill);
+        background: transparent;
+        color: var(--d400);
+        cursor: pointer;
+        font: 600 11px/1.2 var(--font-sans);
+        padding: 7px 12px;
+        white-space: nowrap;
+        transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
+      }
+      .interaction-type-option:hover { color: var(--d200); background: var(--wash-3); }
+      .interaction-type-option:active { transform: scale(0.98); }
+      .interaction-type-option[aria-checked="true"] {
+        color: var(--d50);
+        background: var(--qa-accent-dim);
+        border-color: rgba(var(--qa-accent-rgb), 0.28);
+      }
+      .interaction-type-option:focus-visible {
+        outline: 2px solid var(--qa-accent);
+        outline-offset: 2px;
+      }
+      @media (max-width: 560px) {
+        .interaction-type-filter { align-items: flex-start; flex-direction: column; gap: 7px; }
+        .interaction-type-toggle { width: 100%; }
+        .interaction-type-option { flex: 1; }
+      }
       .active-filter-strip.visible { display: flex; }
 
       .afs-label {
@@ -2986,9 +3037,7 @@
           linear-gradient(135deg, color-mix(in srgb, var(--err) 11%, transparent), transparent 68%),
           color-mix(in srgb, var(--card-bg) 90%, transparent);
         border-color: color-mix(in srgb, var(--err) 30%, var(--card-border));
-        box-shadow:
-          inset 0 1px 0 color-mix(in srgb, var(--err) 12%, var(--wash-6)),
-          0 8px 24px color-mix(in srgb, var(--err) 8%, transparent);
+        box-shadow: none;
         backdrop-filter: blur(18px) saturate(1.2);
         -webkit-backdrop-filter: blur(18px) saturate(1.2);
       }
@@ -3000,9 +3049,7 @@
           linear-gradient(135deg, color-mix(in srgb, var(--warn) 11%, transparent), transparent 68%),
           color-mix(in srgb, var(--card-bg) 90%, transparent);
         border-color: color-mix(in srgb, var(--warn) 30%, var(--card-border));
-        box-shadow:
-          inset 0 1px 0 color-mix(in srgb, var(--warn) 12%, var(--wash-6)),
-          0 8px 24px color-mix(in srgb, var(--warn) 8%, transparent);
+        box-shadow: none;
         backdrop-filter: blur(18px) saturate(1.2);
         -webkit-backdrop-filter: blur(18px) saturate(1.2);
       }
@@ -7570,11 +7617,13 @@
 
         <div class="dashboard-scroll">
           <div class="dash-view" id="viewManager">
-          <!-- Active filter strip, only visible when filters are applied -->
-          <div class="active-filter-strip" id="activeFilterStrip">
-            <span class="afs-label">Filtered by</span>
-            <!-- Active filter chips injected here by JS -->
-            <button class="afs-clear-all" id="afsClearAll">Clear all</button>
+          <div class="interaction-type-filter" aria-label="Interaction type filter">
+            <span class="interaction-type-label" id="interactionTypeLabel">Interaction type</span>
+            <div class="interaction-type-toggle" role="radiogroup" aria-labelledby="interactionTypeLabel">
+              <button class="interaction-type-option" type="button" role="radio" aria-checked="true" data-interaction-type="all">All interactions</button>
+              <button class="interaction-type-option" type="button" role="radio" aria-checked="false" data-interaction-type="calls">Calls</button>
+              <button class="interaction-type-option" type="button" role="radio" aria-checked="false" data-interaction-type="tickets">Tickets</button>
+            </div>
           </div>
         <!-- ════ AIMY DAILY SUMMARY CARD ════════════════════════════════════════
              Headline metric + 3 key signals + primary action for today.
@@ -9368,7 +9417,7 @@
               <button class="filter-chip" data-filter="Product">Product</button>
               <button class="filter-chip" data-filter="Agents">Agents</button>
               <button class="filter-chip" data-filter="Time Period">Time Period</button>
-              <button class="filter-chip" data-filter="All">Reset all</button>
+              <button class="filter-chip" data-action="clear-filters">Reset all</button>
             </div>
           </div>
 
@@ -10945,8 +10994,14 @@
             // Update active filter strip
             const parsed = parseFilterFromText(text);
             if (parsed) {
-              activeFilters[parsed.key] = parsed.value;
-              renderActiveStrip();
+              if (parsed.key.toLowerCase() === "interaction type") {
+                const value = parsed.value.toLowerCase();
+                const type = value === "calls" ? "calls" : value === "tickets" ? "tickets" : "all";
+                setInteractionType(type);
+              } else {
+                activeFilters[parsed.key] = parsed.value;
+                renderActiveStrip();
+              }
             }
 
             // Restart flash animation
@@ -12076,10 +12131,50 @@
        the user focuses the input. It hides on blur (with a short
        delay so clicks on chips register before the tray disappears). */
         const filterTray = document.getElementById("filterTray");
-        const activeFilterStrip = document.getElementById("activeFilterStrip");
-        const afsClearAll = document.getElementById("afsClearAll");
+        const activeFilterStrip = null;
+        const afsClearAll = null;
         let trayHideTimer = null;
         let activeFilters = {}; // { Company: "Upland", "Time Period": "This week", … }
+        let interactionType = "all";
+        document.body.dataset.interactionType = interactionType;
+        const INTERACTION_TYPES = {
+          all: "All interactions",
+          calls: "Calls",
+          tickets: "Tickets",
+        };
+
+        function setInteractionType(type, options) {
+          const next = Object.prototype.hasOwnProperty.call(INTERACTION_TYPES, type) ? type : "all";
+          const changed = interactionType !== next;
+          interactionType = next;
+          document.body.dataset.interactionType = next;
+          document.querySelectorAll(".interaction-type-option").forEach((button) => {
+            const selected = button.dataset.interactionType === next;
+            button.setAttribute("aria-checked", String(selected));
+          });
+          if (next === "all") delete activeFilters["Interaction type"];
+          else activeFilters["Interaction type"] = INTERACTION_TYPES[next];
+          renderActiveStrip();
+          if (changed && !(options && options.silent)) {
+            window.dispatchEvent(new CustomEvent("aimy:interaction-type-changed", {
+              detail: { interactionType: next },
+            }));
+          }
+          return next;
+        }
+
+        document.querySelectorAll(".interaction-type-option").forEach((button) => {
+          button.addEventListener("click", () => setInteractionType(button.dataset.interactionType));
+          button.addEventListener("keydown", (event) => {
+            if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+            event.preventDefault();
+            const options = Array.from(document.querySelectorAll(".interaction-type-option"));
+            const index = options.indexOf(button);
+            const next = options[(index + (event.key === "ArrowRight" ? 1 : -1) + options.length) % options.length];
+            setInteractionType(next.dataset.interactionType);
+            next.focus();
+          });
+        });
 
         function showTray() {
           clearTimeout(trayHideTimer);
@@ -12112,7 +12207,7 @@
           "Product":     "Filter by Product: ",
           "Agents":      "Filter by Agents: ",
           "Time Period":  "Filter by Time Period: ",
-          "All":         "Reset all filters",
+          "Interaction type": "Filter by Interaction type: ",
         };
 
         const FILTER_SUGGESTIONS = {
@@ -12120,6 +12215,7 @@
           "Product":     ["Objectif Lune", "Adestra", "InterFax", "Qvidian", "RightAnswers", "Second Street"],
           "Agents":      ["Salma Ehab", "Omar Adel", "Sara Hassan", "Karim Nour", "Ahmed Mahfouz"],
           "Time Period":  ["This week", "Last 30 days", "Last 90 days", "Q2 2026", "Custom range"],
+          "Interaction type": ["All interactions", "Calls", "Tickets"],
         };
 
         // Cache the default inner HTML so we can restore it
@@ -12176,7 +12272,7 @@
           filterTrayInner.querySelectorAll(".filter-chip[data-filter]").forEach(chip => {
             chip.addEventListener("click", () => {
               const key = chip.dataset.filter;
-              if (key === "All") {
+              if (chip.dataset.action === "clear-filters") {
                 floatInput.value = "";
                 floatInput.dispatchEvent(new Event("input"));
                 clearAllFilters();
@@ -12209,6 +12305,7 @@
         }
 
         function renderActiveStrip() {
+          if (!activeFilterStrip) return;
           // Remove all chips (keep the label and clear-all button)
           activeFilterStrip.querySelectorAll(".afs-chip").forEach(c => c.remove());
           const entries = Object.entries(activeFilters);
@@ -12230,18 +12327,22 @@
           // Wire up individual remove buttons
           activeFilterStrip.querySelectorAll(".afs-chip-x").forEach(btn => {
             btn.addEventListener("click", () => {
-              delete activeFilters[btn.dataset.key];
-              renderActiveStrip();
+              if (btn.dataset.key === "Interaction type") setInteractionType("all");
+              else {
+                delete activeFilters[btn.dataset.key];
+                renderActiveStrip();
+              }
             });
           });
         }
 
         function clearAllFilters() {
           activeFilters = {};
+          setInteractionType("all", { silent: true });
           renderActiveStrip();
         }
 
-        afsClearAll.addEventListener("click", clearAllFilters);
+        if (afsClearAll) afsClearAll.addEventListener("click", clearAllFilters);
 
         /* ══════════════════════════════════════════════════════════════════
            THE SURFACE THIS PAGE CAN CHANGE, AS A QUERY STRING
@@ -12261,7 +12362,7 @@
           /* The dimensions are a closed set, so a slug can be turned back into
              the label it came from. Round-tripping "Time Period" through a URL
              key is otherwise the one thing that can silently go wrong. */
-          var DIMS = Object.keys(FILTER_PREFIXES).filter(function (k) { return k !== "All"; });
+          var DIMS = Object.keys(FILTER_PREFIXES).filter(function (k) { return k !== "Interaction type"; });
           function slug(k) {
             return "f_" + String(k).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
           }
@@ -12273,9 +12374,9 @@
 
           window.AIMY_SURFACE = {
             initials: "NW",
-            SCALAR: ["view", "scenario", "chart"].concat(DIMS.map(slug)),
+            SCALAR: ["view", "scenario", "chart", "interaction"].concat(DIMS.map(slug)),
             MULTI: [],
-            DEFAULTS: { view: "manager", scenario: "critical" },
+            DEFAULTS: { view: "manager", scenario: "critical", interaction: "all" },
 
             read: function () {
               var out = { scenario: activeScenario };
@@ -12286,6 +12387,7 @@
               if (on) out.view = on.getAttribute("data-view");
               var tog = document.getElementById("qsChartToggle");
               if (tog && tog.getAttribute("aria-expanded") === "true") out.chart = "1";
+              out.interaction = interactionType;
               Object.keys(activeFilters).forEach(function (k) { out[slug(k)] = activeFilters[k]; });
               return out;
             },
@@ -12296,6 +12398,7 @@
                 /* Filters: rebuilt from nothing, never merged. */
                 activeFilters = {};
                 DIMS.forEach(function (k) { if (v[slug(k)]) activeFilters[k] = v[slug(k)]; });
+                setInteractionType(v.interaction || "all", { silent: true });
                 renderActiveStrip();
 
                 /* The detected state. `setScenario` repaints the pill, the
