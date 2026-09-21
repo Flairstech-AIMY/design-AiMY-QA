@@ -27,7 +27,7 @@
     <title>AiMY QA · Dashboard</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
     <link
-      href="https://fonts.googleapis.com/css2?family=Urbanist:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
     <style>
@@ -1026,14 +1026,14 @@
       .interaction-type-filter {
         display: flex;
         align-items: center;
-        gap: 12px;
-        margin-bottom: 12px;
+        gap: 8px;
+        margin-bottom: 0;
         min-width: 0;
       }
       .interaction-type-label {
         color: var(--d300);
-        font-size: 11px;
-        font-weight: 700;
+        font-size: 12px;
+        font-weight: 600;
         white-space: nowrap;
       }
       .interaction-type-toggle {
@@ -1041,10 +1041,10 @@
         align-items: center;
         gap: 2px;
         padding: 3px;
-        background: var(--card-bg);
-        border: 1px solid var(--card-border);
-        border-radius: var(--r-pill);
-        box-shadow: inset 0 1px 0 var(--wash-3);
+        background: transparent;
+        border: 0;
+        border-radius: 8px;
+        box-shadow: none;
         min-width: 0;
       }
       .interaction-type-option {
@@ -1053,8 +1053,8 @@
         background: transparent;
         color: var(--d400);
         cursor: pointer;
-        font: 600 11px/1.2 var(--font-sans);
-        padding: 7px 12px;
+        font: 600 12px/1.2 var(--font-sans);
+        padding: 5px 11px;
         white-space: nowrap;
         transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
       }
@@ -1070,7 +1070,7 @@
         outline-offset: 2px;
       }
       @media (max-width: 560px) {
-        .interaction-type-filter { align-items: flex-start; flex-direction: column; gap: 7px; }
+        .interaction-type-filter { align-items: flex-start; flex-direction: column; gap: 5px; }
         .interaction-type-toggle { width: 100%; }
         .interaction-type-option { flex: 1; }
       }
@@ -7143,6 +7143,42 @@
         background: transparent;
         font-family: "Urbanist", sans-serif;
       }
+      .gps-controls {
+        display: flex; align-items: center; gap: 8px;
+        min-width: 0; max-width: 100%;
+      }
+      .gps-filter-btn {
+        display: inline-flex; align-items: center; gap: 7px;
+        min-height: 32px; padding: 5px 10px;
+        background: var(--wash-3); border: 1px solid var(--wash-6);
+        border-radius: 8px; color: var(--d300);
+        font-family: inherit; font-size: 12px; font-weight: 600;
+        line-height: 1.4; white-space: nowrap; cursor: pointer;
+        transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
+      }
+      .gps-filter-btn:hover { background: var(--wash-6); color: var(--d50); }
+      .gps-filter-btn:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+      .gps-filter-btn svg { width: 10px; height: 10px; color: var(--d400); flex-shrink: 0; }
+      .gps-export-btn {
+        display: inline-flex; align-items: center; gap: 7px;
+        min-height: 32px; padding: 5px 10px;
+        background: var(--wash-3); border: 1px solid var(--wash-6);
+        border-radius: 8px; color: var(--d300);
+        font-family: inherit; font-size: 12px; font-weight: 600;
+        line-height: 1.4; white-space: nowrap; cursor: pointer;
+        transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
+      }
+      .gps-export-btn:hover { background: var(--wash-6); color: var(--d50); }
+      .gps-export-btn:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+      .gps-export-btn svg { width: 15px; height: 15px; color: var(--d400); flex-shrink: 0; }
+      .gps-date-btn { gap: 6px; }
+      .gps-date-btn .gps-date-clear { width: 15px; height: 15px; margin-left: -1px; }
+      .gps-date-btn .gps-date-calendar { width: 15px; height: 15px; margin-left: 1px; }
+      @media (max-width: 700px) {
+        .gps-bar { --gps-pad-x: 16px; overflow-x: auto; justify-content: flex-start; }
+        .gps-controls { margin-left: auto; }
+        .gps-filter-btn, .gps-export-btn { font-size: 11px; padding-inline: 8px; }
+      }
       /* Visually hidden, but part of the trigger's accessible name, so the
          control still announces as "Product scope: Upland" now that the
          printed label is gone. */
@@ -7319,6 +7355,7 @@
          the same order aimy-canvas.css has over this page's inline block. -->
     <link rel="stylesheet" href="assets/aimy-responsive.css?v=7" />
     <link rel="stylesheet" href="assets/aimy-rail.css?v=2" />
+    <link rel="stylesheet" href="assets/aimy-typography.css?v=1" />
     <script src="assets/aimy-viewport.js?v=5"></script>
   </head>
   <body>
@@ -7569,6 +7606,18 @@
              tracked with aria-activedescendant. Focus lands in the input,
              never on an option, so the options are not tabbable. -->
         <div class="gps-bar" id="gpsBar">
+          <div class="gps-controls" aria-label="Dashboard filters">
+            <div class="interaction-type-filter" aria-label="Interaction type filter">
+              <div class="interaction-type-toggle" role="radiogroup" aria-label="Interaction type">
+                <button class="interaction-type-option" type="button" role="radio" aria-checked="true" data-interaction-type="all">All interactions</button>
+                <button class="interaction-type-option" type="button" role="radio" aria-checked="false" data-interaction-type="calls">Calls</button>
+                <button class="interaction-type-option" type="button" role="radio" aria-checked="false" data-interaction-type="tickets">Tickets</button>
+              </div>
+            </div>
+            <button class="gps-filter-btn" type="button" aria-haspopup="listbox" aria-label="Filter by client">
+              All clients
+              <svg viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="1 1 5 5 9 1"></polyline></svg>
+            </button>
           <div class="gps" id="gpsRoot">
             <button class="gps-btn" id="gpsBtn" type="button"
                     aria-haspopup="listbox" aria-expanded="false"
@@ -7613,18 +7662,24 @@
               <div class="gps-empty" id="gpsEmpty" role="status" hidden>No products match.</div>
             </div>
           </div>
+            <button class="gps-filter-btn gps-date-btn" type="button" aria-label="Change date range">
+              <span>01 Jan 2026 ~ 15 Sep 2026</span>
+              <svg class="gps-date-clear" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+              <svg class="gps-date-calendar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4.5" width="18" height="17" rx="2"></rect><path d="M16 2.5v4M8 2.5v4M3 9h18"></path></svg>
+            </button>
+            <button class="gps-export-btn" type="button" aria-label="Export dashboard">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M12 3v12"></path>
+                <path d="m7 10 5 5 5-5"></path>
+                <path d="M5 21h14"></path>
+              </svg>
+              Export
+            </button>
+          </div>
         </div>
 
         <div class="dashboard-scroll">
           <div class="dash-view" id="viewManager">
-          <div class="interaction-type-filter" aria-label="Interaction type filter">
-            <span class="interaction-type-label" id="interactionTypeLabel">Interaction type</span>
-            <div class="interaction-type-toggle" role="radiogroup" aria-labelledby="interactionTypeLabel">
-              <button class="interaction-type-option" type="button" role="radio" aria-checked="true" data-interaction-type="all">All interactions</button>
-              <button class="interaction-type-option" type="button" role="radio" aria-checked="false" data-interaction-type="calls">Calls</button>
-              <button class="interaction-type-option" type="button" role="radio" aria-checked="false" data-interaction-type="tickets">Tickets</button>
-            </div>
-          </div>
         <!-- ════ AIMY DAILY SUMMARY CARD ════════════════════════════════════════
              Headline metric + 3 key signals + primary action for today.
              Content driven by JS data below (updateSummaryCard).
