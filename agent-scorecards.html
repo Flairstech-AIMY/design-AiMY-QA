@@ -40,7 +40,7 @@
       }
 
       :root {
-        --ai: linear-gradient(104deg, #0066ff 0%, #61adf1 47%, #6fdfe2 100%);
+        --ai: linear-gradient(104deg, #0066ff 0%, #61adf1 47%, #45d3e6 100%);
         /* Richer navy-tinted dark palette matching V1 */
         --d950: #080b10;
         --d900: #0d1117;
@@ -61,14 +61,22 @@
         --qa-accent: #8b4ff4;
         --qa-accent-rgb: 139, 79, 244;
         --qa-accent-dim: rgba(139, 79, 244, 0.15);
-        --teal: #6fdfe2;
+        --teal: #45d3e6;
         --purple: #8b4ff4;
-        --ok: #7fae94;
-        --warn: #c0a47c;
-        --err: #d2827b;
-        --ok-bg: rgba(127, 174, 148, 0.14);
-        --warn-bg: rgba(192, 164, 124, 0.14);
-        --err-bg: rgba(210, 130, 123, 0.14);
+        --ok: #4ed6a1;
+        --ok-rgb: 78,214,161;
+        --ok-bg: rgba(78,214,161,0.12);
+        --ok-border: rgba(78,214,161,0.30);
+        --ok-glow: rgba(78,214,161,0.20);
+        --warn: #f7c95c;
+        --warn-rgb: 247,201,92;
+        --warn-bg: rgba(247,201,92,0.13);
+        --warn-border: rgba(247,201,92,0.32);
+        --err: #ff7282;
+        --err-rgb: 255,114,130;
+        --err-bg: rgba(255,114,130,0.12);
+        --err-border: rgba(255,114,130,0.30);
+        --err-glow: rgba(255,114,130,0.20);
 
         /* Motion tokens, only two durations allowed. Longer motion
        (chart animation, skeleton shimmer) defines its own keyframe. */
@@ -100,8 +108,8 @@
         --d200: #c8d2dc;
 
         /* Semantic: info completes the ok/warn/err set (.ws-detected) */
-        --info: #8aa6bd;
-        --info-bg: rgba(138, 166, 189, 0.14);
+        --info: #7ea7ff;
+        --info-bg: rgba(126,167,255,0.12);
 
         /* Accents are GLOBAL, one --accent per product, not per-product
        tokens. Aliased onto the existing --qa-accent trio rather than
@@ -176,7 +184,7 @@
        hardcoded #fff values that assumed a dark surface now use this. */
         --text-strong: #ffffff;
       
-        --err-strong: #f04438;
+        --err-strong: #ff5268;
         --ink-primary: var(--d50);
         --ink-secondary: var(--d100);
         --ink-muted: var(--d200);
@@ -310,8 +318,8 @@
       }
       :root[data-theme="light"] .aimy-overlay { background: rgba(244,246,249,0.86); }
       :root[data-theme="light"] .overlay-input-bar,
-      :root[data-theme="light"] .msg-bubble { background: var(--card-bg); }
-      :root[data-theme="light"] .chat-msg.user .msg-bubble { background: var(--qa-accent-dim); color: var(--d50); }
+      :root[data-theme="light"] .msg-bubble { background: transparent; }
+      :root[data-theme="light"] .chat-msg.user .msg-bubble { background: transparent; color: var(--d50); }
       /* ── Solid semantic fills in light ────────────────────────────────
          These chips use DARK text on a bright fill, which reads well against
          dark-theme --ok (#7fae94, 6.6:1). Light darkens --ok to #3f6b52 for
@@ -367,7 +375,6 @@
         border-color: rgba(139,79,244,0.28);
         box-shadow: 0 0 12px rgba(139,79,244,0.12);
       }
-      :root[data-theme="light"] .overlay-badge { background: var(--wash-2); }
 
       /* The design-system toast is dark glass; light needs its own surface or
          its title, sub and Undo all sit near-invisible on it. */
@@ -3123,6 +3130,44 @@
         pointer-events: all;
       }
 
+      .kpa-email-overlay {
+        position: absolute; inset: 0; z-index: 510;
+        display: flex; flex-direction: column; align-items: center;
+        background: rgba(20, 27, 34, 0.30);
+        backdrop-filter: blur(28px) saturate(1.4) brightness(0.85);
+        -webkit-backdrop-filter: blur(28px) saturate(1.4) brightness(0.85);
+        opacity: 0; visibility: hidden; transform: translateY(8px);
+        transition: opacity 300ms cubic-bezier(0.22, 1, 0.36, 1), transform 300ms cubic-bezier(0.22, 1, 0.36, 1), visibility 0s linear 300ms;
+      }
+      .kpa-email-overlay.open { opacity: 1; visibility: visible; transform: none; transition-delay: 0s; }
+      :root[data-theme="light"] .kpa-email-overlay {
+        background: rgba(244, 246, 249, 0.76);
+        backdrop-filter: blur(28px) saturate(1.2);
+        -webkit-backdrop-filter: blur(28px) saturate(1.2);
+      }
+      .kpa-email-head { width: min(760px, 100%); flex-shrink: 0; display: flex; align-items: center; gap: 12px; padding: 18px 20px 10px; }
+      .kpa-email-chip { display: flex; flex-shrink: 0; align-items: center; gap: 7px; border: 1px solid var(--wash-6); border-radius: 20px; padding: 5px 12px; color: var(--d200); font-size: 12px; font-weight: 700; letter-spacing: 0.06em; }
+      .kpa-email-chip svg { width: 14px; height: 15px; }
+      .kpa-email-meta { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--d400); font-size: 12px; }
+      .kpa-email-close { margin-left: auto; width: 40px; height: 40px; display: grid; place-items: center; border: 0; border-radius: 8px; background: transparent; color: var(--d400); cursor: pointer; transition: background var(--transition-fast), color var(--transition-fast); }
+      .kpa-email-close:hover { background: var(--wash-7); color: var(--d50); }
+      .kpa-email-close svg { width: 16px; height: 16px; }
+      .kpa-email-thread { width: min(760px, 100%); flex: 1; min-height: 0; overflow-y: auto; padding: 14px 20px 20px; display: flex; flex-direction: column; gap: 10px; }
+      .kpa-email-card { flex-shrink: 0; overflow: hidden; border: 1px solid var(--wash-6); border-radius: 12px; background: var(--card-bg); }
+      .kpa-email-card header { display: flex; align-items: flex-start; gap: 10px; padding: 10px; border-bottom: 1px solid var(--wash-6); }
+      .kpa-email-avatar { width: 32px; height: 32px; flex-shrink: 0; display: grid; place-items: center; border-radius: 50%; background: rgba(51, 105, 255, 0.25); color: #5c87ff; font-size: 12px; font-weight: 800; }
+      :root[data-theme="light"] .kpa-email-avatar { background: rgba(29, 78, 216, 0.18); color: #1d4ed8; }
+      .kpa-email-who { min-width: 0; flex: 1; }
+      .kpa-email-from { margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--d50); font-size: 14px; font-weight: 700; }
+      .kpa-email-type { margin: 2px 0 0; color: var(--d400); font-size: 12px; }
+      .kpa-email-side { display: flex; flex-shrink: 0; flex-direction: column; align-items: flex-end; gap: 4px; }
+      .kpa-email-time { color: var(--d400); font-size: 12px; }
+      .kpa-email-badge { display: inline-flex; align-items: center; border: 1px solid rgba(var(--ok-rgb), 0.3); border-radius: 999px; padding: 3px 10px; background: rgba(var(--ok-rgb), 0.12); color: var(--ok); font-size: 12px; font-weight: 700; line-height: 16px; white-space: nowrap; }
+      .kpa-email-body { padding: 10px 12px; color: var(--d200); font-size: 14px; line-height: 1.625; overflow-wrap: anywhere; white-space: pre-line; }
+      .kpa-email-card.is-private { border-color: rgba(var(--warn-rgb), 0.32); background: rgba(var(--warn-rgb), 0.06); }
+      .kpa-email-card.is-private header { border-bottom-color: rgba(var(--warn-rgb), 0.32); }
+      .kpa-email-badge.is-private { border-color: rgba(var(--warn-rgb), 0.32); background: rgba(var(--warn-rgb), 0.13); color: var(--warn); }
+
       /* Close button, top right corner */
       .overlay-close {
         position: absolute;
@@ -3150,30 +3195,6 @@
         height: 16px;
         stroke: currentColor;
         stroke-width: 2;
-      }
-
-      /* Overlay header badge · "AiMY Chat" label */
-      .overlay-badge {
-        position: absolute;
-        top: 28px;
-        left: 50%;
-        transform: translateX(-50%);
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        font-size: 11px;
-        font-weight: 700;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        color: var(--d400);
-        padding: 5px 12px;
-        background: var(--wash-3);
-        border: 1px solid var(--wash-7);
-        border-radius: 20px;
-      }
-      .overlay-badge svg {
-        width: 11px;
-        height: 11px;
       }
 
       /* Conversation thread area */
@@ -3205,47 +3226,6 @@
         border-radius: 2px;
       }
 
-      /* Message bubbles */
-      .chat-msg {
-        display: flex;
-        gap: 10px;
-        align-items: flex-start;
-        padding: 0 4px;
-      }
-      .chat-msg.user {
-        flex-direction: row-reverse;
-        justify-content: flex-start;
-      }
-
-      .msg-avatar {
-        width: 28px;
-        height: 28px;
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 10px;
-        font-weight: 700;
-        flex-shrink: 0;
-        margin-top: 2px;
-      }
-      .msg-avatar.aimy-av {
-        background: rgba(70, 40, 140, 0.35);
-        border: 1px solid rgba(139, 79, 244, 0.3);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-      .msg-avatar.aimy-av svg {
-        width: 14px;
-        height: 16px;
-      }
-      .msg-avatar.user-av {
-        background: linear-gradient(135deg, #7c3aed, var(--brand));
-        color: #fff;
-        font-size: 9px;
-      }
-
       .msg-bubble {
         max-width: 540px;
         padding: 12px 16px;
@@ -3254,25 +3234,6 @@
         font-weight: 500;
         line-height: 1.6;
         color: var(--d50);
-      }
-      .chat-msg.aimy .msg-bubble {
-        background: var(--wash-4);
-        border: 1px solid var(--wash-7);
-        border-radius: 4px 12px 12px 12px;
-      }
-      .chat-msg.user .msg-bubble {
-        background: rgba(var(--qa-accent-rgb), 0.14);
-        border: 1px solid rgba(var(--qa-accent-rgb), 0.22);
-        border-radius: 12px 4px 12px 12px;
-        color: var(--d100);
-      }
-
-      /* AiMY typing indicator */
-      .typing-dots {
-        display: flex;
-        gap: 4px;
-        padding: 6px 4px;
-        align-items: center;
       }
       .typing-dots span {
         width: 6px;
@@ -3312,35 +3273,6 @@
           transform 300ms 80ms cubic-bezier(0.22, 1, 0.36, 1),
           opacity 300ms 80ms ease;
       }
-      .aimy-overlay.open .overlay-input-wrap {
-        transform: translateY(0);
-        opacity: 1;
-      }
-
-      .overlay-input-bar {
-        background: rgba(20, 27, 36, 0.72);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        border: 1px solid var(--wash-9);
-        border-radius: 40px;
-        box-shadow:
-          0 8px 32px rgba(0, 0, 0, 0.4),
-          inset 0 1px 0 var(--wash-5);
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 12px 12px 12px 16px;
-        transition:
-          border-color var(--transition-base),
-          box-shadow var(--transition-base);
-      }
-      .overlay-input-bar:focus-within {
-        border-color: rgba(var(--qa-accent-rgb), 0.45);
-        box-shadow:
-          0 12px 40px rgba(0, 0, 0, 0.5),
-          0 0 0 3px rgba(var(--qa-accent-rgb), 0.1),
-          inset 0 1px 0 var(--wash-7);
-      }
 
       .overlay-input {
         flex: 1;
@@ -3357,54 +3289,6 @@
         min-height: 24px;
         max-height: 120px;
         overflow-y: auto;
-      }
-      .overlay-input::placeholder {
-        color: var(--d500);
-        font-weight: 400;
-      }
-
-      .overlay-send {
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
-        background: var(--qa-accent);
-        border: none;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-        transition: transform var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast), color var(--transition-fast), opacity var(--transition-fast);
-        box-shadow: 0 2px 10px rgba(var(--qa-accent-rgb), 0.4);
-      }
-      .overlay-send:hover {
-        box-shadow: 0 4px 20px rgba(var(--qa-accent-rgb), 0.55);
-        transform: translateY(-1px);
-      }
-      .overlay-send svg {
-        width: 15px;
-        height: 15px;
-        stroke: #fff;
-      }
-
-      /* Overlay suggested prompts, shown when thread is empty */
-      .overlay-suggestions {
-        display: flex;
-        gap: 8px;
-        flex-wrap: wrap;
-        padding: 0 4px;
-        justify-content: center;
-        /* Fades out once user starts chatting */
-        transition:
-          opacity 200ms cubic-bezier(0.22, 1, 0.36, 1),
-          transform 200ms cubic-bezier(0.22, 1, 0.36, 1),
-          visibility 200ms;
-      }
-      .overlay-suggestions.hidden {
-        opacity: 0;
-        visibility: hidden;
-        pointer-events: none;
-        transform: translateY(6px);
       }
       .overlay-sugg-chip {
         font-family: "Urbanist", sans-serif;
@@ -5429,7 +5313,13 @@
       .eval-detail-page {
         display: none;
         position: absolute; inset: 0;
-        background: var(--eval-detail-bg);
+        /* Mirrors #appEllipse (fixed to the viewport) so this page matches the dashboard glow. */
+        background-color: var(--eval-detail-bg);
+        background-image: var(--grad-ellipse-1), var(--grad-ellipse-2);
+        background-size: 1300px 1050px, 750px 650px;
+        background-position: calc(50vw - 650px) calc(42vh - 525px), calc(104vw - 750px) calc(108vh - 650px);
+        background-repeat: no-repeat;
+        background-attachment: fixed;
         z-index: 50;
         overflow-y: auto;
         padding: 24px 32px 100px;
@@ -5768,6 +5658,37 @@
       /* Back navigation */
       /* Header row: the way back on the left, the record on the right. */
       .eval-detail-head { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+      .eval-detail-head { justify-content: space-between; }
+      .eval-detail-menu { position: relative; margin-bottom: 20px; }
+      .eval-detail-menu-trigger {
+        width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center;
+        border: 1px solid var(--wash-8); border-radius: 8px; background: var(--wash-3);
+        color: var(--d300); cursor: pointer; transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+      }
+      .eval-detail-menu-trigger:hover, .eval-detail-menu-trigger[aria-expanded="true"] {
+        background: var(--wash-7); border-color: var(--wash-10); color: var(--d100);
+      }
+      .eval-detail-menu-trigger svg { width: 17px; height: 17px; }
+      .eval-detail-actions {
+        position: absolute; top: calc(100% + 8px); right: 0; z-index: 220; width: 190px;
+        padding: 5px; border: 1px solid var(--wash-8); border-radius: 10px; background: var(--d800);
+        box-shadow: 0 12px 34px rgba(0,0,0,.42), inset 0 1px 0 var(--wash-5);
+        opacity: 0; transform: translateY(-4px) scale(.98); transform-origin: top right;
+        pointer-events: none; transition: opacity 150ms ease, transform 150ms ease;
+      }
+      .eval-detail-actions.open { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
+      .eval-detail-action {
+        width: 100%; display: flex; align-items: center; gap: 9px; padding: 9px 10px;
+        border: 0; border-radius: 6px; background: transparent; color: var(--d200); cursor: pointer;
+        font: 600 11px "Urbanist", sans-serif; text-align: left; transition: background var(--transition-fast), color var(--transition-fast);
+      }
+      .eval-detail-action:hover, .eval-detail-action:focus-visible { background: var(--wash-6); color: var(--d50); outline: none; }
+      .eval-detail-action svg { width: 15px; height: 15px; flex: 0 0 15px; color: var(--d400); }
+      .eval-detail-action:hover svg, .eval-detail-action:focus-visible svg { color: var(--brand); }
+      .eval-detail-action.danger { color: var(--err); }
+      .eval-detail-action.danger svg { color: var(--err); }
+      .eval-detail-action.danger:hover, .eval-detail-action.danger:focus-visible { background: rgba(239, 91, 100, .12); color: var(--err); }
+      .eval-detail-action-divider { height: 1px; margin: 4px 5px; background: var(--wash-6); }
 
       .eval-detail-back {
         display: flex; align-items: center; gap: 7px;
@@ -5823,26 +5744,139 @@
          the left edge, which is the rule the design system's own progress
          bars follow (Level 4). */
       .call-player {
-        display: flex; align-items: center; gap: 11px; flex-wrap: wrap;
-        padding: 10px 14px; margin-bottom: 10px;
-        background: var(--card-bg-raised); border: 1px solid var(--card-border);
-        border-radius: var(--r-lg);
+        display: flex; align-items: center; gap: 11px; flex-wrap: nowrap;
+        width: 100%; min-height: 58px; box-sizing: border-box;
+        padding: 3px 6px; margin-bottom: 8px;
+        background: var(--wash-4); border: 1px solid var(--wash-8); border-radius: 14px;
       }
+      .chat-call-evidence {
+        width: min(100%, 620px);
+        padding: 0;
+      }
+      .chat-kpi-context { display: grid; gap: 10px; margin: 0 0 12px; }
+      .chat-kpi-head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+      .chat-kpi-code { color: var(--d500); font: 600 10px var(--font-mono); }
+      .chat-kpi-meta { display: flex; flex-wrap: wrap; gap: 6px; }
+      .chat-kpi-pill { padding: 2px 8px; border: 1px solid var(--wash-8); border-radius: var(--r-pill); color: var(--d300); font-size: 11px; font-weight: 600; }
+      .chat-kpi-pill.is-fail { color: var(--err); background: var(--err-bg); border-color: rgba(240,68,56,0.24); }
+      .chat-kpi-pill.is-pass { color: var(--ok); background: var(--ok-bg); border-color: rgba(23,178,106,0.24); }
+      .chat-kpi-row { display: grid; gap: 3px; }
+      .chat-kpi-label { display: block; margin: 0 0 6px; color: var(--d400); font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+      .chat-kpi-row .chat-kpi-label { margin: 0; }
+      .chat-call-speaker { margin-right: 6px; color: var(--d400); font-size: 11px; font-weight: 700; }
+      .chat-call-empty { margin: 0; color: var(--d400); font-size: 12px; }
+      .chat-kpi-title { margin: 0; color: var(--d100); font-size: 14px; line-height: 1.35; }
+      .chat-kpi-reason { margin: 0; color: var(--d300); font-size: 12px; line-height: 1.55; }
+      .chat-call-frame {
+        padding: 10px;
+        margin: 14px 0px;
+        background: transparent;
+        border-radius: 10px;
+        backdrop-filter: blur(18px) saturate(1.2);
+        -webkit-backdrop-filter: blur(18px) saturate(1.2);
+      }
+      .chat-call-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+      .chat-call-title { margin: 0 0 3px; color: var(--d100); font-size: 15px; line-height: 1.25; }
+      .chat-call-subtitle { margin: 0; color: var(--d400); font-size: 11px; line-height: 1.4; }
+      .chat-call-header-meta { color: var(--d500); font: 600 10px var(--font-mono); white-space: nowrap; }
+      .chat-call-frame .call-player {
+        min-height: 58px; padding: 10px 14px; margin: 0;
+        background: transparent; border-color: rgba(151, 187, 235, .13); border-radius: 18px;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, .04);
+      }
+      .chat-call-frame .rhap_container {
+        width: 100%; min-width: 0; padding: 0; background: transparent; box-shadow: none;
+        color: var(--d300);
+      }
+      .chat-call-frame .rhap_main { display: flex; align-items: center; gap: 10px; }
+      .chat-call-frame .rhap_progress-section { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; }
+      .chat-call-frame .rhap_time {
+        margin: 0px 5px;
+        flex: 0 0 auto;
+        color: var(--d300);
+        font: 7000 12px var(--font-mono);
+        font-variant-numeric: tabular-nums;
+      }
+      .chat-call-frame .rhap_progress-container { flex: 1; min-width: 60px; cursor: pointer; }
+      .chat-call-frame .rhap_progress-bar { position: relative; height: 5px; overflow: visible; border-radius: var(--r-pill); background: var(--wash-6); }
+      .chat-call-frame .rhap_progress-indicator { position: absolute; top: 50%; left: 0; width: 12px; height: 12px; border-radius: 50%; background: var(--brand); transform: translate(-50%, -50%); box-shadow: 0 0 0 3px rgba(51, 105, 255, .14); }
+      .chat-call-frame .rhap_progress-filled { height: 100%; border-radius: inherit; background: var(--brand); }
+      .chat-call-frame .rhap_download-progress { position: absolute; inset: 0 auto auto 0; height: 100%; border-radius: inherit; background: var(--wash-8); pointer-events: none; }
+      .chat-call-frame .rhap_controls-section { display: flex; flex: 0 0 auto; order: -1; justify-content: flex-start; }
+      .chat-call-frame .rhap_main-controls { display: flex; }
+      .chat-call-frame .rhap_button-clear { padding: 0; border: 0; background: transparent; color: var(--brand); cursor: pointer; }
+      .chat-call-frame .rhap_main-controls-button { display: inline-flex; align-items: center; justify-content: center; }
+      .chat-call-frame .rhap_main-controls-button svg { width: 32px; height: 32px; }
+      .chat-call-frame .rhap_button-clear:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; border-radius: 50%; }
+      .cp-waveform { position: absolute; inset: 50% 0 auto; height: 28px; display: flex; align-items: center; justify-content: space-between; gap: 3px; transform: translateY(-50%); pointer-events: none; opacity: .72; }
+      .cp-waveform i { display: block; flex: 1 1 0; min-width: 2px; height: var(--wave, 12px); border-radius: 99px; background: rgba(186, 202, 223, .42); }
+      .cp-waveform i:nth-child(-n+7) { background: rgba(74, 144, 255, .82); }
+      .chat-call-actions { display: flex; align-items: center; gap: 8px; margin-top: 12px; }
+      .cp-speed, .cp-download { min-height: 30px; border: 1px solid rgba(151, 187, 235, .16); border-radius: 10px; background: rgba(255, 255, 255, .045); color: var(--d300); font: 600 11px var(--font-sans); }
+      .cp-speed { padding: 0 28px 0 10px; cursor: pointer; }
+      .cp-download { display: inline-flex; align-items: center; gap: 6px; padding: 0 10px; cursor: pointer; }
+      .cp-download svg { width: 14px; height: 14px; color: var(--brand); }
+      .cp-speed:hover, .cp-download:hover { border-color: rgba(99, 169, 255, .42); background: rgba(51, 105, 255, .1); color: var(--d100); }
+      .cp-speed:focus-visible, .cp-download:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+      .chat-audit-context { width: min(100%, 620px); color: var(--d200); }
+      .chat-audit-intro { position: relative; min-height: 44px; margin-bottom: 18px; padding-right: 160px; color: var(--d200); font-size: 14px; line-height: 1.5; overflow-wrap: anywhere; }
+      .chat-audit-heading { display: block; margin: 0 0 6px; color: var(--d50); font-size: 18px; font-weight: 700; line-height: 1.35; }
+      .chat-audit-log-toggle { position: absolute; top: 0; right: 0; min-height: 42px; display: inline-flex; align-items: center; gap: 8px; padding: 0 16px; border: 1px solid var(--wash-7); border-radius: 18px; background: transparent; color: var(--d400); cursor: pointer; font: 600 12px var(--font-sans); white-space: nowrap; transition: background 160ms ease-out, color 160ms ease-out; }
+      .chat-audit-log-toggle:hover { background: var(--wash-7); color: var(--d200); }
+      .chat-audit-log-toggle:focus-visible { outline: 2px solid var(--qa-accent); outline-offset: 3px; }
+      .chat-audit-log-toggle svg { width: 15px; height: 15px; flex-shrink: 0; }
+      .chat-audit-log { display: none; gap: 8px; margin: 0 0 18px; padding-left: 10px; border-left: 1px solid var(--wash-8); }
+      .chat-audit-log.is-visible { display: grid; }
+      .chat-audit-section { margin-bottom: 12px; border: 1px solid var(--wash-7); border-radius: 4px 12px 12px 12px; background: rgba(255,255,255,0.05); }
+      :root[data-theme="light"] .chat-audit-section { background: rgba(15,23,42,0.03); }
+      .chat-audit-section-head { width: 100%; display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 0; background: transparent; color: var(--d50); cursor: pointer; font-family: var(--font-sans); text-align: left; }
+      .chat-audit-section-head strong { font-size: 14px; font-weight: 700; }
+      .chat-audit-section-icon { display: inline-flex; flex-shrink: 0; color: var(--qa-accent); }
+      .chat-audit-section-icon svg { width: 18px; height: 18px; }
+      .chat-audit-chevron { width: 16px; height: 16px; margin-left: auto; flex-shrink: 0; color: var(--d400); transform: rotate(180deg); transition: transform 160ms ease-out; }
+      .chat-audit-section-head[aria-expanded="false"] .chat-audit-chevron { transform: none; }
+      .chat-audit-section-head[aria-expanded="false"] + .chat-audit-section-body { display: none; }
+      .chat-audit-section-body { padding: 0 12px 12px; border-top: 1px solid var(--wash-7); }
+      .chat-audit-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 12px; padding-top: 10px; }
+      .chat-audit-field { min-width: 0; }
+      .chat-audit-field span { display: block; margin-bottom: 2px; color: var(--d400); font-size: 12px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; }
+      .chat-audit-field strong { display: block; color: var(--d200); font-size: 12px; font-weight: 600; line-height: 1.375; overflow-wrap: anywhere; }
+      .chat-audit-kpis { display: grid; gap: 8px; padding-top: 10px; }
+      .chat-audit-event { display: grid; gap: 2px; font-size: 12px; line-height: 1.45; }
+      .chat-audit-event time { color: var(--d500); font: 600 10px var(--font-mono); }
+      .chat-audit-event span { color: var(--d200); }
+      @media (max-width: 520px) {
+        .chat-audit-intro { padding-right: 0; }
+        .chat-audit-log-toggle { position: static; margin-top: 10px; }
+      }
+      .chat-call-evidence .call-player { margin: 0 0 8px; }
+      .chat-call-transcript {
+        display: grid; gap: 7px; max-height: 300px; overflow: auto;
+        padding: 0 4px 0 0;
+        background: transparent;
+        backdrop-filter: blur(18px) saturate(1.15);
+        -webkit-backdrop-filter: blur(18px) saturate(1.15);
+      }
+      .chat-call-line { display: grid; grid-template-columns: 42px 1fr; gap: 8px; align-items: start; background: transparent; }
+      .chat-call-line time { padding-top: 2px; background: transparent; color: var(--d500); font: 600 10px var(--font-mono); }
+      .chat-call-line p { margin: 0; background: transparent; color: var(--d200); font-size: 12px; line-height: 1.5; }
+      .chat-call-line.is-evidence time { color: var(--brand); font-weight: 700; }
+      .chat-call-evidence-text { padding: 2px 4px; border-radius: 4px; background: rgba(var(--brand-rgb), 0.16); color: var(--d100); box-shadow: inset 0 0 0 1px rgba(var(--brand-rgb), 0.42); }
       .cp-play {
-        width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
+        width: 32px; height: 32px; border-radius: 50%; flex: 0 0 32px;
         display: inline-flex; align-items: center; justify-content: center;
-        background: var(--brand); color: #fff; border: none; cursor: pointer;
+        background: var(--brand); color: #071224; border: none; cursor: pointer;
         transition: filter var(--t-fast), transform var(--t-fast);
       }
       .cp-play:hover { filter: brightness(1.12); }
       .cp-play:active { transform: scale(0.94); }
       .cp-play:focus-visible { outline: 2px solid var(--brand); outline-offset: 3px; }
-      .cp-play svg { width: 15px; height: 15px; }
+      .cp-play svg { width: 13px; height: 13px; }
       .cp-play svg[hidden] { display: none; }
-      .cp-time { font-family: var(--font-mono); font-size: 12.5px; font-weight: 600; color: var(--d200); font-variant-numeric: tabular-nums; }
-      .cp-dur { color: var(--d400); }
+      .cp-time { flex: 0 0 auto; font-family: var(--font-mono); font-size: 14px; font-weight: 600; color: var(--d300); font-variant-numeric: tabular-nums; white-space: nowrap; }
+      .cp-dur { color: var(--d300); }
       .cp-track {
-        position: relative; flex: 1; min-width: 120px; height: 5px;
+        position: relative; flex: 1 1 auto; min-width: 60px; height: 5px;
         border-radius: var(--r-pill); background: var(--wash-6); cursor: pointer;
       }
       .cp-track:focus-visible { outline: 2px solid var(--brand); outline-offset: 4px; }
@@ -5852,9 +5886,9 @@
         transition: transform 120ms linear;
       }
       .cp-head {
-        position: absolute; top: 50%; left: 0; width: 11px; height: 11px;
-        margin: -5.5px 0 0 -5.5px; border-radius: 50%;
-        background: #fff; border: 2px solid var(--brand); pointer-events: none;
+        position: absolute; top: 50%; left: 0; width: 14px; height: 14px;
+        margin: -7px 0 0 -7px; border-radius: 50%;
+        background: var(--brand); border: 0; box-shadow: 0 0 0 3px rgba(51, 105, 255, .14), 0 2px 8px rgba(51, 105, 255, .35); pointer-events: none;
         transition: transform 120ms linear;
       }
       .cp-note { font-size: 12px; color: var(--d400); }
@@ -5970,8 +6004,10 @@
       .eval-panel.has-manual-audit > :not(.kpa-root) { display: none !important; }
       .kpa-root { display: flex; flex-direction: column; gap: 12px; }
       .kpa-summary {
-        background: var(--card-bg); border: 1px solid var(--wash-7);
-        border-radius: 16px; padding: 18px 20px; box-shadow: var(--shadow-md);
+        background: linear-gradient(120deg, rgba(var(--qa-accent-rgb),0.10), rgba(0,102,255,0.04));
+        border: 1px solid rgba(var(--qa-accent-rgb),0.2);
+        border-radius: 16px; padding: 18px 20px;
+        box-shadow: var(--elev-1, 0 1px 2px rgba(0,0,0,0.4));
       }
       .kpa-summary-row { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
       .kpa-score-block { display: flex; align-items: baseline; gap: 10px; padding-right: 18px; border-right: 1px solid var(--wash-6); }
@@ -6000,21 +6036,75 @@
       }
       .kpa-filter:hover { color: var(--d100); border-color: var(--wash-10); }
       .kpa-filter.active { color: var(--qa-accent); background: var(--qa-accent-dim); border-color: rgba(var(--qa-accent-rgb), 0.28); }
-      .kpa-agree-all {
-        margin-left: auto; border: 1px solid var(--wash-8); border-radius: 8px; padding: 7px 12px;
-        background: var(--wash-4); color: var(--d300); font-family: "Urbanist", sans-serif;
-        font-size: 11px; font-weight: 750; cursor: pointer;
-        transition: color var(--transition-fast), background var(--transition-fast);
+      .kpa-toolbar-actions { display: flex; align-items: center; gap: 8px; margin-left: auto; flex-wrap: wrap; }
+      .kpa-toolbar-action { min-height: 36px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 1px solid var(--wash-7); border-radius: var(--r-md); padding: 0 14px; background: var(--card-bg-raised); color: var(--d200); font-family: var(--font-sans, "Urbanist", sans-serif); font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap; transition: color var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast); }
+      .kpa-toolbar-action:hover { color: var(--d50); background: var(--d750); border-color: var(--wash-10); transform: translateY(-1px); }
+      .kpa-toolbar-action svg { width: 15px; height: 15px; flex: 0 0 auto; }
+      .kpa-toolbar-action.primary { color: #9db8ff; border-color: rgba(51,105,255,0.32); background: rgba(51,105,255,0.10); box-shadow: none; }
+      .kpa-toolbar-action.primary:hover { color: #dbe6ff; background: rgba(51,105,255,0.20); border-color: rgba(99,140,255,0.5); box-shadow: none; }
+      :root[data-theme="light"] .kpa-toolbar-action { background: var(--card-bg); color: var(--d700); }
+      :root[data-theme="light"] .kpa-toolbar-action.primary { color: var(--brand); background: rgba(51,105,255,0.08); border-color: rgba(51,105,255,0.28); }
+      :root[data-theme="light"] .kpa-toolbar-action.primary:hover { background: rgba(51,105,255,0.14); border-color: rgba(51,105,255,0.4); }
+      .kpa-agree-all { display: none; }
+      .kpa-confirm-dialog {
+        position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); margin: 0; width: min(420px, calc(100vw - 32px));
+        max-height: calc(100vh - 32px); border: 1px solid var(--card-border-hover);
+        border-radius: var(--r-xl); padding: 16px; background: var(--card-bg);
+        color: var(--d50); box-shadow: var(--shadow-xl, 0 16px 48px rgba(0,0,0,0.5)); font-family: var(--font-sans, "Urbanist", sans-serif); overflow: auto;
       }
-      .kpa-agree-all:hover { background: var(--wash-8); color: var(--d50); }
+      .kpa-confirm-dialog::backdrop { background: rgba(8,11,16,0.65); backdrop-filter: blur(6px); }
+      .kpa-confirm-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 6px; }
+      .kpa-confirm-title { font-size: 15px; line-height: 1.35; font-weight: 800; color: var(--d50); margin: 0; }
+      .kpa-confirm-close { width: 26px; height: 26px; border: 1px solid var(--wash-8); border-radius: var(--r-sm); background: var(--wash-4); color: var(--d400); cursor: pointer; flex: 0 0 auto; display: grid; place-items: center; transition: all var(--t-fast); }
+      .kpa-confirm-close:hover { background: var(--wash-8); color: var(--d50); }
+      .kpa-confirm-close svg { width: 14px; height: 14px; }
+      .kpa-confirm-body { font-size: 12px; color: var(--d400); line-height: 1.55; margin-bottom: 12px; }
+      .kpa-confirm-copy { color: var(--d300); margin: 0 0 8px; }
+      .kpa-confirm-summary { border: 1px solid var(--card-border); background: rgba(255,255,255,0.025); border-radius: var(--r-lg); overflow: hidden; margin-bottom: 6px; }
+      .kpa-confirm-summary-row { display: flex; align-items: center; gap: 10px; padding: 8px 10px; }
+      .kpa-confirm-summary-icon { width: 26px; height: 26px; border-radius: var(--r-sm); display: grid; place-items: center; flex: 0 0 auto; color: var(--ok); background: var(--ok-bg); border: 1px solid rgba(var(--ok-rgb), .22); }
+      .kpa-confirm-summary-icon svg { width: 15px; height: 15px; }
+      .kpa-confirm-summary-copy { min-width: 0; flex: 1; }
+      .kpa-confirm-summary-title { color: var(--d50); font-size: 11.5px; font-weight: 700; line-height: 1.35; margin-bottom: 2px; }
+      .kpa-confirm-summary-sub { color: var(--d500); font-size: 10px; line-height: 1.4; }
+      .kpa-confirm-count { color: var(--d50); font-size: 16px; font-weight: 800; letter-spacing: -0.025em; flex: 0 0 auto; font-variant-numeric: tabular-nums; }
+      .kpa-confirm-na { display: flex; align-items: flex-start; gap: 9px; padding: 8px 10px; border-radius: var(--r-md); background: var(--warn-bg); border: 1px solid rgba(var(--warn-rgb), .22); margin-bottom: 8px; }
+      .kpa-confirm-na[hidden] { display: none; }
+      .kpa-confirm-na-icon { width: 24px; height: 24px; display: grid; place-items: center; flex: 0 0 auto; border-radius: var(--r-sm); color: var(--warn); background: rgba(var(--warn-rgb), .08); }
+      .kpa-confirm-na-icon svg { width: 14px; height: 14px; }
+      .kpa-confirm-na-title { color: var(--warn); font-size: 11px; font-weight: 700; margin-bottom: 2px; }
+      .kpa-confirm-na-copy { color: var(--d300); font-size: 10px; line-height: 1.45; }
+      .kpa-confirm-actions { display: flex; justify-content: flex-end; gap: 8px; padding-top: 10px; border-top: 1px solid var(--wash-6); }
+      .kpa-confirm-cancel, .kpa-confirm-submit { min-height: 34px; border-radius: var(--r-md); padding: 7px 12px; font-family: inherit; font-size: 11px; font-weight: 700; cursor: pointer; white-space: nowrap; transition: background var(--t-fast), border-color var(--t-fast), color var(--t-fast), transform var(--t-fast); }
+      .kpa-confirm-cancel { min-width: 82px; border: 1px solid var(--wash-10); background: var(--wash-4); color: var(--d300); }
+      .kpa-confirm-cancel:hover { background: var(--wash-8); color: var(--d50); border-color: var(--wash-10); }
+      .kpa-confirm-submit { min-width: 132px; border: 1px solid var(--brand); background: var(--brand); color: #fff; box-shadow: 0 4px 14px rgba(51,105,255,.18); }
+      .kpa-confirm-submit:hover { background: #4d7fff; border-color: #4d7fff; transform: translateY(-1px); }
+      :root[data-theme="light"] .kpa-confirm-dialog { border-color: var(--card-border); }
+      @media (max-width: 560px) {
+        .kpa-toolbar-actions { width: 100%; margin-left: 0; }
+        .kpa-toolbar-action { flex: 1 1 auto; padding: 0 10px; font-size: 11px; }
+        .kpa-toolbar-action.transcript-action { flex-basis: 100%; }
+        .kpa-confirm-dialog { width: calc(100vw - 24px); padding: 18px 16px 16px; border-radius: var(--r-2xl) var(--r-2xl) 0 0; top: auto; bottom: 0; transform: translateX(-50%); }
+        .kpa-confirm-actions { flex-direction: column-reverse; }
+        .kpa-confirm-actions button { width: 100%; min-height: 42px; }
+      }
       .kpa-card {
-        border: 1px solid var(--wash-7); border-radius: 14px; background: var(--card-bg);
-        overflow: clip; box-shadow: 0 1px 3px rgba(0,0,0,0.3);
-        transition: border-color var(--transition-base), box-shadow var(--transition-base), transform var(--transition-base);
+        border: 0; border-radius: 16px;
+        background-color: color-mix(in srgb, var(--card-bg) 88%, transparent);
+        background-image: linear-gradient(135deg, var(--wash-2) 0%, transparent 50%);
+        backdrop-filter: blur(18px) saturate(1.2);
+        -webkit-backdrop-filter: blur(18px) saturate(1.2);
+        overflow: clip;
+        transition: box-shadow var(--transition-base);
       }
-      .kpa-card:hover { border-color: var(--wash-10); box-shadow: 0 8px 32px rgba(0,0,0,0.3); transform: translateY(-1px); }
+      .kpa-card:hover {
+        box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+      }
       .kpa-card.is-hidden { display: none; }
-      .kpa-card.is-reviewed { background: color-mix(in srgb, var(--card-bg) 96%, var(--ok) 4%); }
+      .kpa-card.is-collapsed .kpa-body,
+      .kpa-card.is-collapsed .kpa-actions { display: none; }
+      .kpa-card.is-reviewed { background-color: color-mix(in srgb, color-mix(in srgb, var(--card-bg) 96%, var(--ok) 4%) 88%, transparent); }
       .kpa-card-head { padding: 13px 14px 9px; display: flex; align-items: flex-start; gap: 10px; }
       .kpa-mark {
         width: 28px; height: 28px; border-radius: 8px; display: grid; place-items: center;
@@ -6030,6 +6120,8 @@
       .kpa-code { font-size: 9px; font-weight: 800; letter-spacing: 0.06em; color: var(--d500); border: 1px solid var(--wash-6); padding: 2px 5px; border-radius: 5px; }
       .kpa-question { margin: 3px 0 0; color: var(--d400); font-size: 11px; line-height: 1.4; }
       .kpa-head-right { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+      .kpa-toggle { border: 0; background: transparent; color: var(--brand); font-family: "Urbanist", sans-serif; font-size: 11px; font-weight: 800; cursor: pointer; padding: 4px 2px; white-space: nowrap; }
+      .kpa-toggle:hover { color: var(--d50); }
       .kpa-chip { display: inline-flex; align-items: center; gap: 5px; border-radius: 999px; padding: 4px 9px; font-size: 9.5px; font-weight: 800; border: 1px solid transparent; white-space: nowrap; }
       .kpa-chip.pass { color: var(--ok); background: var(--ok-bg); border-color: rgba(23,178,106,0.24); }
       .kpa-chip.fail { color: var(--err); background: var(--err-bg); border-color: rgba(240,68,56,0.24); }
@@ -6052,6 +6144,15 @@
       .kpa-unscored .kpa-dot { margin-top: 5px; background: var(--warn); flex-shrink: 0; }
       .kpa-actions { border-top: 1px solid var(--wash-5); display: flex; align-items: center; gap: 7px; padding: 9px 14px 9px 52px; flex-wrap: wrap; }
       .kpa-action-label { color: var(--d500); font-size: 9px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; margin-right: 2px; }
+      .kpa-insight-suggest {
+        min-height: 30px; border: 1px solid rgba(var(--qa-accent-rgb),0.34); background: rgba(var(--qa-accent-rgb),0.12); color: var(--d100);
+        border-radius: 999px; padding: 0 10px; font-family: "Urbanist", sans-serif; font-size: 10.5px;
+        font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 5px;
+        transition: color var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
+      }
+      .kpa-insight-suggest:hover { background: rgba(var(--qa-accent-rgb),0.2); border-color: rgba(var(--qa-accent-rgb),0.5); color: var(--d50); transform: translateY(-1px); }
+      .kpa-insight-suggest:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+      .kpa-insight-suggest svg { width: 11px; height: 11px; flex: 0 0 auto; }
       .kpa-decision {
         min-height: 30px; border: 1px solid var(--wash-7); background: transparent; color: var(--d400);
         border-radius: 8px; padding: 0 11px; font-family: "Urbanist", sans-serif; font-size: 11px;
@@ -7645,6 +7746,7 @@
   <!-- The canvas shell above: full-width geometry and the conversation
        column. Loaded last so it overrides the inline canvas rules. -->
   <link rel="stylesheet" href="assets/aimy-canvas.css?v=5" />
+    <link rel="stylesheet" href="assets/aimy-sessions.css?v=2" />
 
   <!-- The responsive layer above both: one UI scale for large screens,
        the 1024px tablet floor, and the shell height that keeps the
@@ -10961,6 +11063,26 @@
               <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3L5 7l4 4"/></svg>
               <span id="evalDetailBackLabel">Back to agent</span>
             </button>
+            <div class="eval-detail-menu">
+              <button class="eval-detail-menu-trigger" id="evalDetailMenuTrigger" type="button" aria-label="Evaluation actions" aria-haspopup="menu" aria-expanded="false" aria-controls="evalDetailActions">
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.7"></circle><circle cx="12" cy="12" r="1.7"></circle><circle cx="19" cy="12" r="1.7"></circle></svg>
+              </button>
+              <div class="eval-detail-actions" id="evalDetailActions" role="menu" aria-label="Evaluation actions">
+                <button class="eval-detail-action" type="button" role="menuitem" data-eval-action="send">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2 11 13"></path><path d="m22 2-7 20-4-9-9-4Z"></path></svg><span>Send evaluation</span>
+                </button>
+                <button class="eval-detail-action" type="button" role="menuitem" data-eval-action="extract">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"></path><path d="M14 2v6h6M8 13h8M8 17h6"></path></svg><span>Extract report</span>
+                </button>
+                <button class="eval-detail-action" type="button" role="menuitem" data-eval-action="report">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V4"></path><path d="M4 5c5-3 7 3 12 0 1.3-.8-2.7-.9-4-.4v9.7c1.3-.5 2.7-.4 4 .4 5 3 7-3 12 0"></path></svg><span>Issue reported</span>
+                </button>
+                <div class="eval-detail-action-divider" role="separator"></div>
+                <button class="eval-detail-action danger" type="button" role="menuitem" data-eval-action="delete">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 14h10l1-14M9 7V4h6v3"></path></svg><span>Delete</span>
+                </button>
+              </div>
+            </div>
           </div>
 
                 <!-- ══ CALL RECORDING ══════════════════════════════════
@@ -10973,19 +11095,18 @@
 
                      Voice only. Tickets, chat and email keep the threaded
                      view and get no player. -->
-                <div class="call-player" id="callPlayer" data-duration="514">
+                <div class="call-player" id="callPlayer" data-duration="31">
                   <button class="cp-play" type="button" data-cp-toggle aria-label="Play recording">
                     <svg class="cp-i-play" viewBox="0 0 14 14" fill="currentColor"><path d="M4 2.5v9l7-4.5z"/></svg>
                     <svg class="cp-i-pause" viewBox="0 0 14 14" fill="currentColor" hidden><path d="M4 3h2v8H4zM8 3h2v8H8z"/></svg>
                   </button>
-                  <span class="cp-time" data-cp-now>0:00</span>
+                  <span class="cp-time" data-cp-now>00:00</span>
                   <div class="cp-track" data-cp-seek role="slider" tabindex="0"
                        aria-label="Recording position" aria-valuemin="0" aria-valuemax="514" aria-valuenow="0">
                     <div class="cp-fill" data-cp-fill></div>
                     <div class="cp-head" data-cp-head></div>
                   </div>
-                  <span class="cp-time cp-dur">8:34</span>
-                  <span class="cp-note">Recording · May 7, 10:05</span>
+                  <span class="cp-time cp-dur" data-cp-duration></span>
                 </div>
           <div class="eval-detail-grid">
 
@@ -11094,7 +11215,24 @@
                   <button class="kpa-filter" data-kpa-filter="fail" type="button">Failed</button>
                   <button class="kpa-filter" data-kpa-filter="pass" type="button">Passed</button>
                   <button class="kpa-filter" data-kpa-filter="na" type="button">N/A</button>
-                  <button class="kpa-agree-all" id="kpaAgreeAll" type="button">Agree with remaining</button>
+                  <div class="kpa-toolbar-actions" role="group" aria-label="Review actions">
+                    <button class="kpa-toolbar-action primary" id="kpaAgreeAll" type="button">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 7 17l-5-5"></path><path d="m22 10-7.5 7.5L13 16"></path></svg>
+                      <span>Agree with remaining</span>
+                    </button>
+                    <button class="kpa-toolbar-action transcript-action" id="kpaTranscriptAction" type="button" hidden style="display:none">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"></rect><path d="M8 8h8M8 12h8M8 16h5"></path></svg>
+                      <span>Full transcript &amp; recording</span>
+                    </button>
+                    <button class="kpa-toolbar-action" id="kpaEmailThreadAction" type="button">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="m3 7 9 6 9-6"></path></svg>
+                      <span>Full email thread</span>
+                    </button>
+                    <button class="kpa-toolbar-action" id="kpaAuditContextAction" type="button">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 10v6M12 7h.01"></path></svg>
+                      <span>Audit context</span>
+                    </button>
+                  </div>
                 </div>
 
                 <article class="kpa-card" data-kpa-verdict="fail">
@@ -11240,12 +11378,72 @@
                   </div>
                 </article>
 
+                <dialog class="kpa-confirm-dialog" id="kpaConfirmDialog" aria-labelledby="kpaConfirmTitle" aria-describedby="kpaConfirmText">
+                  <div class="kpa-confirm-header">
+                    <h2 class="kpa-confirm-title" id="kpaConfirmTitle">Agree with remaining KPIs?</h2>
+                    <button class="kpa-confirm-close" id="kpaConfirmClose" type="button" aria-label="Close dialog">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+                    </button>
+                  </div>
+                  <div class="kpa-confirm-body">
+                    <p class="kpa-confirm-copy" id="kpaConfirmText">Apply your agreement to every KPI that already has an AiMY verdict. Existing scores will not change.</p>
+                    <div class="kpa-confirm-summary" aria-label="Bulk review summary">
+                      <div class="kpa-confirm-summary-row">
+                        <div class="kpa-confirm-summary-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.2 4.2L19 7"></path></svg></div>
+                        <div class="kpa-confirm-summary-copy"><div class="kpa-confirm-summary-title">KPIs will be marked as agreed</div><div class="kpa-confirm-summary-sub">AiMY's existing verdict is kept for each included KPI.</div></div>
+                        <strong class="kpa-confirm-count" id="kpaConfirmCount" aria-label="0 KPIs">0</strong>
+                      </div>
+                    </div>
+                    <div class="kpa-confirm-na" id="kpaConfirmNa" hidden>
+                      <div class="kpa-confirm-na-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3L2.8 19h18.4L12 3z"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg></div>
+                      <div><div class="kpa-confirm-na-title">Manual review required</div><div class="kpa-confirm-na-copy"></div></div>
+                    </div>
+                  </div>
+                  <div class="kpa-confirm-actions">
+                    <button class="kpa-confirm-cancel" id="kpaConfirmCancel" type="button">Cancel</button>
+                    <button class="kpa-confirm-submit" id="kpaConfirmSubmit" type="button">Review remaining</button>
+                  </div>
+                </dialog>
+
                 <script>
                   (function () {
                     var root = document.getElementById('kpaRoot');
                     if (!root) return;
                     var settled = document.getElementById('kpaSettled');
                     var reviewable = 6;
+                    var confirmDialog = document.getElementById('kpaConfirmDialog');
+                    var confirmTrigger = null;
+
+                    function setExpanded(card, expanded) {
+                      var toggle = card.querySelector('.kpa-toggle');
+                      card.classList.toggle('is-collapsed', !expanded);
+                      if (toggle) {
+                        toggle.textContent = expanded ? 'Hide details' : 'Show details';
+                        toggle.setAttribute('aria-expanded', String(expanded));
+                      }
+                    }
+
+                    root.querySelectorAll('.kpa-card').forEach(function (card) {
+                      var head = card.querySelector('.kpa-card-head');
+                      var right = card.querySelector('.kpa-head-right');
+                      if (!head || !right) return;
+                      var toggle = document.createElement('button');
+                      toggle.className = 'kpa-toggle';
+                      toggle.type = 'button';
+                      toggle.textContent = 'Hide details';
+                      toggle.setAttribute('aria-expanded', 'true');
+                      toggle.setAttribute('aria-label', 'Collapse KPI details');
+                      right.appendChild(toggle);
+                    });
+
+                    root.addEventListener('click', function (event) {
+                      var toggle = event.target.closest && event.target.closest('.kpa-toggle');
+                      if (!toggle || !root.contains(toggle)) return;
+                      var card = toggle.closest('.kpa-card');
+                      var expanded = !card.classList.contains('is-collapsed');
+                      setExpanded(card, !expanded);
+                      toggle.setAttribute('aria-label', expanded ? 'Expand KPI details' : 'Collapse KPI details');
+                    });
 
                     function paintSettled() {
                       var reviewed = root.querySelectorAll('.kpa-card.is-reviewed').length;
@@ -11287,14 +11485,176 @@
                       card.querySelectorAll('.kpa-decision').forEach(function (btn) {
                         btn.addEventListener('click', function () { decide(card, btn); });
                       });
+                      var actions = card.querySelector('.kpa-actions');
+                      if (actions && !actions.querySelector('.kpa-insight-suggest')) {
+                        var insightBtn = document.createElement('button');
+                        insightBtn.type = 'button';
+                        insightBtn.className = 'kpa-insight-suggest';
+                        insightBtn.setAttribute('aria-label', 'Ask AiMY for KPI insights with reasoning and evidence');
+                        insightBtn.innerHTML = '<svg viewBox="0 0 18 20" aria-hidden="true"><use href="#aimy-logo-small"></use></svg><span>AiMY insights</span>';
+                        insightBtn.addEventListener('click', function () {
+                          if (window.openKpiTranscript) window.openKpiTranscript(card);
+                        });
+                        var label = actions.querySelector('.kpa-action-label');
+                        if (label && label.nextSibling) actions.insertBefore(insightBtn, label.nextSibling);
+                        else actions.insertBefore(insightBtn, actions.firstChild);
+                      }
                     });
 
                     var agreeAll = document.getElementById('kpaAgreeAll');
-                    if (agreeAll) agreeAll.addEventListener('click', function () {
-                      root.querySelectorAll('.kpa-card:not(.is-reviewed)').forEach(function (card) {
+                    var transcriptAction = document.getElementById('kpaTranscriptAction');
+                    var emailThreadAction = document.getElementById('kpaEmailThreadAction');
+                    var auditContextAction = document.getElementById('kpaAuditContextAction');
+                    function remainingCards() {
+                      return Array.prototype.filter.call(root.querySelectorAll('.kpa-card:not(.is-reviewed)'), function (card) {
+                        return !!card.querySelector('.kpa-decision');
+                      });
+                    }
+
+                    if (transcriptAction) transcriptAction.addEventListener('click', function () {
+                      var query = 'Open the full transcript and recording for this call, with the recording player and transcript visible.';
+                      if (window.openCanvasQuery) window.openCanvasQuery(query, 'call-transcript');
+                    });
+                    // The overlay is declared later in the document, so resolve it at call time.
+                    var emailTrigger = null;
+                    function renderEmailThread() {
+                      var list = document.getElementById('kpaEmailThread');
+                      var data = window.AIMY_EMAIL_THREAD;
+                      if (!list || !data || list.childElementCount) return;
+                      var meta = document.getElementById('kpaEmailMeta');
+                      if (meta) meta.textContent = data.meta || '';
+                      function el(tag, cls, text) {
+                        var node = document.createElement(tag);
+                        if (cls) node.className = cls;
+                        if (text != null) node.textContent = text;
+                        return node;
+                      }
+                      data.messages.forEach(function (msg) {
+                        var isPrivate = msg.visibility === 'Private';
+                        var card = el('article', 'kpa-email-card' + (isPrivate ? ' is-private' : ''));
+                        var header = el('header');
+                        header.appendChild(el('span', 'kpa-email-avatar', msg.initial));
+                        var who = el('div', 'kpa-email-who');
+                        who.appendChild(el('p', 'kpa-email-from', msg.from));
+                        who.appendChild(el('p', 'kpa-email-type', msg.type));
+                        header.appendChild(who);
+                        var side = el('div', 'kpa-email-side');
+                        side.appendChild(el('span', 'kpa-email-time', msg.time));
+                        side.appendChild(el('span', 'kpa-email-badge' + (isPrivate ? ' is-private' : ''), msg.visibility));
+                        header.appendChild(side);
+                        card.appendChild(header);
+                        if (msg.body) card.appendChild(el('div', 'kpa-email-body', msg.body));
+                        list.appendChild(card);
+                      });
+                    }
+                    function setEmailOverlay(open) {
+                      var overlay = document.getElementById('kpaEmailOverlay');
+                      if (!overlay) return;
+                      if (open) renderEmailThread();
+                      overlay.classList.toggle('open', open);
+                      overlay.setAttribute('aria-hidden', String(!open));
+                      if (open) {
+                        emailTrigger = document.activeElement;
+                        document.getElementById('kpaEmailClose').focus();
+                      } else if (emailTrigger) {
+                        emailTrigger.focus();
+                        emailTrigger = null;
+                      }
+                    }
+                    if (emailThreadAction) emailThreadAction.addEventListener('click', function () { setEmailOverlay(true); });
+                    document.addEventListener('click', function (event) {
+                      if (event.target.closest && event.target.closest('#kpaEmailClose')) setEmailOverlay(false);
+                    });
+                    document.addEventListener('keydown', function (event) {
+                      var overlay = document.getElementById('kpaEmailOverlay');
+                      if (event.key === 'Escape' && overlay && overlay.classList.contains('open')) setEmailOverlay(false);
+                    });
+                    window.openKpiTranscript = function (card) {
+                      if (!card || !window.openCanvasQuery) return;
+                      var textOf = function (selector) {
+                        var node = card.querySelector(selector);
+                        return node ? node.textContent.trim() : '';
+                      };
+                      var reasonText = textOf('.kpa-reading p').replace(/^Why AiMY scored this:\s*/i, '').trim();
+                      var evidence = Array.prototype.map.call(card.querySelectorAll('.kpa-evidence'), function (figure) {
+                        var speaker = figure.querySelector('figcaption b');
+                        var time = figure.querySelector('figcaption span');
+                        var quote = figure.querySelector('blockquote');
+                        return {
+                          speaker: speaker ? speaker.textContent.trim() : '',
+                          time: time ? time.textContent.trim() : '',
+                          text: quote ? quote.textContent.trim() : ''
+                        };
+                      }).filter(function (item) { return item.time && item.text; });
+                      window.__aimyKpiContext = {
+                        title: textOf('.kpa-title') || 'KPI review',
+                        code: textOf('.kpa-code'),
+                        question: textOf('.kpa-question'),
+                        verdict: card.getAttribute('data-kpa-verdict') || '',
+                        verdictLabel: textOf('.kpa-chip'),
+                        points: textOf('.kpa-pts'),
+                        confidence: textOf('.kpa-reading-conf'),
+                        reason: reasonText,
+                        evidence: evidence
+                      };
+                      window.openCanvasQuery('Explain this KPI using the call transcript and recording.', 'kpi-call');
+                    };
+                    if (auditContextAction) auditContextAction.addEventListener('click', function () {
+                      var query = 'Open the audit context for this call, including the conversation metadata, auditor, audit date, and activity log.';
+                      if (window.openCanvasQuery) window.openCanvasQuery(query, 'call-context');
+                    });
+
+                    function openAgreeConfirmation() {
+                      var cards = remainingCards();
+                      if (!confirmDialog || !cards.length) return;
+                      confirmTrigger = agreeAll;
+                      document.getElementById('kpaConfirmCount').textContent = cards.length;
+                      document.getElementById('kpaConfirmSubmit').textContent = 'Review all ' + cards.length + ' remaining';
+                      var excluded = Array.prototype.filter.call(root.querySelectorAll('.kpa-card:not(.is-reviewed)'), function (card) {
+                        return !card.querySelector('.kpa-decision');
+                      });
+                      var excludedNote = document.getElementById('kpaConfirmNa');
+                      var excludedCopy = excludedNote ? excludedNote.querySelector('.kpa-confirm-na-copy') : null;
+                      if (excludedNote) {
+                        if (excluded.length) {
+                          var names = excluded.map(function (card) {
+                            var title = card.querySelector('.kpa-title');
+                            return title ? title.textContent.trim() : 'unscored KPI';
+                          });
+                          var excludedLabel = excluded.length + (excluded.length === 1 ? ' KPI still needs manual review' : ' KPIs still need manual review');
+                          var excludedDescription = cards.length + ' KPIs already have an AiMY verdict and will be marked as agreed. ' + names.join(', ') + ' ' + (excluded.length === 1 ? 'has' : 'have') + ' no final verdict and must be reviewed manually.';
+                          if (excludedCopy) excludedCopy.textContent = excludedDescription;
+                          excludedNote.querySelector('.kpa-confirm-na-title').textContent = excludedLabel;
+                          excludedNote.hidden = false;
+                        } else {
+                          if (excludedCopy) excludedCopy.textContent = '';
+                          excludedNote.hidden = true;
+                        }
+                      }
+                      confirmDialog.showModal();
+                      document.getElementById('kpaConfirmCancel').focus();
+                    }
+
+                    function agreeWithRemaining() {
+                      remainingCards().forEach(function (card) {
                         var btn = card.querySelector('.kpa-decision.agree');
                         if (btn) decide(card, btn);
                       });
+                      if (confirmDialog && confirmDialog.open) confirmDialog.close('confirmed');
+                      if (window.showToast) window.showToast({ title: 'Remaining KPIs reviewed', sub: 'AiMY verdicts were recorded as agreed.' });
+                    }
+
+                    if (agreeAll) agreeAll.addEventListener('click', openAgreeConfirmation);
+                    var confirmSubmit = document.getElementById('kpaConfirmSubmit');
+                    if (confirmSubmit) confirmSubmit.addEventListener('click', agreeWithRemaining);
+                    var confirmCancel = document.getElementById('kpaConfirmCancel');
+                    if (confirmCancel) confirmCancel.addEventListener('click', function () { confirmDialog.close('cancelled'); });
+                    var confirmClose = document.getElementById('kpaConfirmClose');
+                    if (confirmClose) confirmClose.addEventListener('click', function () { confirmDialog.close('cancelled'); });
+                    if (confirmDialog) confirmDialog.addEventListener('close', function () {
+                      var trigger = confirmTrigger;
+                      confirmTrigger = null;
+                      if (trigger) window.setTimeout(function () { trigger.focus(); }, 80);
                     });
 
                     /* Audit metadata Q&A, mirrors the manual-audit prototype's composer. */
@@ -11923,14 +12283,6 @@
                intact, and they now position against this rather than
                against the overlay, which has become a row. -->
           <div class="overlay-main">
-            <!-- Top label -->
-            <div class="overlay-badge">
-              <svg width="18" height="20" viewBox="0 0 18 20">
-                <use href="#aimy-logo-small" />
-              </svg>
-              AiMY
-            </div>
-
             <!-- Close button -->
             <button
               class="overlay-close"
@@ -12000,6 +12352,17 @@
           <!-- /.overlay-main -->
         </div>
         <!-- /aimy-overlay -->
+
+        <aside class="kpa-email-overlay" id="kpaEmailOverlay" role="dialog" aria-modal="true" aria-label="Full email thread" aria-hidden="true">
+          <div class="kpa-email-head">
+            <span class="kpa-email-chip"><svg viewBox="0 0 18 20" aria-hidden="true"><use href="#aimy-logo-small"></use></svg>AiMY</span>
+            <span class="kpa-email-meta" id="kpaEmailMeta"></span>
+            <button class="kpa-email-close" id="kpaEmailClose" type="button" aria-label="Close email thread">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+            </button>
+          </div>
+          <section class="kpa-email-thread" id="kpaEmailThread" aria-label="Full email thread" tabindex="0"></section>
+        </aside>
       </div>
       <!-- /app-main -->
     </div>
@@ -15932,6 +16295,7 @@
            an answer about Quality Score, the bug is visible on screen. */
         function buildBasisRow(env) {
           if (!env) return "";
+          if (env.topic === 'call-transcript' || env.topic === 'kpi-call' || env.topic === 'call-context') return "";
           const b = (env.topic && BASIS_BY_TOPIC[env.topic]) || null;
           if (!b) return "";
           const ico =
@@ -15960,6 +16324,8 @@
           if (env && env.topic) wrap.setAttribute("data-topic", env.topic);
           if (env && env.source) wrap.setAttribute("data-bind-source", env.source);
 
+          var isEvidenceResponse = env && (env.topic === 'call-transcript' || env.topic === 'kpi-call');
+          if (isEvidenceResponse) wrap.classList.add('chat-evidence-msg');
           wrap.innerHTML =
             '<div class="msg-avatar aimy-av">' +
             '<svg width="23" height="25" viewBox="0 0 18 20"><use href="#aimy-logo-small"/></svg>' +
@@ -16504,6 +16870,9 @@
           'goal-breakdown':       () => STUB_RESPONSES[6],
           'reviewer-calibration': () => STUB_RESPONSES[7],
           'coaching-brief':       () => STUB_RESPONSES[8],
+          'call-transcript':      (env) => renderCallTranscript(env),
+          'kpi-call':             (env) => renderCallTranscript(env),
+          'call-context':         () => renderAuditContext(),
         };
         window.RESPONSE_BY_TOPIC = RESPONSE_BY_TOPIC;
 
@@ -16527,6 +16896,7 @@
           'goal-breakdown':       { item: 'Omar Abdallah', scope: '6 goals',        range: 'Last 30 days',  conf: 'High' },
           'reviewer-calibration': { item: 'Reviewer calibration', scope: '4 reviewers', range: 'This quarter', conf: 'High' },
           'coaching-brief':       { item: 'Billing escalations', scope: 'Team lead', range: 'This period',   conf: 'High' },
+          'call-transcript':      { item: 'Omar Abdallah', scope: 'Voice call', range: 'May 7, 2026 · 8m 34s', conf: 'Full recording' },
           'hr-meeting':           { item: 'Omar Abdallah · Tariq Mansour', scope: '2 agents', range: 'Last 4 evaluations', conf: 'High' },
           'hr-meeting-reschedule':{ item: 'HR meeting', scope: '2 agents',       range: 'Proposed Thu 3:00pm', conf: 'High' },
           'kpi-heatmap':          { item: 'Goal compliance', scope: 'Omar Abdallah · 6 goals', range: 'Last 12 weeks', conf: 'High' },
@@ -17087,6 +17457,137 @@
         });
 
         /* ── The three non-answers. None of these is a guess. ────────────── */
+
+        window.toggleAuditActivity = function (button) {
+          var context = button && button.closest('.chat-audit-context');
+          var log = context && context.querySelector('.chat-audit-log');
+          if (!log) return;
+          var visible = log.classList.toggle('is-visible');
+          button.setAttribute('aria-pressed', String(visible));
+          button.lastChild.textContent = visible ? 'Hide activity log' : 'Show activity log';
+        };
+
+        window.toggleAuditSection = function (button) {
+          button.setAttribute('aria-expanded', String(button.getAttribute('aria-expanded') === 'false'));
+        };
+
+        function renderAuditContext() {
+          var interactionId = '02fc6ab8-c377-43f6-947c-0fde644b154c-1751222386287-07ad5ec5-a0a2-4ae8-801f-f0c035ef0542';
+          var icon = function (paths) {
+            return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + paths + '</svg>';
+          };
+          var clock = icon('<circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path>');
+          var field = function (label, value) {
+            return '<div class="chat-audit-field"><span>' + label + '</span><strong>' + value + '</strong></div>';
+          };
+          var section = function (sectionIcon, title, body) {
+            return '<section class="chat-audit-section">'
+              + '<button class="chat-audit-section-head" type="button" aria-expanded="true" onclick="window.toggleAuditSection(this)">'
+              + '<span class="chat-audit-section-icon">' + sectionIcon + '</span><strong>' + title + '</strong>'
+              + '<svg class="chat-audit-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>'
+              + '</button><div class="chat-audit-section-body">' + body + '</div></section>';
+          };
+          var grid = function (fields) { return '<div class="chat-audit-grid">' + fields.join('') + '</div>'; };
+          var kpis = ['Sentiment Analysis', 'Clear and Professional Tone', 'Client Engagement and Empathy', 'Active Listening and Probing', 'Proper Hold Procedure', 'Client Validation and Information Captures', 'Providing Survey Script', 'Clear and Accurate Resolution Delivery', 'Ticket Number Provided'];
+
+          return '<div class="chat-audit-context">'
+            + '<div class="chat-audit-intro">'
+            + '<strong class="chat-audit-heading">Your audit context, in one conversation.</strong>'
+            + 'Here are all 10 metadata fields for call ' + interactionId + '. Open the full transcript from the audit toolbar, explore activity, or ask about a field below.'
+            + '<button class="chat-audit-log-toggle" type="button" aria-pressed="false" onclick="window.toggleAuditActivity(this)">' + clock + 'Show activity log</button>'
+            + '</div>'
+            + '<div class="chat-audit-log">'
+            + '<div class="chat-audit-event"><time>Sep 02, 2026 · 08:06 PM</time><span>Audit saved by Engy Yasser Elsayed Elsayed.</span></div>'
+            + '<div class="chat-audit-event"><time>Sep 02, 2026 · 08:06 PM</time><span>Interaction analyzed with a positive disposition.</span></div>'
+            + '</div>'
+            + section(icon('<path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"></path><path d="M13 5v2"></path><path d="M13 17v2"></path><path d="M13 11v2"></path>'), 'Call overview', grid([
+              field('Product', 'InnQuest'), field('Status', 'N/A'), field('Direction', 'InBound'), field('Duration', '00:00:32'),
+              field('Silence gap', 'N/A'), field('External ID', interactionId)
+            ]))
+            + section(icon('<circle cx="12" cy="8" r="5"></circle><path d="M20 21a8 8 0 0 0-16 0"></path>'), 'Assignment', grid([
+              field('Agent', 'Sanaa'), field('Agent email', 'sanaa.elkomy@flairstech.com'),
+              field('Last auditor', 'Engy Yasser Elsayed Elsayed'), field('Audit date', 'Sep 02, 2026 at 08:06 PM')
+            ]))
+            + section(clock, 'Timeline', grid([
+              field('Created', 'Oct 01, 2025 at 12:00 AM GMT+3'), field('Closed', 'Oct 01, 2025 at 12:00 AM GMT+3')
+            ]))
+            + section(icon('<rect x="8" y="2" width="8" height="4" rx="1"></rect><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><path d="m9 14 2 2 4-4"></path>'), 'Audit result', grid([
+              field('Evaluation type', 'Interaction evaluation'), field('Audit configuration', 'Analysis Zendesk QA V1 EY Engy Yasser'),
+              field('Audit status', 'Analyzed'), field('Quality score', '100%'),
+              field('Review progress', '9 reviewed · 0 remaining'), field('Result counts', 'Passed 9 · Failed 0 · Unanalyzed 0'),
+              field('Review mode', 'Manual review'), field('Audit disposition', 'Positive')
+            ]))
+            + section(icon('<path d="M8 6h13"></path><path d="M8 12h13"></path><path d="M8 18h13"></path><path d="M3 6h.01"></path><path d="M3 12h.01"></path><path d="M3 18h.01"></path>'), 'KPI rules · ' + kpis.length,
+              '<div class="chat-audit-kpis">' + kpis.map(function (name) { return '<div class="chat-audit-event"><span>' + name + '</span></div>'; }).join('') + '</div>')
+            + '</div>';
+        }
+
+        window.setCallSpeed = function (value) {
+          if (window.showToast) window.showToast({ title: 'Playback speed: ' + value + 'x', sub: 'The selected speed will be used for this recording.' });
+        };
+
+        window.downloadCallRecording = function () {
+          if (window.showToast) window.showToast({ title: 'Recording download', sub: 'The recording file is not available in this preview.' });
+        };
+
+        function renderCallTranscript(env) {
+          const kpi = window.__aimyKpiContext;
+          const canonicalPlayer = document.getElementById('callPlayer');
+          const recordingDuration = canonicalPlayer ? parseInt(canonicalPlayer.getAttribute('data-duration'), 10) || 0 : 0;
+          const durationLabel = String(Math.floor(recordingDuration / 60)).padStart(2, '0') + ':' + String(recordingDuration % 60).padStart(2, '0');
+          const isKpi = !!(env && env.topic === 'kpi-call' && kpi && kpi.title);
+          const kpiMeta = isKpi ? [kpi.verdictLabel, kpi.points, kpi.confidence].filter(Boolean) : [];
+          const context = isKpi
+            ? '<div class="chat-kpi-context">'
+              + '<div class="chat-kpi-head"><h3 class="chat-kpi-title">' + escHtml(kpi.title) + '</h3>'
+              + (kpi.code ? '<span class="chat-kpi-code">' + escHtml(kpi.code) + '</span>' : '') + '</div>'
+              + (kpiMeta.length ? '<div class="chat-kpi-meta">' + kpiMeta.map(function (item, i) {
+                  return '<span class="chat-kpi-pill' + (i === 0 && kpi.verdict ? ' is-' + escHtml(kpi.verdict) : '') + '">' + escHtml(item) + '</span>';
+                }).join('') + '</div>' : '')
+              + (kpi.question ? '<div class="chat-kpi-row"><span class="chat-kpi-label">What this KPI checks</span><p class="chat-kpi-reason">' + escHtml(kpi.question) + '</p></div>' : '')
+              + (kpi.reason ? '<div class="chat-kpi-row"><span class="chat-kpi-label">Why AiMY scored this</span><p class="chat-kpi-reason">' + escHtml(kpi.reason) + '</p></div>' : '')
+              + '</div>'
+            : '';
+          const lines = [
+            ['10:05', 'Customer', "Hi, I've been waiting 3 days for a refund and still nothing. This is really frustrating. Can you please just fix this today?"],
+            ['10:06', 'Agent', "Hi, I'm sorry to hear that. Let me pull up your account and check the refund status right now."],
+            ['10:07', 'Customer', "It says processing but it's been 3 days. You said 2 business days last time."],
+            ['10:09', 'Agent', "I can see the refund was submitted on May 5th. It's still in the processing queue, I'm escalating this now so it clears today. You'll receive an email confirmation within the hour."],
+            ['10:11', 'Customer', "Okay, thank you. But what if it doesn't? Who do I contact?"],
+            ['10:12', 'Agent', "You're all set. Is there anything else I can help you with today?"],
+          ];
+          function evidenceText(text, time) {
+            var match = kpi && env && env.topic === 'kpi-call' && Array.isArray(kpi.evidence)
+              ? kpi.evidence.find(function (item) { return item.time === time && item.text && text.toLowerCase().indexOf(item.text.toLowerCase()) !== -1; })
+              : null;
+            if (!match) return { html: escHtml(text), evidence: false };
+            var start = text.toLowerCase().indexOf(match.text.toLowerCase());
+            return {
+              html: escHtml(text.slice(0, start))
+                + '<mark class="chat-call-evidence-text">' + escHtml(text.slice(start, start + match.text.length)) + '</mark>'
+                + escHtml(text.slice(start + match.text.length)),
+              evidence: true
+            };
+          }
+          const transcript = isKpi
+            ? (kpi.evidence || []).map(function (item) {
+                return '<div class="chat-call-line is-evidence"><time>' + escHtml(item.time) + '</time><p>'
+                  + (item.speaker ? '<b class="chat-call-speaker">' + escHtml(item.speaker) + '</b>' : '')
+                  + '<mark class="chat-call-evidence-text">' + escHtml(item.text) + '</mark></p></div>';
+              }).join('') || '<p class="chat-call-empty">No transcript evidence was cited for this KPI.</p>'
+            : lines.map(function(line) {
+                var renderedText = evidenceText(line[2], line[0]);
+                return '<div class="chat-call-line' + (renderedText.evidence ? ' is-evidence' : '') + '"><time>' + escHtml(line[0]) + '</time><p>' + renderedText.html + '</p></div>';
+              }).join('');
+          return '<div class="chat-call-evidence">' + context
+            + '<div class="chat-call-frame">'
+            + '<div class="rhap_container rhap_loop--off rhap_play-status--paused" role="group" tabindex="0" aria-label="Audio player">'
+            + '<audio preload="auto" class="sf-hidden"></audio><div class="rhap_main rhap_horizontal-reverse"><div class="rhap_progress-section"><div class="rhap_time rhap_current-time">00:00</div><div class="rhap_progress-container" aria-label="Audio progress control" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0"><div class="rhap_progress-bar rhap_progress-bar-show-download"><div class="rhap_progress-indicator" style="left:0%"></div><div class="rhap_progress-filled" style="width:0%"></div><div class="rhap_download-progress" style="left:0%;width:100%;transition-duration:0s"></div></div></div><div class="rhap_time rhap_total-time">' + durationLabel + '</div></div><div class="rhap_controls-section"><div class="rhap_additional-controls"></div><div class="rhap_main-controls"><button class="rhap_button-clear rhap_main-controls-button" type="button" aria-label="Play recording" onclick="document.getElementById(\'callPlayer\')?.querySelector(\'[data-cp-toggle]\')?.click()"><svg width="32" height="32" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path></svg></button></div><div class="rhap_volume-controls"></div></div></div></div>'
+            + '</div>'
+            + (isKpi ? '<span class="chat-kpi-label">Supporting evidence</span>' : '')
+            + '<div class="chat-call-transcript" aria-label="' + (isKpi ? 'Supporting evidence' : 'Call transcript') + '">' + transcript + '</div>'
+            + '</div>';
+        }
 
         /* Nothing matched confidently. Doctrine §6.7 / Level 7: this is a
            designed state, and it must say what still works. */
@@ -19101,6 +19602,56 @@
           /* else: agent tickets page stays open, user lands back there */
           _evalOpenedFromAgent = false;
         };
+
+        (function initEvaluationActions() {
+          var trigger = document.getElementById('evalDetailMenuTrigger');
+          var menu = document.getElementById('evalDetailActions');
+          if (!trigger || !menu) return;
+          function closeMenu() {
+            menu.classList.remove('open');
+            trigger.setAttribute('aria-expanded', 'false');
+          }
+          function openMenu() {
+            menu.classList.add('open');
+            trigger.setAttribute('aria-expanded', 'true');
+          }
+          trigger.addEventListener('click', function() {
+            if (menu.classList.contains('open')) closeMenu();
+            else openMenu();
+          });
+          document.addEventListener('click', function(event) {
+            if (!event.target.closest('.eval-detail-menu')) closeMenu();
+          });
+          document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') closeMenu();
+          });
+          menu.addEventListener('click', function(event) {
+            var action = event.target.closest('[data-eval-action]');
+            if (!action) return;
+            var kind = action.getAttribute('data-eval-action');
+            closeMenu();
+            if (kind === 'send') {
+              if (window.showToast) window.showToast({ title: 'Evaluation ready to send', sub: 'The evaluation has been queued for sharing.' });
+            } else if (kind === 'extract') {
+              var detail = document.querySelector('.eval-detail-page.open');
+              var report = detail ? detail.innerText : 'AiMY evaluation report';
+              var blob = new Blob([report], { type: 'text/plain;charset=utf-8' });
+              var link = document.createElement('a');
+              link.href = URL.createObjectURL(blob);
+              link.download = 'aimy-evaluation-report.txt';
+              link.click();
+              URL.revokeObjectURL(link.href);
+              if (window.showToast) window.showToast({ title: 'Report extracted', sub: 'The evaluation report was downloaded.' });
+            } else if (kind === 'report') {
+              if (window.showToast) window.showToast({ title: 'Issue reported', sub: 'The evaluation issue was added to the review queue.' });
+            } else if (kind === 'delete') {
+              if (window.confirm('Delete this evaluation? This action cannot be undone.')) {
+                window.closeEvalDetail();
+                if (window.showToast) window.showToast({ title: 'Evaluation deleted', sub: 'The evaluation was removed from this review.' });
+              }
+            }
+          });
+        }());
 
         /* Toggle confidence factor breakdown */
         window.toggleConfFactors = function(btnId, factorsId) {
@@ -23583,7 +24134,8 @@
           var q;
           try { q = new URLSearchParams(location.search); } catch (e) { return false; }
           var tab = q.get("tbl"), verdict = q.get("verdict"), agent = q.get("agent");
-          if (!tab && !verdict && !agent) return false;
+          var reviewsView = q.get("view") === "evals";
+          if (!tab && !verdict && !agent && !reviewsView) return false;
 
           if (tab === "calls" || tab === "tickets" || tab === "agents") TAB = tab;
           if (verdict === "awaiting" || verdict === "confirmed" || verdict === "overturned") F.verdict = verdict;
@@ -24532,7 +25084,7 @@
 
         function mmss(s) {
           s = Math.max(0, Math.round(s));
-          return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0");
+          return String(Math.floor(s / 60)).padStart(2, "0") + ":" + String(s % 60).padStart(2, "0");
         }
 
         /* "10:05" → seconds since the first line. If a stamp is missing or
@@ -24612,6 +25164,9 @@
           fill = player.querySelector("[data-cp-fill]");
           head = player.querySelector("[data-cp-head]");
           nowEl = player.querySelector("[data-cp-now]");
+          var durationEl = player.querySelector("[data-cp-duration]");
+          if (durationEl) durationEl.textContent = mmss(dur);
+          if (track) track.setAttribute("aria-valuemax", dur);
 
           var page = player.closest(".eval-detail-page") || player.parentNode;
           var body = page.querySelector(".eval-transcript-body");
@@ -25823,5 +26378,6 @@
 
     <script src="assets/aimy-canvas.js?v=7"></script>
     <script src="assets/aimy-rail.js?v=3"></script>
+    <script src="assets/aimy-email-thread.js?v=1"></script>
   </body>
 </html>

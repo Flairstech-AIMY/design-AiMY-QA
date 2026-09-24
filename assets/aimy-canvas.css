@@ -49,6 +49,7 @@
   --fs-2xs: 10px;
   --fs-xs: 11px;
   --fs-base: 13px;
+   --fs-chat: 13px;
   --fw-semibold: 600;
   --fw-bold: 700;
   --ls-wide: 0.04em;
@@ -162,7 +163,7 @@
   width: 100%; min-height: 24px; padding: 8px;
   border-radius: var(--r-sm);
   border: 1px solid var(--glass-border); background: transparent;
-  font-family: inherit; font-size: var(--fs-xs); color: var(--d100);
+   font-family: inherit; font-size: var(--fs-chat); font-weight: 400 !important; color: var(--d100);
 }
 .ov-chat-input::placeholder { color: var(--d600); }
 .ov-chat-input:focus-visible { outline: 2px solid var(--brand); outline-offset: -1px; }
@@ -180,7 +181,7 @@
      turn count against the middle of a wrapped question. */
   display: flex; align-items: flex-start; gap: 8px;
   min-height: 24px; padding: 8px; border-radius: var(--r-sm);
-  font-size: var(--fs-xs); color: var(--d300);
+   font-size: var(--fs-chat); font-weight: 400 !important; color: var(--d300);
   cursor: pointer; text-align: left; width: 100%;
   background: transparent; border: 0; font-family: inherit;
   transition: background-color var(--t-fast), color var(--t-fast);
@@ -198,6 +199,9 @@
   font-size: var(--fs-2xs); color: var(--d500); font-variant-numeric: tabular-nums;
 }
 .ov-chat-none { font-size: var(--fs-base); color: var(--d500); line-height: var(--lh-relaxed); padding: 0 8px; }
+
+/* Keep both sides of a conversation and its search control on one readable scale. */
+.msg-bubble { font-size: var(--fs-chat); }
 
 /* Below this the column and a readable thread cannot both fit, and the thread
    is what you came for. */
