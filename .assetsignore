@@ -1,0 +1,19 @@
+# What `wrangler deploy` must not publish. The assets directory is the repo
+# root, so without this the git history, local tool settings, npm files and
+# dev-only sources would be served to anyone who asks for them.
+.git
+.gitignore
+.assetsignore
+.claude
+.wrangler
+.dev.vars*
+.env*
+.nvm
+.nvmrc
+.storybook
+stories
+node_modules
+package.json
+package-lock.json
+wrangler.jsonc
+README.md
