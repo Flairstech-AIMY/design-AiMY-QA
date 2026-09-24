@@ -548,6 +548,51 @@
     .ds-topbar-right {
       margin-left: auto; display: flex; align-items: center; gap: 12px;
     }
+    .ds-topbar-filters {
+      display: flex; align-items: center; gap: 10px;
+      min-width: 0;
+    }
+    .ds-topbar-filter,
+    .ds-topbar-date,
+    .ds-topbar-export {
+      display: inline-flex; align-items: center; gap: 10px;
+      min-height: 40px; padding: 0 14px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: var(--r-pill); color: var(--d200);
+      font-family: var(--font-sans); font-size: 14px; font-weight: 600;
+      white-space: nowrap; cursor: pointer;
+      transition: background-color var(--t-fast), border-color var(--t-fast), color var(--t-fast);
+    }
+    .ds-topbar-filter:hover,
+    .ds-topbar-date:hover,
+    .ds-topbar-export:hover { background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.16); }
+    .ds-topbar-filter:focus-visible,
+    .ds-topbar-date:focus-visible,
+    .ds-topbar-export:focus-visible,
+    .ds-topbar-filter-clear:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+    .ds-topbar-filter svg,
+    .ds-topbar-date svg,
+    .ds-topbar-export svg { flex-shrink: 0; color: var(--ink-muted); }
+    .ds-topbar-filter svg { width: 12px; height: 7px; }
+    .ds-topbar-date { gap: 8px; padding-right: 10px; }
+    .ds-topbar-date svg { width: 18px; height: 18px; }
+    .ds-topbar-export { gap: 7px; }
+    .ds-topbar-export svg { width: 16px; height: 16px; }
+    .ds-topbar-filter-clear {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 20px; height: 20px; margin-left: -4px; padding: 0;
+      border: 0; border-radius: 50%; background: transparent;
+      color: var(--ink-muted); cursor: pointer;
+    }
+    .ds-topbar-filter-clear:hover { color: var(--d50); background: rgba(255,255,255,0.08); }
+    .ds-topbar-filter-clear svg { width: 14px; height: 14px; }
+    :root[data-theme="light"] .ds-topbar-filter,
+    :root[data-theme="light"] .ds-topbar-date,
+    :root[data-theme="light"] .ds-topbar-export { background: rgba(16,24,40,0.04); border-color: rgba(16,24,40,0.12); }
+    :root[data-theme="light"] .ds-topbar-filter:hover,
+    :root[data-theme="light"] .ds-topbar-date:hover,
+    :root[data-theme="light"] .ds-topbar-export:hover { background: rgba(16,24,40,0.08); border-color: rgba(16,24,40,0.20); }
     .ds-topbar-version {
       font-size: 14px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
       color: var(--teal); background: var(--teal-dim);
@@ -586,6 +631,19 @@
     .ds-theme-toggle .icon-sun  { display: block; }
     :root[data-theme="light"] .ds-theme-toggle .icon-sun  { display: none; }
     :root[data-theme="light"] .ds-theme-toggle .icon-moon { display: block; }
+    @media (max-width: 1100px) {
+      .ds-topbar { padding-inline: 20px; }
+      .ds-topbar-search { display: none; }
+    }
+    @media (max-width: 760px) {
+      .ds-topbar { gap: 10px; }
+      .ds-topbar-title, .ds-topbar-sep { display: none; }
+      .ds-topbar-right { gap: 8px; }
+      .ds-topbar-filters { gap: 6px; overflow-x: auto; scrollbar-width: none; }
+      .ds-topbar-filters::-webkit-scrollbar { display: none; }
+      .ds-topbar-filter, .ds-topbar-date, .ds-topbar-export { min-height: 34px; padding-inline: 10px; font-size: 12px; }
+      .ds-topbar-date { max-width: 190px; overflow: hidden; text-overflow: ellipsis; }
+    }
 
     /* ═══════════════════════════════════════════════
        SHELL LAYOUT
@@ -4121,6 +4179,27 @@
   <span class="ds-topbar-title">Design System</span>
 
   <div class="ds-topbar-right">
+    <div class="ds-topbar-filters" aria-label="Dashboard filters">
+      <button class="ds-topbar-filter" type="button" aria-haspopup="listbox" aria-label="Filter by client">
+        All clients
+        <svg viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="1 1 5 5 9 1"/></svg>
+      </button>
+      <button class="ds-topbar-filter" type="button" aria-haspopup="listbox" aria-label="Filter by product">
+        All products
+        <svg viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="1 1 5 5 9 1"/></svg>
+      </button>
+      <button class="ds-topbar-date" type="button" aria-label="Change date range">
+        <span>01 Jan 2026 ~ 15 Sep 2026</span>
+        <span class="ds-topbar-filter-clear" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4.5" width="18" height="17" rx="2"/><path d="M16 2.5v4M8 2.5v4M3 9h18"/></svg>
+      </button>
+      <button class="ds-topbar-export" type="button" aria-label="Export dashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/></svg>
+        Export
+      </button>
+    </div>
     <div class="ds-topbar-search" role="button" tabindex="0" aria-label="Quick find (press / or ⌘K)">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
       Quick find&nbsp;
