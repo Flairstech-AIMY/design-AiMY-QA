@@ -33,6 +33,7 @@
     <style>
       *,
       *::before,
+          const declared = explicitTopic || window.__aimyTopic || null;
       *::after {
         box-sizing: border-box;
         margin: 0;
@@ -3149,10 +3150,19 @@
       .kpa-email-chip { display: flex; flex-shrink: 0; align-items: center; gap: 7px; border: 1px solid var(--wash-6); border-radius: 20px; padding: 5px 12px; color: var(--d200); font-size: 12px; font-weight: 700; letter-spacing: 0.06em; }
       .kpa-email-chip svg { width: 14px; height: 15px; }
       .kpa-email-meta { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--d400); font-size: 12px; }
-      .kpa-email-close { margin-left: auto; width: 40px; height: 40px; display: grid; place-items: center; border: 0; border-radius: 8px; background: transparent; color: var(--d400); cursor: pointer; transition: background var(--transition-fast), color var(--transition-fast); }
-      .kpa-email-close:hover { background: var(--wash-7); color: var(--d50); }
-      .kpa-email-close svg { width: 16px; height: 16px; }
+      .kpa-email-head .kpa-email-close { margin-left: auto; width: 36px; flex: 0 0 36px; padding: 0; }
       .kpa-email-thread { width: min(760px, 100%); flex: 1; min-height: 0; overflow-y: auto; padding: 14px 20px 20px; display: flex; flex-direction: column; gap: 10px; }
+      .kpa-email-ai-dock { box-sizing: border-box; width: min(760px, 100%); flex: 0 0 auto; display: flex; flex-direction: column; padding: 0 20px 16px; }
+      .kpa-email-ai-dock .kpi-followup-suggestions,
+      .kpa-email-ai-dock .overlay-input-bar { width: 100%; }
+      .kpa-email-ai-dock .overlay-input-bar { box-sizing: border-box; }
+      .kpa-email-ai-dock .overlay-input { min-width: 0; }
+      .kpa-email-chat { display: flex; flex-direction: column; gap: 16px; padding: 16px 0 4px; }
+      .kpa-email-thread .chat-msg { flex-shrink: 0; }
+      .kpa-email-thread .chat-msg .msg-bubble { white-space: pre-line; overflow-wrap: anywhere; }
+      @media (max-width: 600px) {
+        .kpa-email-ai-dock { padding: 0 12px 12px; }
+      }
       .kpa-email-card { flex-shrink: 0; overflow: hidden; border: 1px solid var(--wash-6); border-radius: 12px; background: var(--card-bg); }
       .kpa-email-card header { display: flex; align-items: flex-start; gap: 10px; padding: 10px; border-bottom: 1px solid var(--wash-6); }
       .kpa-email-avatar { width: 32px; height: 32px; flex-shrink: 0; display: grid; place-items: center; border-radius: 50%; background: rgba(51, 105, 255, 0.25); color: #5c87ff; font-size: 12px; font-weight: 800; }
@@ -3171,6 +3181,7 @@
       /* Close button, top right corner */
       .overlay-close {
         position: absolute;
+        z-index: 2;
         top: 24px;
         right: 28px;
         width: 36px;
@@ -3235,6 +3246,7 @@
         line-height: 1.6;
         color: var(--d50);
       }
+      .chat-msg.user.kpi-explanation-request .msg-bubble { padding: 9px 12px; font-size: 11.5px; line-height: 1.45; }
       .typing-dots span {
         width: 6px;
         height: 6px;
@@ -3273,6 +3285,7 @@
           transform 300ms 80ms cubic-bezier(0.22, 1, 0.36, 1),
           opacity 300ms 80ms ease;
       }
+          .aimy-overlay.context-only .overlay-input-wrap { display: none; }
 
       .overlay-input {
         flex: 1;
@@ -3307,6 +3320,43 @@
         background: var(--wash-7);
         border-color: var(--wash-10);
         color: var(--d50);
+      }
+      .kpi-followup-suggestions { display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px; }
+      .kpi-followup-suggestions[hidden] { display: none; }
+      .kpi-followup-label { padding-left: 3px; color: var(--d500); font-size: 10px; font-weight: 600; }
+      .kpi-followup-options { display: flex; flex-wrap: wrap; gap: 8px; }
+      .kpi-followup-chip { min-height: 34px; padding: 6px 11px; font-size: 11px; text-align: left; white-space: normal; }
+      @keyframes kpiFollowupReveal {
+        from { opacity: 0; transform: translateY(6px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      .kpi-followup-options.is-refreshing .kpi-followup-chip {
+        animation: kpiFollowupReveal 280ms var(--ease-out) both;
+      }
+      .kpi-followup-options.is-refreshing .kpi-followup-chip:nth-child(2) { animation-delay: 55ms; }
+      .kpi-followup-options.is-refreshing .kpi-followup-chip:nth-child(3) { animation-delay: 110ms; }
+      @media (prefers-reduced-motion: reduce) {
+        .kpi-followup-options.is-refreshing .kpi-followup-chip { animation: none; }
+      }
+      .overlay-sugg-chip.kpi-followup-chip {
+        font-weight: 400;
+        color: var(--d50);
+        background: linear-gradient(125deg, rgba(var(--qa-accent-rgb), 0.17), rgba(var(--qa-accent-rgb), 0.07) 55%, var(--wash-3)), var(--wash-2);
+        border-color: rgba(var(--qa-accent-rgb), 0.28);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.14), 0 3px 12px rgba(var(--qa-accent-rgb),0.08);
+        backdrop-filter: blur(12px) saturate(135%);
+        -webkit-backdrop-filter: blur(12px) saturate(135%);
+      }
+      .kpi-followup-chip:hover {
+        color: var(--d50);
+        background: linear-gradient(125deg, rgba(var(--qa-accent-rgb), 0.25), rgba(var(--qa-accent-rgb), 0.11) 55%, var(--wash-4)), var(--wash-3);
+        border-color: rgba(var(--qa-accent-rgb), 0.42);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.18), 0 4px 15px rgba(var(--qa-accent-rgb),0.14);
+      }
+      .kpi-followup-chip:focus-visible { outline: 2px solid var(--qa-accent); outline-offset: 2px; }
+      @media (max-width: 600px) {
+        .kpi-followup-options { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; }
+        .kpi-followup-chip { width: 100%; min-height: 38px; }
       }
 
       /* Styled scrollbar */
@@ -6129,13 +6179,26 @@
       .kpa-pts { color: var(--d500); font-size: 9.5px; font-weight: 700; }
       .kpa-body { padding: 0 14px 12px 52px; }
       .kpa-reading {
-        display: flex; align-items: start; justify-content: space-between; gap: 10px;
+        display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: start; gap: 8px 12px;
         padding: 9px 11px; border-radius: 10px;
         background: rgba(0,102,255,0.07); border: 1px solid rgba(0,102,255,0.22);
       }
-      .kpa-reading p { margin: 0; color: var(--d300); font-size: 11px; line-height: 1.5; }
-      .kpa-reading p b { color: var(--d100); }
-      .kpa-reading-conf { color: var(--ai-text); font-size: 9.5px; white-space: nowrap; font-weight: 700; }
+      .kpa-reading p { grid-column: 1; grid-row: 1 / span 2; margin: 0; color: var(--d300); font-size: 11px; line-height: 1.5; min-width: 0; }
+      .kpa-reading p b { display: block; margin-bottom: 3px; color: var(--d100); }
+      .kpa-reading-conf { grid-column: 2; grid-row: 1; color: var(--ai-text); font-size: 9.5px; white-space: nowrap; font-weight: 700; }
+      .kpa-explain-score {
+        grid-column: 2; grid-row: 2; align-self: end; justify-self: end;
+        min-height: 32px; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+        border: 1px solid rgba(var(--qa-accent-rgb),0.28); border-radius: 8px; padding: 0 10px;
+        background: rgba(var(--qa-accent-rgb),0.08); color: var(--d100);
+        font-family: var(--font-sans, "Urbanist", sans-serif); font-size: 11px; font-weight: 650;
+        cursor: pointer; white-space: nowrap;
+        transition: color var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
+      }
+      .kpa-explain-score:hover { background: rgba(var(--qa-accent-rgb),0.15); border-color: rgba(var(--qa-accent-rgb),0.42); color: var(--d50); transform: translateY(-1px); }
+      .kpa-explain-score:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+      .kpa-explain-score svg { width: 13px; height: 13px; flex: 0 0 auto; }
+      .kpa-explain-score .kpa-explain-arrow { width: 12px; height: 12px; opacity: 0.75; }
       .kpa-evidence { margin: 8px 0 0; padding: 9px 11px; border: 1px solid var(--wash-6); border-left: 2px solid rgba(var(--qa-accent-rgb),0.5); border-radius: 0 9px 9px 0; background: var(--wash-3); }
       .kpa-evidence figcaption { display: flex; gap: 8px; align-items: baseline; font-size: 10px; color: var(--d400); }
       .kpa-evidence figcaption b { color: var(--d200); }
@@ -6144,15 +6207,6 @@
       .kpa-unscored .kpa-dot { margin-top: 5px; background: var(--warn); flex-shrink: 0; }
       .kpa-actions { border-top: 1px solid var(--wash-5); display: flex; align-items: center; gap: 7px; padding: 9px 14px 9px 52px; flex-wrap: wrap; }
       .kpa-action-label { color: var(--d500); font-size: 9px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; margin-right: 2px; }
-      .kpa-insight-suggest {
-        min-height: 30px; border: 1px solid rgba(var(--qa-accent-rgb),0.34); background: rgba(var(--qa-accent-rgb),0.12); color: var(--d100);
-        border-radius: 999px; padding: 0 10px; font-family: "Urbanist", sans-serif; font-size: 10.5px;
-        font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 5px;
-        transition: color var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
-      }
-      .kpa-insight-suggest:hover { background: rgba(var(--qa-accent-rgb),0.2); border-color: rgba(var(--qa-accent-rgb),0.5); color: var(--d50); transform: translateY(-1px); }
-      .kpa-insight-suggest:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
-      .kpa-insight-suggest svg { width: 11px; height: 11px; flex: 0 0 auto; }
       .kpa-decision {
         min-height: 30px; border: 1px solid var(--wash-7); background: transparent; color: var(--d400);
         border-radius: 8px; padding: 0 11px; font-family: "Urbanist", sans-serif; font-size: 11px;
@@ -11485,19 +11539,18 @@
                       card.querySelectorAll('.kpa-decision').forEach(function (btn) {
                         btn.addEventListener('click', function () { decide(card, btn); });
                       });
-                      var actions = card.querySelector('.kpa-actions');
-                      if (actions && !actions.querySelector('.kpa-insight-suggest')) {
+                      var reading = card.querySelector('.kpa-reading');
+                      if (reading && !reading.querySelector('.kpa-explain-score')) {
                         var insightBtn = document.createElement('button');
                         insightBtn.type = 'button';
-                        insightBtn.className = 'kpa-insight-suggest';
-                        insightBtn.setAttribute('aria-label', 'Ask AiMY for KPI insights with reasoning and evidence');
-                        insightBtn.innerHTML = '<svg viewBox="0 0 18 20" aria-hidden="true"><use href="#aimy-logo-small"></use></svg><span>AiMY insights</span>';
+                        insightBtn.className = 'kpa-explain-score';
+                        var kpiTitle = card.querySelector('.kpa-title');
+                        insightBtn.setAttribute('aria-label', 'Ask AiMY to explain the ' + (kpiTitle ? kpiTitle.textContent.trim() : 'selected KPI') + ' score');
+                        insightBtn.innerHTML = '<svg viewBox="0 0 18 20" aria-hidden="true"><use href="#aimy-logo-small"></use></svg><span>Explain this score in chat</span><svg class="kpa-explain-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>';
                         insightBtn.addEventListener('click', function () {
                           if (window.openKpiTranscript) window.openKpiTranscript(card);
                         });
-                        var label = actions.querySelector('.kpa-action-label');
-                        if (label && label.nextSibling) actions.insertBefore(insightBtn, label.nextSibling);
-                        else actions.insertBefore(insightBtn, actions.firstChild);
+                        reading.appendChild(insightBtn);
                       }
                     });
 
@@ -11550,7 +11603,12 @@
                     function setEmailOverlay(open) {
                       var overlay = document.getElementById('kpaEmailOverlay');
                       if (!overlay) return;
-                      if (open) renderEmailThread();
+                      if (open) {
+                        renderEmailThread();
+                        emailSuggestionFamily = null;
+                        emailSuggestionVariant = 0;
+                        showEmailSuggestions(emailInitialSuggestions, false);
+                      }
                       overlay.classList.toggle('open', open);
                       overlay.setAttribute('aria-hidden', String(!open));
                       if (open) {
@@ -11569,6 +11627,166 @@
                       var overlay = document.getElementById('kpaEmailOverlay');
                       if (event.key === 'Escape' && overlay && overlay.classList.contains('open')) setEmailOverlay(false);
                     });
+                    function emailMessageExcerpt(message, maxLength) {
+                      var text = (message.body || '').replace(/\s+/g, ' ').trim();
+                      return text.length > maxLength ? text.slice(0, maxLength - 1).trimEnd() + '…' : text;
+                    }
+                    function answerEmailThread(question, intent) {
+                      var messages = window.AIMY_EMAIL_THREAD && window.AIMY_EMAIL_THREAD.messages || [];
+                      var latest = messages.slice().reverse().find(function (message) { return (message.body || '').trim(); });
+                      var latestPublic = messages.slice().reverse().find(function (message) { return message.visibility === 'Public' && (message.body || '').trim(); });
+                      var firstCustomer = messages.find(function (message) { return message.type === 'customer_reply' && message.visibility === 'Public' && (message.body || '').trim(); });
+                      var closure = messages.find(function (message) { return (message.body || '').indexOf('Ticket Closure') >= 0; });
+                      var replication = messages.find(function (message) { return /I tried to replicate the issue/i.test(message.body || ''); });
+                      var mode = intent || '';
+                      if (!mode && /summar|overview|tl;dr/i.test(question)) mode = 'summary';
+                      if (!mode && /latest|newest|most recent/i.test(question)) mode = 'latest';
+                      if (!mode && /action|owner|follow.?up|next step|to-do/i.test(question)) mode = 'actions';
+                      if (!mode && /unresolved|open question|blocker|still open/i.test(question)) mode = 'unresolved';
+                      if (mode === 'summary') {
+                        var issue = firstCustomer ? firstCustomer.body : 'No public customer message is available.';
+                        var issueEnd = issue.search(/[.!?](?:\s|$)/);
+                        if (issueEnd >= 0) issue = issue.slice(0, issueEnd + 1);
+                        if (issue.length > 290) issue = issue.slice(0, 287).trimEnd() + '…';
+                        var outcomeMatch = closure && closure.body.match(/Final resolution:\s*[-→>]*\s*([^\r\n]+)/i);
+                        var outcome = outcomeMatch ? outcomeMatch[1].trim() : 'No final resolution is recorded in the thread.';
+                        if (/customer report|original issue/i.test(question)) return 'The customer reported: ' + issue;
+                        if (/support try|investigation/i.test(question)) return 'Support reviewed the PDF exports, tested in the cloud environment without reproducing the image loss, and asked for an affected solution to compare. The customer reported difficulty sharing the large files and copying the complex solution.';
+                        if (/thread end|outcome/i.test(question)) return 'Recorded outcome: ' + outcome + '. The later private Jira update is dated ' + (latest ? latest.time : 'unknown') + '.';
+                        return 'Initial issue: ' + issue + '\nInvestigation: ' + (replication ? 'Support could not reproduce the image-loss issue in the tested cloud environment and requested a comparable affected solution.' : 'The thread records support investigation but no reproduction details.') + '\nRecorded outcome: ' + outcome + '\nNewest logged activity: ' + (latest ? latest.time + ' · ' + emailMessageExcerpt(latest, 150) : 'No later update is available.');
+                      }
+                      if (mode === 'latest') {
+                        if (/last public/i.test(question)) return latestPublic ? 'Last public email (' + latestPublic.time + '): ' + emailMessageExcerpt(latestPublic, 300) : 'No public email is available.';
+                        if (/when did the ticket close/i.test(question)) return closure ? 'The ticket closure note was logged ' + closure.time + '. The newest private Jira entry was logged ' + (latest ? latest.time : 'at an unknown time') + '.' : 'No closure note is available.';
+                        return 'Newest logged entry (' + (latest ? latest.time + ', ' + latest.visibility + ' ' + latest.type : 'unavailable') + '): ' + (latest ? emailMessageExcerpt(latest, 220) : 'No update is available.') + '\nLatest public email (' + (latestPublic ? latestPublic.time : 'unavailable') + '): ' + (latestPublic ? emailMessageExcerpt(latestPublic, 220) : 'No public email is available.');
+                      }
+                      if (mode === 'actions') {
+                        if (/lisa asked/i.test(question)) return 'Lisa was asked to share the affected files and reproduce the image-loss issue using the same solution in cloud. She reported attachment-size limits and that copying complex content lost images and tables.';
+                        if (/support investigate/i.test(question)) return 'Support compared the PDFs, tried to reproduce the image loss in cloud, investigated the attachment-size issue and requested a comparable affected solution. The image-loss cause was not confirmed.';
+                        if (/incomplete/i.test(question)) return 'The affected solution was not exported for cloud testing before the ticket closed, so a root cause and fix for the missing images remain unconfirmed.';
+                        return 'Customer (Lisa): support requested a cloud reproduction using the affected solution and asked for the source files; Lisa reported that large files and copying the complex content made this difficult.\nSupport (Alaa): compare the generated PDFs, investigate the upload limit, and confirm whether the issue reproduces in cloud. The upload-size issue was later reported fixed.\nStatus: the closure note says the affected solution was not tested in cloud, so the PDF image-loss cause was not confirmed.';
+                      }
+                      if (mode === 'unresolved') {
+                        if (/blocked/i.test(question)) return 'The customer could not share the large affected files or reliably copy the complex solution with its images and tables, so the same case was not reproduced in cloud before closure.';
+                        return 'The image-loss issue was not reproduced in the tested cloud environment. The thread does not confirm a root cause or a fix for missing images in the on-prem environment. The closure note says the affected solution was not exported for a cloud test. The newest overall entry is a private Jira status change to Closed.';
+                      }
+                      var stopWords = /^(about|after|again|also|and|are|for|from|have|into|that|the|this|what|when|where|which|with|would|you|your|show|tell|find|does|did|was|were|has|had|can|could|please|email|emails|thread|ticket)$/;
+                      var terms = question.toLowerCase().match(/[a-z0-9]{3,}/g) || [];
+                      terms = terms.filter(function (term, index) { return !stopWords.test(term) && terms.indexOf(term) === index; });
+                      var matches = messages.map(function (message, index) {
+                        var text = (message.body || '').toLowerCase();
+                        var score = terms.reduce(function (total, term) { return total + (text.indexOf(term) >= 0 ? 1 : 0); }, 0);
+                        return { message: message, index: index, score: score };
+                      }).filter(function (item) { return item.score > 0 && item.message.type !== 'system_note'; }).sort(function (a, b) {
+                        return b.score - a.score || a.message.body.length - b.message.body.length || b.index - a.index;
+                      }).slice(0, 3);
+                      return matches.length ? 'Relevant messages from the thread:\n' + matches.map(function (item) { return item.message.time + ' · ' + item.message.visibility + ' · ' + item.message.from + '\n' + emailMessageExcerpt(item.message, 260); }).join('\n\n') : 'I could not find a direct match in this email thread. Try asking for a summary, the latest update, action items, or unresolved questions.';
+                    }
+                    var emailInitialSuggestions = [
+                      ['Summarize this email thread', 'summary'],
+                      ['What is the latest update?', 'latest'],
+                      ['Extract actions and owners', 'actions']
+                    ];
+                    var emailNextSuggestions = {
+                      summary: [
+                        [['What did the customer report?', 'summary'], ['What did support try?', 'summary'], ['How did the thread end?', 'summary']],
+                        [['What is the latest update?', 'latest'], ['What is still unresolved?', 'unresolved'], ['Extract actions and owners', 'actions']]
+                      ],
+                      latest: [
+                        [['What was the last public email?', 'latest'], ['When did the ticket close?', 'latest'], ['What is still unresolved?', 'unresolved']],
+                        [['Summarize this email thread', 'summary'], ['Extract actions and owners', 'actions'], ['What blocked reproducing it?', 'unresolved']]
+                      ],
+                      actions: [
+                        [['What was Lisa asked to do?', 'actions'], ['What did support investigate?', 'actions'], ['Which actions remained incomplete?', 'actions']],
+                        [['What is still unresolved?', 'unresolved'], ['What was the last public email?', 'latest'], ['Summarize this email thread', 'summary']]
+                      ],
+                      unresolved: [
+                        [['What blocked reproducing it?', 'unresolved'], ['Which actions remained incomplete?', 'actions'], ['When did the ticket close?', 'latest']],
+                        [['What did support try?', 'summary'], ['What is the latest update?', 'latest'], ['Extract actions and owners', 'actions']]
+                      ]
+                    };
+                    var emailSuggestionFamily = null;
+                    var emailSuggestionVariant = 0;
+                    function showEmailSuggestions(questions, animate) {
+                      var options = document.querySelector('#kpaEmailAimySuggestions .kpi-followup-options');
+                      if (!options) return;
+                      options.classList.remove('is-refreshing');
+                      options.replaceChildren(...questions.map(function (entry) {
+                        var button = document.createElement('button');
+                        button.type = 'button';
+                        button.className = 'overlay-sugg-chip kpi-followup-chip';
+                        button.dataset.emailIntent = entry[1];
+                        button.textContent = entry[0];
+                        return button;
+                      }));
+                      if (animate) {
+                        void options.offsetWidth;
+                        options.classList.add('is-refreshing');
+                      }
+                    }
+                    function appendEmailChatTurn(kind, text) {
+                      var list = document.getElementById('kpaEmailThread');
+                      var conversation = document.getElementById('kpaEmailChat');
+                      if (!conversation) {
+                        conversation = document.createElement('div');
+                        conversation.id = 'kpaEmailChat';
+                        conversation.className = 'kpa-email-chat';
+                        conversation.setAttribute('role', 'log');
+                        conversation.setAttribute('aria-label', 'AiMY email conversation');
+                        conversation.setAttribute('aria-live', 'polite');
+                        list.appendChild(conversation);
+                      }
+                      var turn = document.createElement('div');
+                      turn.className = 'chat-msg ' + kind;
+                      var avatar = document.createElement('div');
+                      avatar.className = 'msg-avatar ' + (kind === 'user' ? 'user-av' : 'aimy-av');
+                      if (kind === 'user') avatar.textContent = 'NW';
+                      else avatar.innerHTML = '<svg viewBox="0 0 18 20" aria-hidden="true"><use href="#aimy-logo-small"></use></svg>';
+                      var bubble = document.createElement('div');
+                      bubble.className = 'msg-bubble';
+                      bubble.textContent = text;
+                      turn.append(avatar, bubble);
+                      conversation.appendChild(turn);
+                      list.scrollTop = list.scrollHeight;
+                    }
+                    function askEmailAimy(question, intent) {
+                      var text = (question || '').trim();
+                      if (!text) return;
+                      appendEmailChatTurn('user', text);
+                      appendEmailChatTurn('aimy', answerEmailThread(text, intent));
+                    }
+                    document.addEventListener('click', function (event) {
+                      var button = event.target.closest('[data-email-intent]');
+                      if (!button || !button.closest('#kpaEmailAimySuggestions')) return;
+                      var keyboardActivated = event.detail === 0;
+                      var family = button.dataset.emailIntent;
+                      askEmailAimy(button.textContent, family);
+                      emailSuggestionVariant = family === emailSuggestionFamily ? 1 - emailSuggestionVariant : 0;
+                      emailSuggestionFamily = family;
+                      showEmailSuggestions(emailNextSuggestions[family][emailSuggestionVariant], true);
+                      if (keyboardActivated) document.querySelector('#kpaEmailAimySuggestions .kpi-followup-chip').focus();
+                    });
+                    document.addEventListener('submit', function (event) {
+                      if (event.target.id !== 'kpaEmailAimyForm') return;
+                      event.preventDefault();
+                      var input = document.getElementById('kpaEmailAimyInput');
+                      askEmailAimy(input.value);
+                      input.value = '';
+                      input.style.height = '';
+                      input.focus();
+                    });
+                    document.addEventListener('keydown', function (event) {
+                      if (event.target.id !== 'kpaEmailAimyInput') return;
+                      if (event.key === 'Enter' && !event.shiftKey) {
+                        event.preventDefault();
+                        document.getElementById('kpaEmailAimyForm').requestSubmit();
+                      }
+                    });
+                    document.addEventListener('input', function (event) {
+                      if (event.target.id !== 'kpaEmailAimyInput') return;
+                      event.target.style.height = 'auto';
+                      event.target.style.height = Math.min(event.target.scrollHeight, 72) + 'px';
+                    });
                     window.openKpiTranscript = function (card) {
                       if (!card || !window.openCanvasQuery) return;
                       var textOf = function (selector) {
@@ -11576,6 +11794,13 @@
                         return node ? node.textContent.trim() : '';
                       };
                       var reasonText = textOf('.kpa-reading p').replace(/^Why AiMY scored this:\s*/i, '').trim();
+                      var detailPage = card.closest('.eval-detail-page');
+                      var evaluationIdNode = detailPage && detailPage.querySelector('[data-eval-id]');
+                      var callPlayer = detailPage && detailPage.querySelector('.call-player');
+                      var interactionId = (detailPage && (detailPage.getAttribute('data-interaction-id') || detailPage.getAttribute('data-call-id')))
+                        || (callPlayer && (callPlayer.getAttribute('data-interaction-id') || callPlayer.getAttribute('data-call-id')))
+                        || '';
+                      var criteria = textOf('.kpa-criteria') || card.getAttribute('data-kpa-criteria') || textOf('.kpa-question');
                       var evidence = Array.prototype.map.call(card.querySelectorAll('.kpa-evidence'), function (figure) {
                         var speaker = figure.querySelector('figcaption b');
                         var time = figure.querySelector('figcaption span');
@@ -11589,15 +11814,24 @@
                       window.__aimyKpiContext = {
                         title: textOf('.kpa-title') || 'KPI review',
                         code: textOf('.kpa-code'),
-                        question: textOf('.kpa-question'),
+                        question: criteria,
                         verdict: card.getAttribute('data-kpa-verdict') || '',
                         verdictLabel: textOf('.kpa-chip'),
                         points: textOf('.kpa-pts'),
                         confidence: textOf('.kpa-reading-conf'),
                         reason: reasonText,
-                        evidence: evidence
+                        evidence: evidence,
+                        evaluationId: evaluationIdNode ? evaluationIdNode.getAttribute('data-eval-id') : '',
+                        interactionId: interactionId
                       };
-                      window.openCanvasQuery('Explain this KPI using the call transcript and recording.', 'kpi-call');
+                      var resultLabel = (textOf('.kpa-chip') || card.getAttribute('data-kpa-verdict') || 'current result').replace(/^AiMY\s+/i, '');
+                      var prompt = 'Explain why the ' + window.__aimyKpiContext.title
+                        + (window.__aimyKpiContext.code ? ' (' + window.__aimyKpiContext.code + ')' : '')
+                        + ' KPI scored ' + resultLabel
+                        + (window.__aimyKpiContext.points ? ' (' + window.__aimyKpiContext.points + ')' : '')
+                        + (window.__aimyKpiContext.evaluationId ? ' in evaluation ' + window.__aimyKpiContext.evaluationId : '')
+                        + '. Use its criteria, scoring reason, confidence, and cited transcript evidence to explain the decision and what the agent would need to do to pass.';
+                      window.openCanvasQuery(prompt, 'kpi-call');
                     };
                     if (auditContextAction) auditContextAction.addEventListener('click', function () {
                       var query = 'Open the audit context for this call, including the conversation metadata, auditor, audit date, and activity log.';
@@ -12287,6 +12521,7 @@
             <button
               class="overlay-close"
               id="overlayClose"
+              type="button"
               aria-label="Close conversation"
             >
               <svg
@@ -12316,6 +12551,14 @@
 
             <!-- Input bar inside overlay -->
             <div class="overlay-input-wrap" id="overlayInputWrap">
+              <div class="kpi-followup-suggestions" id="kpiFollowupSuggestions" role="group" aria-label="Suggested KPI follow-up questions" hidden>
+                <span class="kpi-followup-label">Suggested questions</span>
+                <div class="kpi-followup-options">
+                  <button class="overlay-sugg-chip kpi-followup-chip" type="button">What would the agent need to do to pass?</button>
+                  <button class="overlay-sugg-chip kpi-followup-chip" type="button">Show me the exact evidence from the call</button>
+                  <button class="overlay-sugg-chip kpi-followup-chip" type="button">Explain the full KPI criteria</button>
+                </div>
+              </div>
               <div class="overlay-input-bar">
                 <div class="aimy-float-icon">
                   <svg width="23" height="25" viewBox="0 0 18 20">
@@ -12357,11 +12600,28 @@
           <div class="kpa-email-head">
             <span class="kpa-email-chip"><svg viewBox="0 0 18 20" aria-hidden="true"><use href="#aimy-logo-small"></use></svg>AiMY</span>
             <span class="kpa-email-meta" id="kpaEmailMeta"></span>
-            <button class="kpa-email-close" id="kpaEmailClose" type="button" aria-label="Close email thread">
+            <button class="kpa-toolbar-action kpa-email-close" id="kpaEmailClose" type="button" aria-label="Close email thread">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
             </button>
           </div>
           <section class="kpa-email-thread" id="kpaEmailThread" aria-label="Full email thread" tabindex="0"></section>
+          <section class="kpa-email-ai-dock" aria-label="Ask AiMY about this email thread">
+            <div class="kpi-followup-suggestions" id="kpaEmailAimySuggestions" role="group" aria-label="Suggested email questions">
+              <span class="kpi-followup-label">Suggested questions</span>
+              <div class="kpi-followup-options">
+                <button class="overlay-sugg-chip kpi-followup-chip" type="button" data-email-intent="summary">Summarize this email thread</button>
+                <button class="overlay-sugg-chip kpi-followup-chip" type="button" data-email-intent="latest">What is the latest update?</button>
+                <button class="overlay-sugg-chip kpi-followup-chip" type="button" data-email-intent="actions">Extract actions and owners</button>
+              </div>
+            </div>
+            <form class="overlay-input-bar" id="kpaEmailAimyForm" aria-label="Ask AiMY about this email thread">
+              <span class="aimy-float-icon" aria-hidden="true"><svg width="23" height="25" viewBox="0 0 18 20"><use href="#aimy-logo-small"></use></svg></span>
+              <textarea class="overlay-input" id="kpaEmailAimyInput" rows="1" aria-label="Ask AiMY about this email thread" placeholder="Ask AiMY anything…" spellcheck="false" autocomplete="off"></textarea>
+              <button class="overlay-send" type="submit" aria-label="Send">
+                <svg class="send-icon" viewBox="0 0 14 14" fill="none" width="14" height="14" aria-hidden="true"><path d="M6.12464 7.8751L12.2496 1.7501M6.19906 8.06647L7.73213 12.0086C7.86718 12.3559 7.93471 12.5296 8.03201 12.5803C8.11636 12.6242 8.21684 12.6243 8.30124 12.5804C8.3986 12.5298 8.46633 12.3563 8.6018 12.0092L12.4462 2.15797C12.5684 1.84461 12.6296 1.68793 12.5961 1.58782C12.5671 1.50087 12.4989 1.43264 12.4119 1.40359C12.3118 1.37015 12.1551 1.43129 11.8418 1.55358L1.99059 5.39794C1.64346 5.53341 1.4699 5.60114 1.41932 5.6985C1.37547 5.7829 1.37553 5.88338 1.41948 5.96773C1.47017 6.06503 1.64381 6.13256 1.9911 6.26761L5.93327 7.80068C6.00376 7.82809 6.03901 7.8418 6.06869 7.86297C6.095 7.88174 6.118 7.90474 6.13677 7.93105C6.15794 7.96073 6.17165 7.99598 6.19906 8.06647Z" stroke="white" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+              </button>
+            </form>
+          </section>
         </aside>
       </div>
       <!-- /app-main -->
@@ -13251,6 +13511,12 @@
         .snap-primary-row { grid-template-columns: 1fr; }
         .snap-secondary-row { flex-direction: column; }
         .snap-mini-divider { display: none; }
+        .kpa-reading { grid-template-columns: minmax(0, 1fr); }
+        .kpa-reading p, .kpa-reading-conf, .kpa-explain-score { grid-column: 1; }
+        .kpa-reading p { grid-row: 1; }
+        .kpa-reading-conf { grid-row: 2; }
+        .kpa-explain-score { grid-row: 3; justify-self: stretch; min-height: 38px; white-space: normal; }
+        .kpa-explain-score span { min-width: 0; }
       }
       @media (prefers-reduced-motion: reduce) {
         .snap-hero, .snap-mini { transition: none; }
@@ -15957,6 +16223,45 @@
         const overlayClose = document.getElementById("overlayClose");
         const thread = document.getElementById("overlayThread");
         const suggestions = document.getElementById("overlaySuggestions");
+        const overlayChats = document.getElementById("overlayChats");
+        const kpiFollowupSuggestions = document.getElementById("kpiFollowupSuggestions");
+        const kpiFollowupOptions = kpiFollowupSuggestions.querySelector(".kpi-followup-options");
+        const kpiFollowupInitial = [
+          ['What would the agent need to do to pass?', 'pass'],
+          ['Show me the exact evidence from the call', 'evidence'],
+          ['Explain the full KPI criteria', 'criteria']
+        ];
+        const kpiFollowupNext = {
+          pass: [
+            [['Which step was missing?', 'pass'], ['What should the agent have said?', 'pass'], ['Could this result have passed?', 'pass']],
+            [['How would the agent meet this criterion?', 'pass'], ['What coaching action fits this gap?', 'pass'], ['What change would improve the score?', 'pass']]
+          ],
+          evidence: [
+            [['Which excerpt supports this score?', 'evidence'], ['What did the customer ask?', 'evidence'], ['What did the agent say?', 'evidence']],
+            [['Show the timestamps for this evidence', 'evidence'], ['Which speaker provided the evidence?', 'evidence'], ['How does the excerpt relate to the result?', 'evidence']]
+          ],
+          criteria: [
+            [['What exactly does this KPI check?', 'criteria'], ['Why did this result fail?', 'criteria'], ['How confident is AiMY?', 'criteria']],
+            [['Summarize the criterion in plain language', 'criteria'], ['What reason supports the result?', 'criteria'], ['Which evidence was used for this criterion?', 'criteria']]
+          ]
+        };
+        let kpiFollowupFamily = null;
+        let kpiFollowupVariant = 0;
+        function showKpiFollowups(questions, animate) {
+          kpiFollowupOptions.classList.remove('is-refreshing');
+          kpiFollowupOptions.replaceChildren(...questions.map(([text, family]) => {
+            const button = document.createElement('button');
+            button.className = 'overlay-sugg-chip kpi-followup-chip';
+            button.type = 'button';
+            button.dataset.family = family;
+            button.textContent = text;
+            return button;
+          }));
+          if (animate) {
+            void kpiFollowupOptions.offsetWidth;
+            kpiFollowupOptions.classList.add('is-refreshing');
+          }
+        }
         const overlayInput = document.getElementById("overlayInput");
         const overlaySend = document.getElementById("overlaySend");
 
@@ -15964,6 +16269,7 @@
         let overlayOpen = false;
         let msgCount = 0;
         let isTyping = false;
+        let kpiChatContextActive = false;
 
         /* ── Intent detection ─────────────────────────────────────────────
      Keywords that suggest a filter / dashboard-mutation intent.
@@ -16177,11 +16483,22 @@
           floatBar.classList.add("hidden");
 
           const declared = topic || window.__aimyTopic || null;
+          const contextOnly = declared === "call-context";
+          const isKpiExplanation = declared === "kpi-call" && !!window.__aimyKpiContext;
+          kpiChatContextActive = isKpiExplanation;
+          kpiFollowupSuggestions.hidden = !isKpiExplanation;
+          if (isKpiExplanation) {
+            kpiFollowupFamily = null;
+            kpiFollowupVariant = 0;
+            showKpiFollowups(kpiFollowupInitial, false);
+          }
+          overlay.classList.toggle("context-only", contextOnly);
           window.__aimyTopic = null;
 
           if (initialText) {
             setTimeout(() => {
-              appendUserMsg(initialText);          /* increments msgCount */
+              if (contextOnly) suggestions.classList.add("hidden");
+              else appendUserMsg(initialText, isKpiExplanation); /* increments msgCount */
               floatInput.value = "";
               floatHint.style.opacity = "1";
               /* Bind to the turn just created, so the pairing survives queueing. */
@@ -16189,7 +16506,7 @@
             }, 80);
           }
 
-          setTimeout(() => overlayInput.focus(), 220);
+          if (!contextOnly) setTimeout(() => overlayInput.focus(), 220);
         }
 
         /* ── Close overlay ───────────────────────────────────────────── */
@@ -16252,6 +16569,7 @@
             });
           }
           overlay.classList.remove("open");
+          overlay.classList.remove("context-only");
           floatBar.classList.remove("hidden");
           overlayOpen = false;
           showResumePill();
@@ -16268,13 +16586,13 @@
         });
 
         /* ── Append messages to the thread ───────────────────────────── */
-        function appendUserMsg(text) {
+        function appendUserMsg(text, isKpiExplanation) {
           // Hide suggestions once user has sent anything
           suggestions.classList.add("hidden");
           msgCount++;
 
           const wrap = document.createElement("div");
-          wrap.className = "chat-msg user";
+          wrap.className = "chat-msg user" + (isKpiExplanation ? " kpi-explanation-request" : "");
           wrap.id = "turn-" + msgCount;
           wrap.innerHTML =
             '<div class="msg-avatar user-av">NW</div>' +
@@ -17537,6 +17855,35 @@
           const durationLabel = String(Math.floor(recordingDuration / 60)).padStart(2, '0') + ':' + String(recordingDuration % 60).padStart(2, '0');
           const isKpi = !!(env && env.topic === 'kpi-call' && kpi && kpi.title);
           const kpiMeta = isKpi ? [kpi.verdictLabel, kpi.points, kpi.confidence].filter(Boolean) : [];
+          const followupAnswer = isKpi && env.source === 'kpi-follow-up'
+            ? (function () {
+                const question = String(env.text || '').toLowerCase();
+                const criterion = (kpi.question || 'the available KPI definition').replace(/[.!?]+$/, '');
+                const reason = kpi.reason || 'the cited transcript evidence';
+                const result = kpi.verdictLabel || 'the current result';
+                const evidence = Array.isArray(kpi.evidence) ? kpi.evidence : [];
+                const citedLines = evidence.map(function (item) {
+                  return [item.time, item.speaker, item.text].filter(Boolean).join(' - ');
+                }).join(' ');
+                let answer;
+                if (/customer ask|agent say/.test(question)) {
+                  const speaker = question.indexOf('customer') >= 0 ? 'Customer' : 'Agent';
+                  const lines = evidence.filter(function (item) { return (item.speaker || '').toLowerCase() === speaker.toLowerCase(); });
+                  answer = lines.length ? speaker + ' evidence: ' + lines.map(function (item) { return item.time + ' - ' + item.text; }).join(' ') : 'No ' + speaker.toLowerCase() + ' excerpt was cited for this KPI. The cited evidence is shown below.';
+                } else if (/evidence|excerpt|timestamp|speaker/.test(question)) {
+                  answer = 'The cited call evidence is: ' + (citedLines || 'No transcript excerpts were cited for this KPI.') + ' AiMY used this evidence to assess the criterion "' + criterion + '" and reached ' + result + '.';
+                } else if (/confident/.test(question)) {
+                  answer = 'AiMY scored ' + kpi.title + ' as ' + result + (kpi.confidence ? ' with ' + kpi.confidence.replace(/confident$/, 'confidence') : '') + '. The reason was: ' + reason;
+                } else if (/pass|missing|agent have said|meet this criterion|coaching|improve the score/.test(question)) {
+                  answer = 'To pass ' + kpi.title + ', the agent needed to meet this criterion: "' + criterion + '". The scoring gap in this evaluation was: ' + reason;
+                } else if (/criteria|criterion|kpi check|result fail|reason supports/.test(question)) {
+                  answer = 'The criterion available for ' + kpi.title + ' is: "' + criterion + '". The result was ' + result + (kpi.confidence ? ' at ' + kpi.confidence : '') + ', based on the scoring reason and transcript evidence below.';
+                } else {
+                  answer = kpi.title + ' was scored ' + result + ' because ' + reason + ' The criterion was: ' + criterion + '.';
+                }
+                return '<div class="chat-kpi-row"><span class="chat-kpi-label">AiMY response</span><p class="chat-kpi-reason">' + escHtml(answer) + '</p></div>';
+              })()
+            : '';
           const context = isKpi
             ? '<div class="chat-kpi-context">'
               + '<div class="chat-kpi-head"><h3 class="chat-kpi-title">' + escHtml(kpi.title) + '</h3>'
@@ -17544,6 +17891,7 @@
               + (kpiMeta.length ? '<div class="chat-kpi-meta">' + kpiMeta.map(function (item, i) {
                   return '<span class="chat-kpi-pill' + (i === 0 && kpi.verdict ? ' is-' + escHtml(kpi.verdict) : '') + '">' + escHtml(item) + '</span>';
                 }).join('') + '</div>' : '')
+              + followupAnswer
               + (kpi.question ? '<div class="chat-kpi-row"><span class="chat-kpi-label">What this KPI checks</span><p class="chat-kpi-reason">' + escHtml(kpi.question) + '</p></div>' : '')
               + (kpi.reason ? '<div class="chat-kpi-row"><span class="chat-kpi-label">Why AiMY scored this</span><p class="chat-kpi-reason">' + escHtml(kpi.reason) + '</p></div>' : '')
               + '</div>'
@@ -17737,26 +18085,28 @@
              exactly the kind §4 is about, and it shows up in the one attribute
              a reviewer would use to check the binding. */
           const turn = turnId || msgCount;
+            const declared = explicitTopic || window.__aimyTopic || null;
 
           /* Was: `if (isTyping) return;`, a question asked while the previous
              answer was still rendering was dropped on the floor, leaving a
              user turn that never got a reply. Same dead-end class as the
              binding bug (§1.2, "no dead ends"), so it is queued, not dropped. */
           if (isTyping) {
-            _pendingTurns.push([userText, explicitTopic || window.__aimyTopic || null, turn]);
+            _pendingTurns.push([userText, declared, turn]);
             window.__aimyTopic = null;
             return;
           }
           isTyping = true;
-          showTypingIndicator();
+          if (declared !== 'call-context') showTypingIndicator();
 
-          const declared = explicitTopic || window.__aimyTopic || null;
           window.__aimyTopic = null;
 
           const env = { text: userText, turn: turn };
           if (declared) {
             env.topic = declared;
-            env.source = 'declared';
+            env.source = declared === 'kpi-call' && kpiChatContextActive && !/^Explain why the .+ KPI scored /i.test(userText)
+              ? 'kpi-follow-up'
+              : 'declared';
           } else {
             const m = matchTopic(userText);
             if (m && m.topic)          { env.topic = m.topic; env.source = 'matched'; }
@@ -17764,7 +18114,7 @@
             else                       { env.source = 'unbound'; }
           }
 
-          const delay = 900 + Math.random() * 600;
+          const delay = declared === 'call-context' ? 0 : 900 + Math.random() * 600;
           setTimeout(() => {
             const response = respond(env);
             if (response === null) {
@@ -17788,16 +18138,39 @@
         }
 
         /* ── Overlay input: Enter to send (Shift+Enter = newline) ────── */
-        function handleOverlaySend() {
-          const text = overlayInput.value.trim();
-          if (!text) return;
-          appendUserMsg(text);                     /* increments msgCount */
-          overlayInput.value = "";
-          autoResizeTextarea();
-          /* The `isTyping` bail-out is gone: sending while an answer renders
-             now queues rather than silently discarding the message. */
-          simulateAiResponse(text, null, msgCount);
+        function submitOverlayMessage(text, preserveDraft) {
+          const message = String(text || "").trim();
+          if (!message) return;
+          appendUserMsg(message);
+          if (!preserveDraft) {
+            overlayInput.value = "";
+            autoResizeTextarea();
+          }
+          const topic = kpiChatContextActive && window.__aimyKpiContext ? "kpi-call" : null;
+          simulateAiResponse(message, topic, msgCount);
         }
+
+        function handleOverlaySend() {
+          submitOverlayMessage(overlayInput.value, false);
+        }
+
+        kpiFollowupSuggestions.addEventListener("click", (event) => {
+          const button = event.target.closest(".kpi-followup-chip");
+          if (!button || !kpiChatContextActive || !window.__aimyKpiContext) return;
+          const keyboardActivated = event.detail === 0;
+          submitOverlayMessage(button.textContent, true);
+          const family = button.dataset.family;
+          kpiFollowupVariant = family === kpiFollowupFamily ? 1 - kpiFollowupVariant : 0;
+          kpiFollowupFamily = family;
+          showKpiFollowups(kpiFollowupNext[family][kpiFollowupVariant], true);
+          if (keyboardActivated) kpiFollowupOptions.querySelector('.kpi-followup-chip').focus();
+        });
+
+        overlayChats.addEventListener("click", (event) => {
+          if (!event.target.closest("[data-chat], [data-newchat]")) return;
+          kpiChatContextActive = false;
+          kpiFollowupSuggestions.hidden = true;
+        });
 
         overlayInput.addEventListener("keydown", (e) => {
           if (e.key === "Enter" && !e.shiftKey) {
