@@ -28,8 +28,9 @@
    day is a line nobody reads twice, and a rail nobody reads is not a rail.
 
    So each one now states what AiMY has actually found on that surface, with the
-   number in it, and the way there is the last phrase. "5 agents are failing
-   Follow-up Confirmation — open Reviews."
+   number in it, and the way there leads the line so the rail can be scanned
+   by destination. "Open Reviews — 5 agents are failing Follow-up
+   Confirmation."
 
    THE ORDER STILL DOES NOT MOVE. That is the half of the old reasoning worth
    keeping: the findings change, the six positions do not, so the rail can be
@@ -90,17 +91,17 @@
      builds text nodes rather than assigning innerHTML — see the note there. */
   var PAGES = {
     "index":
-      "SLA compliance is running *29 points* under target — {open Dashboard}.",
+      "{Open Dashboard} — SLA compliance is running *29 points* under target.",
     "agent-scorecards":
-      "*5 agents* are failing Follow-up Confirmation and need coaching — {open Reviews}.",
+      "{Open Reviews} — *5 agents* are failing Follow-up Confirmation and need coaching.",
     "my-profile":
-      "Your feedback escalates in *3 days* unless you acknowledge it — {open My Profile}.",
+      "{Open My Profile} — Your feedback escalates in *3 days* unless you acknowledge it.",
     "goal-browser":
-      "*2 goal change requests* are waiting on your decision — {open Goal Hub}.",
+      "{Open Goal Hub} — *2 goal change requests* are waiting on your decision.",
     "data-ingestion":
-      "S3 Voice has failed *3 times* in 24 hours — {open Data}.",
+      "{Open Data} — S3 Voice has failed *3 times* in 24 hours.",
     "settings":
-      "*3 integrations* are still not connected — {open Settings}."
+      "{Open Settings} — *3 integrations* are still not connected."
   };
 
   function $(sel, root) {
@@ -182,9 +183,9 @@
     var phrase = template.slice(open + 1, close);
     var after = template.slice(close + 1);
 
-    /* `before` is emitted by each branch rather than shared, because the two
-       want different tails: the offer keeps its " — " separator, the
-       you-are-here line has to shed it. */
+    /* `before` and `after` are emitted by each branch rather than shared,
+       because the offer keeps its " — " separator and the you-are-here line has
+       to shed it. */
     if (isCurrent) {
       /* THE WHOLE OFFER COMES OFF, NOT JUST THE HREF. An earlier pass rendered
          the phrase as unlinked text, which was fine while it read "Dashboard"
@@ -192,10 +193,11 @@
          the page you are looking at. The finding is still worth stating, so the
          line keeps it, drops the dash and the offer, and says where you are.
 
-         The trailing separator goes with the phrase: `before` ends in " — "
-         and leaving it would hang a dash off the end of the sentence. */
+         The separator goes with the phrase, on whichever side it sits: the
+         destination leads, so `after` starts with " — " and leaving it would
+         open the line on a dash. */
       emphasise(p, before.replace(/[\s—–,;:-]+$/, ""));
-      emphasise(p, after);
+      emphasise(p, after.replace(/^[\s—–,;:-]+/, ""));
 
       var note = document.createElement("span");
       note.className = "rail-here-note";
