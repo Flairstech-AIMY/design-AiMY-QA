@@ -23844,6 +23844,19 @@
 
         function inTab(x) { return TAB === "calls" ? x.ch === "voice" : x.ch !== "voice"; }
 
+        function inReviewScope(record) {
+          if (F.from && (!record.d || record.d < F.from)) return false;
+          if (F.to && (!record.d || record.d > F.to)) return false;
+          return F.agent === "all" || record.agent === F.agent;
+        }
+
+        function reviewDisputes() {
+          return JUSTIFIES.filter(function (record) {
+            var evaluation = I.filter(function (item) { return item.id === record.evalId; })[0];
+            return inReviewScope(evaluation || record);
+          });
+        }
+
         function rows() {
           return I.filter(function (x) {
             if (!inTab(x)) return false;
@@ -24074,7 +24087,7 @@
           if (!list) return;
 
           if (TAB === "justifies") {
-            var jsAll = JUSTIFIES.filter(function (j) { return j.state === "open"; })
+            var jsAll = reviewDisputes().filter(function (j) { return j.state === "open"; })
               .filter(function (j) {
                 if (!F.q) return true;
                 var hay = (j.agent + " " + j.interaction + " " + j.reason + " " + (j.goals || []).join(" ")).toLowerCase();
@@ -24501,6 +24514,10 @@
           if (tab === "calls" || tab === "tickets" || tab === "agents" || tab === "justifies") TAB = tab;
           if (verdict === "awaiting" || verdict === "confirmed" || verdict === "overturned") F.verdict = verdict;
           if (agent) F.agent = agent;
+          var channel = q.get("channel");
+          if (channel === "ticket" || channel === "voice" || channel === "email" || channel === "chat") F.channel = channel;
+          if (/^\d{4}-\d{2}-\d{2}$/.test(q.get("from") || "")) F.from = q.get("from");
+          if (/^\d{4}-\d{2}-\d{2}$/.test(q.get("to") || "")) F.to = q.get("to");
 
           document.querySelectorAll("[data-tbl]").forEach(function (b) {
             var on = b.dataset.tbl === TAB;
@@ -25337,15 +25354,17 @@
            pane had its own hardcoded copy, which is how two lists of the
            same disputes came to disagree. */
         window.__evalJustifies = function () {
-          return JUSTIFIES.filter(function (j) { return j.state === "open"; });
+          return reviewDisputes().filter(function (j) { return j.state === "open"; });
         };
         window.__evalReviewSummary = function () {
+          var scoped = I.filter(inReviewScope);
           return {
-            totalTickets: I.filter(function (record) { return record.ch === "ticket"; }).length,
-            totalCalls: I.filter(function (record) { return record.ch === "voice"; }).length,
-            totalDisputes: JUSTIFIES.length,
-            awaitingTickets: I.filter(function (record) { return record.ch === "ticket" && record.verdict === "awaiting"; }).length,
-            awaitingCalls: I.filter(function (record) { return record.ch === "voice" && record.verdict === "awaiting"; }).length
+            totalTickets: scoped.filter(function (record) { return record.ch === "ticket"; }).length,
+            totalCalls: scoped.filter(function (record) { return record.ch === "voice"; }).length,
+            totalDisputes: reviewDisputes().length,
+            awaitingTickets: scoped.filter(function (record) { return record.ch === "ticket" && record.verdict === "awaiting"; }).length,
+            awaitingCalls: scoped.filter(function (record) { return record.ch === "voice" && record.verdict === "awaiting"; }).length,
+            scope: { from: F.from, to: F.to, agent: F.agent }
           };
         };
         /* An agent raising one. Same record shape the seeds and the

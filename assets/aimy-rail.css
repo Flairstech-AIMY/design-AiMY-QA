@@ -93,8 +93,39 @@
   }
 
   :root .sidebar-nav {
-    padding: 26px 16px;
+    padding: 24px 16px;
     gap: 0;
+  }
+}
+
+:root .app-sidebar .sidebar-nav {
+  background: var(--card-bg, #141b24);
+  isolation: isolate;
+}
+:root .sidebar-nav,
+:root .sidebar-nav * {
+  font-family: "Poppins", system-ui, sans-serif !important;
+}
+:root .sidebar-nav .rail-review-metric {
+  font-weight: 500 !important;
+}
+:root .sidebar-nav .rail-metric-value,
+:root .sidebar-nav .rail-head-label {
+  font-weight: 700 !important;
+}
+:root .sidebar-nav .rail-say,
+:root .sidebar-nav .rail-head-count {
+  font-weight: 500 !important;
+}
+:root .sidebar-nav .rail-link,
+:root .sidebar-nav .rail-toggle {
+  font-weight: 700 !important;
+}
+@supports ((backdrop-filter: blur(12px)) or (-webkit-backdrop-filter: blur(12px))) {
+  :root .app-sidebar .sidebar-nav {
+    background: rgba(20,27,36,0.85);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
   }
 }
 
@@ -109,38 +140,73 @@
    and clipped text has no computable colour for a contrast check besides. */
 :root .rail-head {
   display: flex;
+  position: sticky;
+  top: 0;
+  z-index: 2;
   align-items: center;
   gap: 7px;
-  margin: 0 0 14px;
+  margin: 0 0 16px;
   padding: 8px 12px;
-  border-radius: 9px;
-  background: linear-gradient(
-    104deg,
-    rgba(0, 102, 255, 0.09) 0%,
-    rgba(97, 173, 241, 0.06) 50%,
-    rgba(111, 223, 226, 0.05) 100%
-  );
-  border: 1px solid rgba(97, 173, 241, 0.2);
+  border-radius: var(--r-md, 8px);
+  background: var(--card-bg, #141b24);
+  border: 1px solid var(--glass-border, rgba(255,255,255,0.08));
+}
+@supports ((backdrop-filter: blur(12px)) or (-webkit-backdrop-filter: blur(12px))) {
+  :root .rail-head {
+    background: rgba(20,27,36,0.85);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+  }
 }
 :root .rail-head-mark {
   display: inline-flex;
   flex-shrink: 0;
 }
 :root .rail-head-label {
-  font-family: var(--font-sans, "Urbanist", sans-serif);
+  font-family: var(--font-sans, "Poppins", system-ui, sans-serif);
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.02em;
   color: var(--ai-text, #6fa0ff);
 }
-:root .rail-head-note {
-  font-family: var(--font-sans, "Urbanist", sans-serif);
-  font-size: 10.5px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--d400);
+:root .rail-head-count {
   margin-left: auto;
+  color: var(--d300);
+  font-size: 10px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+:root .rail-entry[data-page="agent-scorecards"] {
+  position: relative;
+  background: transparent;
+}
+:root .rail-selected {
+  position: relative;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+}
+:root .rail-selected::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(var(--qa-accent-rgb, 139,79,244),0.7) 50%, transparent);
+  pointer-events: none;
+}
+:root .rail-proportion {
+  height: 6px;
+  width: 100%;
+  background: var(--wash-6, rgba(255,255,255,0.07));
+  overflow: hidden;
+  border-radius: 3px;
+}
+:root .rail-proportion > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--text-link, #7ea7ff);
 }
 
 /* ═══ 2. THE ENTRY, AND ITS SURFACE ════════════════════════════════════════
@@ -165,42 +231,59 @@
      not a fit — one extra wrapped line from a font that loads late, or a
      sentence someone lengthens by three words, and the rail scrolls. These two
      numbers buy ~17px of it. */
-  margin-bottom: 7px;
+  margin-bottom: 16px;
 }
 :root .rail-entry:last-child {
   margin-bottom: 0;
 }
 :root .rail-card {
-  padding: 10px 13px;
-  border-radius: 9px;
-  background: rgba(0, 102, 255, 0.05);
-  border: 1px solid rgba(0, 102, 255, 0.14);
-  transition: background-color var(--t-fast, 140ms) ease,
-    border-color var(--t-fast, 140ms) ease;
+  position: relative;
+  padding: 12px;
+  border-radius: 14px;
+  background: linear-gradient(120deg, rgba(var(--qa-accent-rgb, 139,79,244),0.10), rgba(0,102,255,0.04));
+  border: 1px solid rgba(var(--qa-accent-rgb, 139,79,244),0.2);
+  box-shadow: var(--elev-1, 0 1px 2px rgba(0,0,0,0.4));
+  transition: background-color var(--t-fast, 150ms) ease,
+    border-color var(--t-fast, 150ms) ease,
+    transform var(--t-base, 200ms) var(--ease-out, cubic-bezier(0.22,1,0.36,1));
+}
+@supports ((backdrop-filter: blur(18px)) or (-webkit-backdrop-filter: blur(18px))) {
+  :root .rail-card {
+    -webkit-backdrop-filter: blur(18px) saturate(1.2);
+    backdrop-filter: blur(18px) saturate(1.2);
+  }
 }
 /* Warms as the cursor crosses it, so the column answers a hovering reader
    before they have found the link. NOT a click target: the affordance stays on
    the phrase, or the card becomes the row this rail exists to not be. */
-:root .rail-entry:not(.is-current):hover .rail-card {
-  background: rgba(0, 102, 255, 0.08);
-  border-color: rgba(0, 102, 255, 0.22);
+:root .rail-entry:not(.is-current):hover .rail-card:not(.rail-review-card),
+:root .rail-review-card:hover,
+:root .rail-card:focus-within {
+  background-color: color-mix(in srgb, var(--card-bg-raised, #1c2630) 80%, transparent);
+  border-color: var(--card-border-hover, rgba(255,255,255,0.14));
+  transform: translateY(-1px);
 }
 /* The one you are standing in reads as settled rather than offered. */
-:root .rail-entry.is-current .rail-card:not(.rail-review-card),
-:root .rail-review-card[aria-current="page"] {
-  background: var(--wash-3);
-  border-color: var(--wash-6);
+:root .rail-selected > .rail-card {
+  background:
+    radial-gradient(120% 90% at 0% 0%, rgba(var(--qa-accent-rgb, 139,79,244),0.38), transparent 70%),
+    linear-gradient(120deg, rgba(var(--qa-accent-rgb, 139,79,244),0.22), rgba(0,102,255,0.12));
+  border-color: rgba(var(--qa-accent-rgb, 139,79,244),0.6);
+  box-shadow: none;
+}
+:root .rail-selected > .rail-card .rail-metric-value {
+  color: #fff;
 }
 
 :root .rail-review-card,
 :root .rail-summary-card {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  border-radius: 8px;
+  gap: 8px;
+  border-radius: 14px;
 }
-:root .rail-review-card + .rail-review-card {
-  margin-top: 7px;
+:root .rail-card + .rail-card {
+  margin-top: 8px;
 }
 :root .rail-review-title {
   color: var(--d300);
@@ -210,10 +293,18 @@
 :root .rail-review-metric {
   margin: 0;
   color: var(--d50);
-  font-size: 17px;
-  font-weight: 800;
-  line-height: 1.3;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.5;
   letter-spacing: 0;
+}
+:root .rail-metric-value {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
 }
 :root .rail-review-context {
   margin: 0;
@@ -232,6 +323,23 @@
 :root .rail-summary-card .rail-say {
   letter-spacing: 0;
 }
+/* Stretched link: the whole card is the click target. */
+:root .rail-card:has(.rail-link) {
+  cursor: pointer;
+}
+:root .rail-card .rail-link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+:root .rail-card .rail-link:focus-visible {
+  outline: none;
+}
+:root .rail-card:has(.rail-link:focus-visible) {
+  outline: 2px solid var(--brand, #3369ff);
+  outline-offset: 2px;
+}
 
 /* ═══ 3. THE SENTENCE — the loudest thing in the column ════════════════════
    13px against the 13px the buttons used to be, so it inherits their weight in
@@ -239,7 +347,7 @@
    because this is prose being read, not a label being scanned. */
 :root .rail-say {
   margin: 0;
-  font-family: var(--font-sans, "Urbanist", sans-serif);
+  font-family: var(--font-sans, "Poppins", system-ui, sans-serif);
   font-size: 13px;
   font-weight: 500;
   line-height: 1.6;
@@ -274,9 +382,9 @@
    at full strength, and makes the affordance a shape rather than a hue — which
    is what 1.4.1 asks for anyway. */
 :root .rail-link {
-  color: var(--d50);
+  color: var(--text-link, #7ea7ff);
   font-weight: 700;
-  text-decoration: underline;
+  text-decoration: none;
   text-decoration-thickness: 1.5px;
   text-underline-offset: 3px;
   text-decoration-color: rgba(var(--qa-accent-rgb), 0.55);
@@ -296,6 +404,14 @@
 :root .rail-link:hover {
   text-decoration-color: var(--qa-accent);
   background: rgba(var(--qa-accent-rgb), 0.1);
+}
+:root .rail-action-arrow {
+  display: inline-block;
+  transition: transform var(--t-base, 200ms) var(--ease-out, cubic-bezier(0.22,1,0.36,1));
+}
+:root .rail-link:hover .rail-action-arrow,
+:root .rail-link:focus-visible .rail-action-arrow {
+  transform: translateX(2px);
 }
 :root .rail-link:focus-visible {
   outline: 2px solid var(--brand);
@@ -328,7 +444,7 @@
   background: var(--wash-3);
   border: 1px solid var(--wash-6);
   color: var(--d300);
-  font-family: var(--font-sans, "Urbanist", sans-serif);
+  font-family: var(--font-sans, "Poppins", system-ui, sans-serif);
   font-size: 12px;
   font-weight: 700;
   cursor: pointer;
@@ -390,7 +506,8 @@
 @media (max-width: 1099.98px) {
 
   /* ── THE COLLAPSED 64px RAIL ── */
-  :root .app-sidebar:not(.is-open) .rail-review-card {
+  :root .app-sidebar:not(.is-open) .rail-card,
+  :root .app-sidebar:not(.is-open) .rail-selected {
     display: none;
   }
   :root .app-sidebar:not(.is-open) .rail-say,
@@ -467,7 +584,7 @@
     overflow: hidden;
   }
   :root .app-sidebar.is-open .sidebar-nav {
-    padding: 22px 16px;
+    padding: 24px 16px;
     gap: 0;
     overflow-y: auto;
   }
@@ -486,11 +603,79 @@
    Level 4: transform and opacity only, 300ms ceiling, guard present. The
    drawer's entrance is the scrim's fade plus a fixed panel — nothing here
    animates a layout property. */
+@keyframes rail-select-in {
+  from { opacity: 0; transform: translateY(-8px) scale(0.95); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes rail-card-in {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes rail-line-in {
+  from { opacity: 0; transform: scaleX(0); }
+  to { opacity: 1; transform: scaleX(1); }
+}
+:root .rail-motion .rail-selected > .rail-card {
+  animation: rail-select-in 420ms var(--ease-out, cubic-bezier(0.22,1,0.36,1)) both;
+}
+:root .rail-motion .rail-selected::after {
+  animation: rail-line-in 500ms var(--ease-out, cubic-bezier(0.22,1,0.36,1)) 150ms both;
+}
+:root .rail-motion .rail-entry .rail-card {
+  animation: rail-card-in 380ms var(--ease-out, cubic-bezier(0.22,1,0.36,1)) both;
+  animation-delay: calc(220ms + var(--rail-i, 0) * 90ms);
+}
 @media (prefers-reduced-motion: reduce) {
+  :root .rail-motion .rail-selected > .rail-card,
+  :root .rail-motion .rail-selected::after,
+  :root .rail-motion .rail-entry .rail-card {
+    animation: none;
+  }
   :root .rail-scrim,
   :root .rail-toggle,
   :root .rail-link,
-  :root .rail-card {
+  :root .rail-card,
+  :root .rail-action-arrow {
     transition: none;
   }
+  :root .rail-card:hover,
+  :root .rail-card:focus-within,
+  :root .rail-action-arrow,
+  :root .rail-link:hover .rail-action-arrow,
+  :root .rail-link:focus-visible .rail-action-arrow {
+    transform: none;
+  }
+}
+
+:root[data-theme="light"] .app-sidebar .sidebar-nav,
+:root[data-theme="light"] .rail-head {
+  background: var(--card-bg, #ffffff);
+}
+@supports ((backdrop-filter: blur(12px)) or (-webkit-backdrop-filter: blur(12px))) {
+  :root[data-theme="light"] .app-sidebar .sidebar-nav,
+  :root[data-theme="light"] .rail-head {
+    background: rgba(255,255,255,0.85);
+  }
+}
+:root[data-theme="light"] .rail-entry[data-page="agent-scorecards"] {
+  background: rgba(255,255,255,0.25);
+}
+:root[data-theme="light"] .rail-card {
+  background: rgba(255,255,255,0.35);
+}
+:root[data-theme="light"] .rail-card:hover,
+:root[data-theme="light"] .rail-card:focus-within {
+  background: var(--card-bg, #ffffff);
+}
+:root[data-theme="light"] .rail-card.rail-priority {
+  background: var(--card-bg, #ffffff);
+}
+:root[data-theme="light"] .rail-link,
+:root[data-theme="light"] .rail-head-note,
+:root[data-theme="light"] .rail-overview-link {
+  color: #2458d6;
+  color: color-mix(in srgb, var(--brand, #3369ff) 85%, var(--d50));
+}
+:root[data-theme="light"] .rail-proportion > span {
+  background: var(--brand, #3369ff);
 }

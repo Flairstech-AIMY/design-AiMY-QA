@@ -113,7 +113,12 @@
     function percentage(count, total) {
       return total ? Math.round(count / total * 100) + "%" : "0%";
     }
-    var summary = window.__evalReviewSummary && window.__evalReviewSummary();
+    var hasReviewData = typeof window.__evalReviewSummary === "function";
+    var summary = hasReviewData ? window.__evalReviewSummary() : {
+      awaitingTickets: 21, totalTickets: 24,
+      awaitingCalls: 10, totalCalls: 15,
+      totalDisputes: records.length
+    };
     var selectedTab = $('[data-tbl][aria-selected="true"]');
     var items = [
       { category: "ticket", label: "Tickets", headline: "Tickets need your attention", table: "tickets", count: summary ? summary.awaitingTickets : null, total: summary ? summary.totalTickets : null },
@@ -121,31 +126,46 @@
       { category: "dispute", label: "Disputes", headline: "Disputes need review", table: "justifies", count: open.length, total: summary ? summary.totalDisputes : records.length }
     ];
     $$(".rail-card", entry).forEach(function (card) { card.remove(); });
+    entry.setAttribute("role", "group");
+    entry.setAttribute("aria-label", "Review queues");
     items.forEach(function (item) {
       var card = document.createElement("div");
       card.className = "rail-card rail-review-card";
       card.setAttribute("data-review-table", item.table);
+      card.dataset.reviewSource = hasReviewData ? "queue" : "prototype";
       var metric = document.createElement("p");
       metric.className = "rail-review-metric";
-      var countLabel = item.count + " " + item.category + (item.count === 1 ? "" : "s");
-      var verb = item.count === 1 ? " is" : " are";
       metric.textContent = item.headline;
       if (item.count !== null) {
         metric.textContent = percentage(item.count, item.total) + " of " + item.category + "s need " + (item.category === "ticket" ? "attention" : "review");
       }
-      var detail = document.createElement("p");
-      detail.className = "rail-say";
-      if (item.count === null) detail.textContent = "Review the pending " + item.category + " audits.";
-      else if (item.count === 0) detail.textContent = "No " + item.category + "s are awaiting review.";
-      else detail.textContent = countLabel + verb + " still awaiting your review.";
+      highlightMetric(metric);
       var action = document.createElement("a");
       action.className = "rail-link rail-review-action";
       var target = new URL(href, location.href);
       target.searchParams.set("view", "evals");
       target.searchParams.set("tbl", item.table);
+      if (item.table !== "justifies") target.searchParams.set("verdict", "awaiting");
+      if (item.table === "tickets") target.searchParams.set("channel", "ticket");
+      if (summary && summary.scope) {
+        ["from", "to", "agent"].forEach(function (key) {
+          if (summary.scope[key] && summary.scope[key] !== "all") target.searchParams.set(key, summary.scope[key]);
+        });
+      }
       action.href = target.href;
-      action.textContent = "Review " + item.label;
-      card.append(metric, detail, action);
+      action.textContent = "Review " + item.label.toLowerCase();
+      actionArrow(action);
+      card.append(metric);
+      if (item.count !== null) {
+        var indicator = document.createElement("div");
+        indicator.className = "rail-proportion";
+        indicator.setAttribute("aria-hidden", "true");
+        var fill = document.createElement("span");
+        fill.style.width = percentage(item.count, item.total);
+        indicator.appendChild(fill);
+        card.appendChild(indicator);
+      }
+      card.appendChild(action);
       if (isCurrent && selectedTab && selectedTab.dataset.tbl === item.table) card.setAttribute("aria-current", "page");
       entry.insertBefore(card, $(".nav-item", entry));
     });
@@ -154,7 +174,58 @@
   function refreshReviews() {
     var entry = $('.rail-entry[data-page="agent-scorecards"]');
     if (!entry) return;
+    $$(".rail-selected .rail-review-card").forEach(function (card) { card.remove(); });
     reviewCards(entry, $(".nav-item", entry).getAttribute("href"), entry.classList.contains("is-current"));
+    refreshSelectedCard();
+    refreshInsightHeader();
+  }
+
+  function actionArrow(action) {
+    var arrow = document.createElement("span");
+    arrow.className = "rail-action-arrow";
+    arrow.setAttribute("aria-hidden", "true");
+    arrow.textContent = "\u2192";
+    action.append(" ", arrow);
+  }
+
+  function refreshInsightHeader() {
+    var nav = $(".sidebar-nav");
+    var count = nav && $(".rail-head-count", nav);
+    if (count) count.textContent = $$(".rail-card", nav).length + " insights";
+  }
+
+  function refreshSelectedCard() {
+    var nav = $(".sidebar-nav");
+    if (!nav) return;
+    var selected = $(".rail-selected", nav);
+    var current = $('.rail-review-card[aria-current="page"]', nav) ||
+      $(".rail-entry.is-current .rail-card", nav) ||
+      (selected && selected.firstElementChild);
+    if (!current) return;
+    if (!selected) {
+      selected = document.createElement("div");
+      selected.className = "rail-selected";
+      $(".rail-head", nav).insertAdjacentElement("afterend", selected);
+    }
+    selected.replaceChildren(current);
+    var key = current.dataset.reviewTable || "page";
+    if (key !== lastSelectedKey) {
+      lastSelectedKey = key;
+      playRailMotion(nav);
+    }
+  }
+
+  var lastSelectedKey = null;
+  var motionTimer = 0;
+
+  function playRailMotion(nav) {
+    var rest = $$(".rail-card", nav).filter(function (card) { return !card.closest(".rail-selected"); });
+    rest.forEach(function (card, index) { card.style.setProperty("--rail-i", index); });
+    clearTimeout(motionTimer);
+    nav.classList.remove("rail-motion");
+    void nav.offsetWidth;
+    nav.classList.add("rail-motion");
+    motionTimer = setTimeout(function () { nav.classList.remove("rail-motion"); }, 600 + rest.length * 90);
   }
 
   /* One finding per surface. The braces mark the phrase that becomes the link,
@@ -180,7 +251,8 @@
     "my-profile": {
       metric: "3 days to escalation",
       detail: "Your feedback is waiting for your acknowledgement.",
-      action: "Open My Profile"
+      action: "Open My Profile",
+      deadlineDays: 3
     },
     "goal-browser": {
       metric: "2 pending goal changes",
@@ -199,21 +271,34 @@
     }
   };
 
+  function highlightMetric(metric) {
+    var parts = /^(\d+(?:\.\d+)?%?)\s+(.+)$/.exec(metric.textContent);
+    if (!parts) return;
+    var value = document.createElement("span");
+    value.className = "rail-metric-value";
+    value.textContent = parts[1];
+    metric.replaceChildren(value, document.createTextNode(" " + parts[2]));
+  }
+
   function summaryCard(card, summary, href, isCurrent) {
     var metric = document.createElement("p");
     metric.className = "rail-review-metric";
     metric.textContent = summary.metric;
-    var detail = document.createElement("p");
-    detail.className = "rail-say";
-    detail.textContent = summary.detail;
+    highlightMetric(metric);
     var action = document.createElement(isCurrent ? "span" : "a");
     action.className = isCurrent ? "rail-here-note rail-review-context" : "rail-link rail-review-action";
     action.textContent = isCurrent ? "You are on this page." : summary.action;
     if (isCurrent) action.setAttribute("aria-current", "page");
-    else action.setAttribute("href", href);
+    else {
+      action.setAttribute("href", href);
+      actionArrow(action);
+    }
     card.classList.add("rail-summary-card");
+    if (summary.deadlineDays) {
+      card.dataset.deadlineDays = summary.deadlineDays;
+      card.dataset.railStatus = "warning";
+    }
     card.appendChild(metric);
-    card.appendChild(detail);
     card.appendChild(action);
   }
 
@@ -449,16 +534,12 @@
   function mountHead(nav) {
     var head = document.createElement("div");
     head.className = "rail-head";
-    /* aria-hidden: the marks and the wordmark are decoration over a region that
-       already names itself through the sidebar's `aria-label`. Announcing
-       "AiMY What is where" before every sentence is noise in a screen reader. */
-    head.setAttribute("aria-hidden", "true");
     head.innerHTML =
-      '<span class="rail-head-mark">' +
+      '<span class="rail-head-mark" aria-hidden="true">' +
       '<svg viewBox="0 0 18 20" width="14" height="16"><use href="#aimy-logo-small"/></svg>' +
       "</span>" +
       '<span class="rail-head-label">AiMY</span>' +
-      '<span class="rail-head-note">What is where</span>';
+      '<span class="rail-head-count"></span>';
     nav.insertBefore(head, nav.firstChild);
   }
 
@@ -479,12 +560,12 @@
     toggle.id = "railToggle";
     toggle.setAttribute("aria-expanded", "false");
     toggle.setAttribute("aria-controls", sidebar.id);
-    toggle.setAttribute("aria-label", "Show what is where in QA");
+    toggle.setAttribute("aria-label", "Show QA insights");
     toggle.innerHTML =
       '<svg viewBox="0 0 24 24" aria-hidden="true" stroke-linecap="round" stroke-linejoin="round">' +
       '<line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/>' +
       '<line x1="3" y1="18" x2="21" y2="18"/></svg>' +
-      '<span class="rail-toggle-label">What is where</span>';
+      '<span class="rail-toggle-label">Insights</span>';
     nav.insertBefore(toggle, nav.firstChild);  /* above the attribution */
 
     var scrim = document.createElement("div");
@@ -500,7 +581,7 @@
       sidebar.classList.toggle("is-open", on);
       scrim.classList.toggle("is-open", on);
       toggle.setAttribute("aria-expanded", on ? "true" : "false");
-      toggle.setAttribute("aria-label", on ? "Hide what is where in QA" : "Show what is where in QA");
+      toggle.setAttribute("aria-label", on ? "Hide QA insights" : "Show QA insights");
     }
 
     function close(returnFocus) {
@@ -557,7 +638,7 @@
     /* The rail is not a list of places any more, so it does not get a list's
        label. Read by CSS, and by anything auditing what this region claims to
        be. */
-    sidebar.setAttribute("aria-label", "What is where in QA");
+    sidebar.setAttribute("aria-label", "QA insights");
 
     mountHead(nav);
     build(nav, pageKey(location.pathname));
