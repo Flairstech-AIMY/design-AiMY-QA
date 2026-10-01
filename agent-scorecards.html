@@ -23811,31 +23811,8 @@
 
            Only used when nothing has been raised for real; a live justify
            replaces them. */
-        var SEED_JUSTIFIES = [
-          {
-            id: "JU-201", feedbackId: "fb-201", agent: "Omar Abdallah", evalId: "ev-1042",
-            interaction: "Voice call · May 7", goals: ["Follow-up Confirmation"],
-            reason: "The customer hung up while I was giving the callback number. The recording cuts at 8:31 and the line was already dead — I did give it.",
-            raised: "2 days ago", state: "open"
-          },
-          {
-            id: "JU-202", feedbackId: "fb-206", agent: "Michael Chen", evalId: "ev-1047",
-            interaction: "Ticket · May 10", goals: ["Ticket categorisation", "Survey Promotion"],
-            reason: "This was an internal escalation from Tier 2, not a customer contact. There is nobody to survey and the category list has no option that fits.",
-            raised: "yesterday", state: "open"
-          },
-          {
-            id: "JU-203", feedbackId: "fb-204", agent: "Tariq Mansour", evalId: "ev-1056",
-            interaction: "Voice call · May 15", goals: ["Issue Resolution"],
-            reason: "I could not resolve it because the refund tool was down all morning — it is in the incident log. I raised it and set the callback, which is all that was available to me.",
-            raised: "4 hours ago", state: "open"
-          }
-        ];
-
         function loadJustifies() {
-          try { JUSTIFIES = JSON.parse(localStorage.getItem("aimy-qa-justifies") || "[]"); }
-          catch (e) { JUSTIFIES = []; }
-          if (!JUSTIFIES.length) JUSTIFIES = SEED_JUSTIFIES.map(function (j) { return Object.assign({}, j); });
+          JUSTIFIES = window.aimyReviewDisputes();
           JUSTIFIES.filter(function (j) { return j.state === "open"; }).forEach(function (j) {
             var x = I.filter(function (y) { return y.id === j.evalId; })[0];
             if (x) { x.verdict = "justified"; x.justify = j; }
@@ -24083,6 +24060,7 @@
 
         function paintRows() {
           paintAiState();
+          document.dispatchEvent(new CustomEvent("aimy:reviews-changed"));
           var list = document.getElementById("evalListAccountRows");
           if (!list) return;
 
@@ -24510,7 +24488,7 @@
           var reviewsView = q.get("view") === "evals";
           if (!tab && !verdict && !agent && !reviewsView) return false;
 
-          if (tab === "calls" || tab === "tickets" || tab === "agents") TAB = tab;
+          if (tab === "calls" || tab === "tickets" || tab === "agents" || tab === "justifies") TAB = tab;
           if (verdict === "awaiting" || verdict === "confirmed" || verdict === "overturned") F.verdict = verdict;
           if (agent) F.agent = agent;
 
@@ -25338,6 +25316,8 @@
         /* A decided case has to leave the queue now, not on the next reload. */
         window.__evalResolveJustify = function (juId) {
           JUSTIFIES.forEach(function (j) { if (j.id === juId) j.state = "resolved"; });
+          try { localStorage.setItem("aimy-qa-justifies", JSON.stringify(JUSTIFIES)); } catch (e) {}
+          document.dispatchEvent(new CustomEvent("aimy:reviews-changed"));
           /* The HR pane reads the same store but does not repaint itself. */
           if (window.renderjustifyQueue) window.renderjustifyQueue();
         };
@@ -25348,6 +25328,9 @@
            same disputes came to disagree. */
         window.__evalJustifies = function () {
           return JUSTIFIES.filter(function (j) { return j.state === "open"; });
+        };
+        window.__evalReviewSummary = function () {
+          return { awaitingCalls: I.filter(function (record) { return record.ch === "voice" && record.verdict === "awaiting"; }).length };
         };
         /* An agent raising one. Same record shape the seeds and the
            profile page write, so the queue cannot tell them apart. */

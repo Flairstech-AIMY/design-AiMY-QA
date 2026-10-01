@@ -77,6 +77,86 @@
 
   var RAIL_MQ = "(max-width: 1099.98px)";
 
+  var REVIEW_SEEDS = [
+    {
+      id: "JU-201", feedbackId: "fb-201", agent: "Omar Abdallah", evalId: "ev-1042",
+      interaction: "Voice call · May 7", goals: ["Follow-up Confirmation"],
+      reason: "The customer hung up while I was giving the callback number. The recording cuts at 8:31 and the line was already dead — I did give it.",
+      raised: "2 days ago", state: "open"
+    },
+    {
+      id: "JU-202", feedbackId: "fb-206", agent: "Michael Chen", evalId: "ev-1047",
+      interaction: "Ticket · May 10", goals: ["Ticket categorisation", "Survey Promotion"],
+      reason: "This was an internal escalation from Tier 2, not a customer contact. There is nobody to survey and the category list has no option that fits.",
+      raised: "yesterday", state: "open"
+    },
+    {
+      id: "JU-203", feedbackId: "fb-204", agent: "Tariq Mansour", evalId: "ev-1056",
+      interaction: "Voice call · May 15", goals: ["Issue Resolution"],
+      reason: "I could not resolve it because the refund tool was down all morning — it is in the incident log. I raised it and set the callback, which is all that was available to me.",
+      raised: "4 hours ago", state: "open"
+    }
+  ];
+
+  window.aimyReviewDisputes = function () {
+    var records;
+    try { records = JSON.parse(localStorage.getItem("aimy-qa-justifies") || "null"); }
+    catch (error) { records = null; }
+    if (Array.isArray(records)) return records;
+    return REVIEW_SEEDS.map(function (record) { return Object.assign({}, record); });
+  };
+
+  function reviewCard(card, href, isCurrent) {
+    var open = (window.__evalJustifies ? window.__evalJustifies() : window.aimyReviewDisputes())
+      .filter(function (record) { return record.state === "open"; });
+    var calls = open.filter(function (record) {
+      var evaluation = window.__evalRecord && window.__evalRecord(record.evalId);
+      return evaluation ? evaluation.ch === "voice" : /\b(voice|call)\b/i.test(record.interaction || "");
+    }).length;
+    var metric = document.createElement("p");
+    metric.className = "rail-review-metric";
+    metric.textContent = open.length + (open.length === 1 ? " open dispute" : " open disputes");
+    var detail = document.createElement("p");
+    detail.className = "rail-say";
+    detail.textContent = open.length
+      ? calls + (calls === 1 ? " call dispute" : " call disputes") + " need a decision."
+      : "No disputes waiting on a decision.";
+    if (calls === 0 && open.length) detail.textContent = "Non-call interactions need a decision.";
+    var oldest = open[open.length - 1];
+    var ages = { "yesterday": 24, "just now": 0 };
+    function age(record) {
+      var label = String(record.raised || "").toLowerCase();
+      if (Object.prototype.hasOwnProperty.call(ages, label)) return ages[label];
+      var match = label.match(/(\d+)\s+(day|hour|minute)/);
+      return match ? Number(match[1]) * (match[2] === "day" ? 24 : match[2] === "minute" ? 1 / 60 : 1) : -1;
+    }
+    open.forEach(function (record) { if (age(record) > age(oldest)) oldest = record; });
+    var context = document.createElement("p");
+    context.className = "rail-review-context";
+    if (oldest && oldest.raised) context.textContent = "Oldest raised " + oldest.raised + ".";
+    var summary = window.__evalReviewSummary && window.__evalReviewSummary();
+    if (summary) context.textContent += (context.textContent ? " " : "") + summary.awaitingCalls + " calls awaiting review.";
+    var action = document.createElement("a");
+    action.className = "rail-link rail-review-action";
+    var target = new URL(href, location.href);
+    target.searchParams.set("view", "evals");
+    target.searchParams.set("tbl", open.length ? "justifies" : "calls");
+    if (!open.length) target.searchParams.set("verdict", "awaiting");
+    action.href = target.href;
+    action.textContent = open.length ? "Review disputes" : "Review waiting calls";
+    card.replaceChildren(metric, detail);
+    if (context.textContent) card.appendChild(context);
+    card.appendChild(action);
+    card.classList.add("rail-review-card");
+    if (isCurrent) card.setAttribute("aria-current", "page");
+  }
+
+  function refreshReviews() {
+    var entry = $('.rail-entry[data-page="agent-scorecards"]');
+    if (!entry) return;
+    reviewCard($(".rail-card", entry), $(".nav-item", entry).getAttribute("href"), entry.classList.contains("is-current"));
+  }
+
   /* One finding per surface. The braces mark the phrase that becomes the link,
      written inline so the line reads as a line while you are editing it.
 
@@ -90,19 +170,52 @@
      figure. Both are cut out and turned into elements by `sentence()`, which
      builds text nodes rather than assigning innerHTML — see the note there. */
   var PAGES = {
-    "index":
-      "{Open Dashboard} — SLA compliance is running *29 points* under target.",
+    "index": {
+      metric: "29 points below target",
+      detail: "SLA compliance is running below its goal.",
+      action: "Open Dashboard"
+    },
     "agent-scorecards":
       "{Open Reviews} — *5 agents* are failing Follow-up Confirmation and need coaching.",
-    "my-profile":
-      "{Open My Profile} — Your feedback escalates in *3 days* unless you acknowledge it.",
-    "goal-browser":
-      "{Open Goal Hub} — *2 goal change requests* are waiting on your decision.",
-    "data-ingestion":
-      "{Open Data} — S3 Voice has failed *3 times* in 24 hours.",
-    "settings":
-      "{Open Settings} — *3 integrations* are still not connected."
+    "my-profile": {
+      metric: "3 days to escalation",
+      detail: "Your feedback is waiting for your acknowledgement.",
+      action: "Open My Profile"
+    },
+    "goal-browser": {
+      metric: "2 pending goal changes",
+      detail: "Change requests are waiting on your decision.",
+      action: "Open Goal Hub"
+    },
+    "data-ingestion": {
+      metric: "3 failures in 24 hours",
+      detail: "S3 Voice ingestion needs attention.",
+      action: "Open Data"
+    },
+    "settings": {
+      metric: "3 unconnected integrations",
+      detail: "These connections still need to be set up.",
+      action: "Open Settings"
+    }
   };
+
+  function summaryCard(card, summary, href, isCurrent) {
+    var metric = document.createElement("p");
+    metric.className = "rail-review-metric";
+    metric.textContent = summary.metric;
+    var detail = document.createElement("p");
+    detail.className = "rail-say";
+    detail.textContent = summary.detail;
+    var action = document.createElement(isCurrent ? "span" : "a");
+    action.className = isCurrent ? "rail-here-note rail-review-context" : "rail-link rail-review-action";
+    action.textContent = isCurrent ? "You are on this page." : summary.action;
+    if (isCurrent) action.setAttribute("aria-current", "page");
+    else action.setAttribute("href", href);
+    card.classList.add("rail-summary-card");
+    card.appendChild(metric);
+    card.appendChild(detail);
+    card.appendChild(action);
+  }
 
   function $(sel, root) {
     return (root || document).querySelector(sel);
@@ -289,7 +402,11 @@
            the way its own host expects; the rail borrows that verbatim so it
            can never disagree with the rest of the page about where a
            destination lives. */
-        card.appendChild(sentence(PAGES[key], a.getAttribute("href"), key === page));
+        if (typeof PAGES[key] === "object") {
+          summaryCard(card, PAGES[key], a.getAttribute("href"), key === page);
+        } else {
+          card.appendChild(sentence(PAGES[key], a.getAttribute("href"), key === page));
+        }
         entry.appendChild(card);
       }
 
@@ -444,9 +561,14 @@
 
     mountHead(nav);
     build(nav, pageKey(location.pathname));
+    refreshReviews();
     mountDrawer(sidebar, nav);
   }
 
+  document.addEventListener("aimy:reviews-changed", refreshReviews);
+  window.addEventListener("storage", function (event) {
+    if (event.key === "aimy-qa-justifies" || event.key === null) refreshReviews();
+  });
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
   else boot();
 
