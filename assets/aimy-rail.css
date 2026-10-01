@@ -186,7 +186,8 @@
   border-color: rgba(0, 102, 255, 0.22);
 }
 /* The one you are standing in reads as settled rather than offered. */
-:root .rail-entry.is-current .rail-card {
+:root .rail-entry.is-current .rail-card:not(.rail-review-card),
+:root .rail-review-card[aria-current="page"] {
   background: var(--wash-3);
   border-color: var(--wash-6);
 }
@@ -197,6 +198,9 @@
   flex-direction: column;
   gap: 6px;
   border-radius: 8px;
+}
+:root .rail-review-card + .rail-review-card {
+  margin-top: 7px;
 }
 :root .rail-review-title {
   color: var(--d300);
@@ -386,6 +390,9 @@
 @media (max-width: 1099.98px) {
 
   /* ── THE COLLAPSED 64px RAIL ── */
+  :root .app-sidebar:not(.is-open) .rail-review-card {
+    display: none;
+  }
   :root .app-sidebar:not(.is-open) .rail-say,
   :root .app-sidebar:not(.is-open) .rail-head {
     display: none;
