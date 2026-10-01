@@ -25330,7 +25330,10 @@
           return JUSTIFIES.filter(function (j) { return j.state === "open"; });
         };
         window.__evalReviewSummary = function () {
-          return { awaitingCalls: I.filter(function (record) { return record.ch === "voice" && record.verdict === "awaiting"; }).length };
+          return {
+            awaitingTickets: I.filter(function (record) { return record.ch === "ticket" && record.verdict === "awaiting"; }).length,
+            awaitingCalls: I.filter(function (record) { return record.ch === "voice" && record.verdict === "awaiting"; }).length
+          };
         };
         /* An agent raising one. Same record shape the seeds and the
            profile page write, so the queue cannot tell them apart. */

@@ -118,10 +118,13 @@
     metric.textContent = open.length + (open.length === 1 ? " open dispute" : " open disputes");
     var detail = document.createElement("p");
     detail.className = "rail-say";
+    var tickets = open.length - calls;
+    var disputeCounts = [];
+    if (tickets) disputeCounts.push(tickets + (tickets === 1 ? " ticket audit dispute" : " ticket audit disputes"));
+    if (calls) disputeCounts.push(calls + (calls === 1 ? " call audit dispute" : " call audit disputes"));
     detail.textContent = open.length
-      ? calls + (calls === 1 ? " call dispute" : " call disputes") + " need a decision."
+      ? disputeCounts.join(" and ") + (open.length === 1 ? " needs a decision." : " need a decision.")
       : "No disputes waiting on a decision.";
-    if (calls === 0 && open.length) detail.textContent = "Non-call interactions need a decision.";
     var oldest = open[open.length - 1];
     var ages = { "yesterday": 24, "just now": 0 };
     function age(record) {
@@ -135,7 +138,7 @@
     context.className = "rail-review-context";
     if (oldest && oldest.raised) context.textContent = "Oldest raised " + oldest.raised + ".";
     var summary = window.__evalReviewSummary && window.__evalReviewSummary();
-    if (summary) context.textContent += (context.textContent ? " " : "") + summary.awaitingCalls + " calls awaiting review.";
+    if (summary) context.textContent += (context.textContent ? " " : "") + summary.awaitingTickets + " ticket audits and " + summary.awaitingCalls + " call audits awaiting review.";
     var action = document.createElement("a");
     action.className = "rail-link rail-review-action";
     var target = new URL(href, location.href);
