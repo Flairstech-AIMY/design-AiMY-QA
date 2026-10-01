@@ -106,58 +106,55 @@
     return REVIEW_SEEDS.map(function (record) { return Object.assign({}, record); });
   };
 
-  function reviewCard(card, href, isCurrent) {
-    var open = (window.__evalJustifies ? window.__evalJustifies() : window.aimyReviewDisputes())
+  function reviewCards(entry, href, isCurrent) {
+    var records = window.aimyReviewDisputes();
+    var open = (window.__evalJustifies ? window.__evalJustifies() : records)
       .filter(function (record) { return record.state === "open"; });
-    var calls = open.filter(function (record) {
-      var evaluation = window.__evalRecord && window.__evalRecord(record.evalId);
-      return evaluation ? evaluation.ch === "voice" : /\b(voice|call)\b/i.test(record.interaction || "");
-    }).length;
-    var metric = document.createElement("p");
-    metric.className = "rail-review-metric";
-    metric.textContent = open.length + (open.length === 1 ? " open dispute" : " open disputes");
-    var detail = document.createElement("p");
-    detail.className = "rail-say";
-    var tickets = open.length - calls;
-    var disputeCounts = [];
-    if (tickets) disputeCounts.push(tickets + (tickets === 1 ? " ticket audit dispute" : " ticket audit disputes"));
-    if (calls) disputeCounts.push(calls + (calls === 1 ? " call audit dispute" : " call audit disputes"));
-    detail.textContent = open.length
-      ? disputeCounts.join(" and ") + (open.length === 1 ? " needs a decision." : " need a decision.")
-      : "No disputes waiting on a decision.";
-    var oldest = open[open.length - 1];
-    var ages = { "yesterday": 24, "just now": 0 };
-    function age(record) {
-      var label = String(record.raised || "").toLowerCase();
-      if (Object.prototype.hasOwnProperty.call(ages, label)) return ages[label];
-      var match = label.match(/(\d+)\s+(day|hour|minute)/);
-      return match ? Number(match[1]) * (match[2] === "day" ? 24 : match[2] === "minute" ? 1 / 60 : 1) : -1;
+    function percentage(count, total) {
+      return total ? Math.round(count / total * 100) + "%" : "0%";
     }
-    open.forEach(function (record) { if (age(record) > age(oldest)) oldest = record; });
-    var context = document.createElement("p");
-    context.className = "rail-review-context";
-    if (oldest && oldest.raised) context.textContent = "Oldest raised " + oldest.raised + ".";
     var summary = window.__evalReviewSummary && window.__evalReviewSummary();
-    if (summary) context.textContent += (context.textContent ? " " : "") + summary.awaitingTickets + " ticket audits and " + summary.awaitingCalls + " call audits awaiting review.";
-    var action = document.createElement("a");
-    action.className = "rail-link rail-review-action";
-    var target = new URL(href, location.href);
-    target.searchParams.set("view", "evals");
-    target.searchParams.set("tbl", open.length ? "justifies" : "calls");
-    if (!open.length) target.searchParams.set("verdict", "awaiting");
-    action.href = target.href;
-    action.textContent = open.length ? "Review disputes" : "Review waiting calls";
-    card.replaceChildren(metric, detail);
-    if (context.textContent) card.appendChild(context);
-    card.appendChild(action);
-    card.classList.add("rail-review-card");
-    if (isCurrent) card.setAttribute("aria-current", "page");
+    var selectedTab = $('[data-tbl][aria-selected="true"]');
+    var items = [
+      { category: "ticket", label: "Tickets", headline: "Tickets need your attention", table: "tickets", count: summary ? summary.awaitingTickets : null, total: summary ? summary.totalTickets : null },
+      { category: "call", label: "Calls", headline: "Calls are waiting for review", table: "calls", count: summary ? summary.awaitingCalls : null, total: summary ? summary.totalCalls : null },
+      { category: "dispute", label: "Disputes", headline: "Disputes need review", table: "justifies", count: open.length, total: summary ? summary.totalDisputes : records.length }
+    ];
+    $$(".rail-card", entry).forEach(function (card) { card.remove(); });
+    items.forEach(function (item) {
+      var card = document.createElement("div");
+      card.className = "rail-card rail-review-card";
+      card.setAttribute("data-review-table", item.table);
+      var metric = document.createElement("p");
+      metric.className = "rail-review-metric";
+      var countLabel = item.count + " " + item.category + (item.count === 1 ? "" : "s");
+      var verb = item.count === 1 ? " is" : " are";
+      metric.textContent = item.headline;
+      if (item.count !== null) {
+        metric.textContent = percentage(item.count, item.total) + " of " + item.category + "s need " + (item.category === "ticket" ? "attention" : "review");
+      }
+      var detail = document.createElement("p");
+      detail.className = "rail-say";
+      if (item.count === null) detail.textContent = "Review the pending " + item.category + " audits.";
+      else if (item.count === 0) detail.textContent = "No " + item.category + "s are awaiting review.";
+      else detail.textContent = countLabel + verb + " still awaiting your review.";
+      var action = document.createElement("a");
+      action.className = "rail-link rail-review-action";
+      var target = new URL(href, location.href);
+      target.searchParams.set("view", "evals");
+      target.searchParams.set("tbl", item.table);
+      action.href = target.href;
+      action.textContent = "Review " + item.label;
+      card.append(metric, detail, action);
+      if (isCurrent && selectedTab && selectedTab.dataset.tbl === item.table) card.setAttribute("aria-current", "page");
+      entry.insertBefore(card, $(".nav-item", entry));
+    });
   }
 
   function refreshReviews() {
     var entry = $('.rail-entry[data-page="agent-scorecards"]');
     if (!entry) return;
-    reviewCard($(".rail-card", entry), $(".nav-item", entry).getAttribute("href"), entry.classList.contains("is-current"));
+    reviewCards(entry, $(".nav-item", entry).getAttribute("href"), entry.classList.contains("is-current"));
   }
 
   /* One finding per surface. The braces mark the phrase that becomes the link,

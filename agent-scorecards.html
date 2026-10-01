@@ -23780,6 +23780,15 @@
           { id: "ev-1071", fails: ["g-resolution", "g-survey"], agent: "Omar Abdallah", d: "2026-05-23", ch: "chat",   score: 64, st: "fail",   conf: "high", sent: "neg", verdict: "awaiting",   detail: "eval-detail-human", sum: "Closed the chat while the customer was still typing." },
           { id: "ev-1072", fails: [], agent: "Sarah Reyes",   d: "2026-05-23", ch: "voice",  score: 99, st: "pass",   conf: "high", sent: "pos", verdict: "confirmed",  detail: "eval-detail-human", sum: "Textbook handling of a billing escalation." }
         ];
+        var pendingSamples = I.filter(function (record) { return record.verdict === "awaiting" && record.agent !== "AiMY"; });
+        var nextSampleId = 1073;
+        [{ channel: "ticket", count: 17 }, { channel: "voice", count: 5 }].forEach(function (batch) {
+          var templates = pendingSamples.filter(function (record) { return record.ch === batch.channel; });
+          for (var sampleIndex = 0; sampleIndex < batch.count; sampleIndex++) {
+            var template = templates[sampleIndex % templates.length];
+            I.push(Object.assign({}, template, { id: "ev-" + nextSampleId++, fails: template.fails.slice() }));
+          }
+        });
 
         var CH_LABEL = { voice: "Voice", chat: "Chat", email: "Email", ticket: "Ticket" };
         var ST_LABEL = { pass: "Pass", fail: "Fail", border: "Borderline" };
@@ -24370,6 +24379,7 @@
               b.setAttribute("aria-selected", on ? "true" : "false");
             });
             repaint();
+            document.dispatchEvent(new CustomEvent("aimy:reviews-changed"));
             return;
           }
 
@@ -25331,6 +25341,9 @@
         };
         window.__evalReviewSummary = function () {
           return {
+            totalTickets: I.filter(function (record) { return record.ch === "ticket"; }).length,
+            totalCalls: I.filter(function (record) { return record.ch === "voice"; }).length,
+            totalDisputes: JUSTIFIES.length,
             awaitingTickets: I.filter(function (record) { return record.ch === "ticket" && record.verdict === "awaiting"; }).length,
             awaitingCalls: I.filter(function (record) { return record.ch === "voice" && record.verdict === "awaiting"; }).length
           };
