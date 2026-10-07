@@ -373,7 +373,11 @@
      after the first message; here it is a scroll handler and works both ways. */
   function markEnd(th) {
     var atEnd = th.scrollHeight - th.scrollTop - th.clientHeight < 4;
+    var scrolled = th.scrollTop > 4;
     th.classList.toggle("is-at-end", atEnd);
+    th.classList.toggle("is-scrolled", scrolled);
+    var overlay = th.closest(".aimy-overlay");
+    if (overlay) overlay.classList.toggle("thread-scrolled", scrolled);
   }
 
   /* ═══ THE COLUMN ═══ (sales.js:13710-13802, copied) */
@@ -436,9 +440,13 @@
     var found = recent.filter(function (k) { return k === here || hits(k); });
 
     host.innerHTML =
-      '<button class="btn btn-brand btn-sm ov-chat-new" type="button" data-newchat aria-label="New conversation">'
-      + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>'
-      + "New</button>"
+      '<button class="btn btn-brand btn-sm ov-chat-new" type="button" data-newchat aria-label="New chat">'
+      + '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">'
+      + '<path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>'
+      + '<path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"/>'
+      + '</svg>'
+      + '<span class="ov-chat-new-label">New chat</span>'
+        + '</button>'
       + '<label class="ov-chat-find">'
       + '<span class="s-sr">Find a conversation</span>'
       + '<input class="ov-chat-input" type="search" id="chatFind" placeholder="Find a conversation&hellip;"'
@@ -560,6 +568,23 @@
   }
 
   /* ═══ EVENTS ═══ */
+
+  document.addEventListener("keydown", function (e) {
+    if (e.defaultPrevented || e.isComposing || e.repeat) return;
+    if (!(e.ctrlKey && e.altKey) || e.shiftKey || e.metaKey || String(e.key).toLowerCase() !== "n") return;
+    var describeButton = $("#fpDescribeBtn");
+    if (describeButton) {
+      e.preventDefault();
+      describeButton.click();
+      return;
+    }
+    var overlay = $("#aimyOverlay");
+    if (!overlay || !overlay.classList.contains("open")) return;
+    var newChat = overlay.querySelector("[data-newchat]");
+    if (!newChat) return;
+    e.preventDefault();
+    newChat.click();
+  });
 
   document.addEventListener("input", function (e) {
     if (e.target && e.target.id === "chatFind") { CHAT_Q = e.target.value; paintChats(); }

@@ -1,0 +1,83 @@
+{
+  "version": 1,
+  "skills": {
+    "custom-icons": {
+      "source": "jkc66/custom-icons-skill",
+      "sourceType": "github",
+      "skillPath": "skills/SKILL.md",
+      "computedHash": "86a496ca540f5a610b46323d26389dff78f20bd920d79f957dffefd2e3409631"
+    },
+    "jira-ai-behavior-story": {
+      "source": "Flairstech-AIMY/jira-skills",
+      "sourceType": "github",
+      "skillPath": "skills/jira-ai-behavior-story/SKILL.md",
+      "computedHash": "76b8d471fd5710519b76d15f6910099133a0766799d1863888b80e14affa6c5e"
+    },
+    "jira-database-deployment": {
+      "source": "Flairstech-AIMY/jira-skills",
+      "sourceType": "github",
+      "skillPath": "skills/jira-database-deployment/SKILL.md",
+      "computedHash": "87d4cf8b3e3b7b7966c65d1d7db1c91039cabcdb8e1af43e3c04cf9ee21a7c7b"
+    },
+    "jira-description-format": {
+      "source": "Flairstech-AIMY/jira-skills",
+      "sourceType": "github",
+      "skillPath": "skills/jira-description-format/SKILL.md",
+      "computedHash": "0245e791eeb5ee786131aaed85780c6d0d27c1d5ef78f30bb6a6fab00b17c9e8"
+    },
+    "jira-feature-breakdown": {
+      "source": "Flairstech-AIMY/jira-skills",
+      "sourceType": "github",
+      "skillPath": "skills/jira-feature-breakdown/SKILL.md",
+      "computedHash": "d2d10f994ad10d9325343f8d4a80e60dd3da1b6a7f727990fb960596208c8f06"
+    },
+    "jira-implementation-neutral-task-breakdown": {
+      "source": "Flairstech-AIMY/jira-skills",
+      "sourceType": "github",
+      "skillPath": "skills/jira-implementation-neutral-task-breakdown/SKILL.md",
+      "computedHash": "d224c982434bf738b412d714b1b2e69a900cc5d69e2a2c8e981b2fc0a093af13"
+    },
+    "jira-product-owner": {
+      "source": "Flairstech-AIMY/jira-skills",
+      "sourceType": "github",
+      "skillPath": "skills/jira-product-owner/SKILL.md",
+      "computedHash": "396afe09477aea9011b884e91a0e17dc75e2c7d76c9ce8db309b65babe30bf92"
+    },
+    "jira-production-incident": {
+      "source": "Flairstech-AIMY/jira-skills",
+      "sourceType": "github",
+      "skillPath": "skills/jira-production-incident/SKILL.md",
+      "computedHash": "ff4404c165308de087ca580b32cfe3ab0962d7cc4428fff7b3e718340207ba11"
+    },
+    "jira-ticket-refiner": {
+      "source": "Flairstech-AIMY/jira-skills",
+      "sourceType": "github",
+      "skillPath": "skills/jira-ticket-refiner/SKILL.md",
+      "computedHash": "ef8e241896339f79264ab7318daae2e2335926a1a82c6c27bcb251968647358e"
+    },
+    "jira-ticket-writer": {
+      "source": "Flairstech-AIMY/jira-skills",
+      "sourceType": "github",
+      "skillPath": "skills/jira-ticket-writer/SKILL.md",
+      "computedHash": "531bc574b21d9e524fab34d6a7c08c75d1801bcf56969c9ca3fdc33cde3fcdbe"
+    },
+    "jira-user-outcome-story-refiner": {
+      "source": "Flairstech-AIMY/jira-skills",
+      "sourceType": "github",
+      "skillPath": "skills/jira-user-outcome-story-refiner/SKILL.md",
+      "computedHash": "76dd7d0c6ce629a0788215d2e4ba176b96a55e9b0ee785c54826e42df621ccdd"
+    },
+    "mads-project-management": {
+      "source": "Flairstech-AIMY/jira-skills",
+      "sourceType": "github",
+      "skillPath": "skills/mads-project-management/SKILL.md",
+      "computedHash": "0dc9d4366860247887c50020d80248eda22c9aea71c2048e41a898718e8998da"
+    },
+    "micro-interactions": {
+      "source": "solinkz/micro-interactions-skill",
+      "sourceType": "github",
+      "skillPath": "skills/micro-interactions/SKILL.md",
+      "computedHash": "0e7a87532cd1f287d2d8d3f92a8fa0803e6af637b64ae68f0f7a3b9cc6cde37c"
+    }
+  }
+}

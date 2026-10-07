@@ -26,5 +26,8 @@
   "devDependencies": {
     "@storybook/html-vite": "^10.6.0",
     "storybook": "^10.6.0"
+  },
+  "dependencies": {
+    "lucide-react": "^1.52.0"
   }
 }
