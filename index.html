@@ -11,13 +11,21 @@
 
           /* Product scope, pre-paint for the same reason. The scope bar's
              trigger label is rendered by CSS off this attribute, so a
-             persisted scope never flashes "All products" first. Whitelisted:
-             a stale value leaves the attribute off and the
-             :root:not([data-scope]) rule falls back to All products. */
+             persisted scope never flashes "All products" first. The value is
+             a JSON array of product ids (empty = all); a legacy plain single
+             id is still accepted. Anything unrecognised resolves to 'all'. */
           var s = localStorage.getItem('aimy-qa-scope');
-          if (s === 'all' || s === 'upland' || s === 'asteris' || s === 'secondstreet') {
-            document.documentElement.setAttribute('data-scope', s);
+          var scopeList = [];
+          if (s) {
+            if (s.charAt(0) === '[') {
+              try { var parsedScope = JSON.parse(s); if (Array.isArray(parsedScope)) scopeList = parsedScope; } catch (e) {}
+            } else scopeList = [s];
           }
+          scopeList = scopeList.filter(function (v) {
+            return v === 'upland' || v === 'asteris' || v === 'secondstreet';
+          });
+          document.documentElement.setAttribute('data-scope',
+            scopeList.length === 0 ? 'all' : scopeList.length === 1 ? scopeList[0] : 'multi');
         } catch (e) {}
       })();
     </script>
@@ -1046,57 +1054,6 @@
         background-size: 200% 100%;
         animation: glassShimmer 4s linear 2;
       }
-      .interaction-type-filter {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        margin-bottom: 0;
-        min-width: 0;
-      }
-      .interaction-type-label {
-        color: var(--d300);
-        font-size: 12px;
-        font-weight: 600;
-        white-space: nowrap;
-      }
-      .interaction-type-toggle {
-        display: inline-flex;
-        align-items: center;
-        gap: 2px;
-        padding: 3px;
-        background: transparent;
-        border: 0;
-        border-radius: 8px;
-        box-shadow: none;
-        min-width: 0;
-      }
-      .interaction-type-option {
-        border: 1px solid transparent;
-        border-radius: var(--r-pill);
-        background: transparent;
-        color: var(--d400);
-        cursor: pointer;
-        font: 600 12px/1.2 var(--font-sans);
-        padding: 5px 11px;
-        white-space: nowrap;
-        transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
-      }
-      .interaction-type-option:hover { color: var(--d200); background: var(--wash-3); }
-      .interaction-type-option:active { transform: scale(0.98); }
-      .interaction-type-option[aria-checked="true"] {
-        color: var(--d50);
-        background: var(--qa-accent-dim);
-        border-color: rgba(var(--qa-accent-rgb), 0.28);
-      }
-      .interaction-type-option:focus-visible {
-        outline: 2px solid var(--qa-accent);
-        outline-offset: 2px;
-      }
-      @media (max-width: 560px) {
-        .interaction-type-filter { align-items: flex-start; flex-direction: column; gap: 5px; }
-        .interaction-type-toggle { width: 100%; }
-        .interaction-type-option { flex: 1; }
-      }
       .active-filter-strip.visible { display: flex; }
 
       .afs-label {
@@ -1179,6 +1136,7 @@
       .filter-tray-inner {
         display: flex;
         align-items: center;
+        flex-wrap: wrap;
         gap: 5px;
         background: rgba(14, 20, 30, 0.75);
         border: 1px solid rgba(99, 169, 255, 0.10);
@@ -1190,7 +1148,7 @@
           inset 0 1px 0 var(--wash-5),
           0 4px 20px rgba(0,0,0,0.35),
           0 0 24px rgba(51,105,255,0.06);
-        max-width: 760px;
+        max-width: min(880px, calc(100vw - 32px));
         width: 100%;
         position: relative;
         overflow: hidden;
@@ -1228,10 +1186,15 @@
         padding-right: 7px;
         border-right: 1px solid var(--wash-6);
         margin-right: 1px;
-        flex-shrink: 0;
+        flex: 0 0 auto;
+        border-right: 1px solid var(--wash-6);
+        padding-right: 7px;
+        margin: 0 1px 0 0;
+        color: rgba(99,169,255,0.7);
         position: relative;
         z-index: 1;
       }
+      .filter-tray-prompts .filter-tray-label { flex: 0 0 auto; }
       .filter-chip {
         background: var(--wash-3);
         border: 1px solid var(--wash-7);
@@ -1263,34 +1226,15 @@
           0 0 10px rgba(51,105,255,0.12);
       }
       .filter-chip:active  { transform: translateY(0) scale(0.97); }
-      /* Back chip in contextual mode */
-      .filter-chip-back {
-        color: var(--d400);
-        border-color: var(--wash-7);
-        font-size: 10px;
-        padding: 4px 10px;
-        flex-shrink: 0;
-      }
-      .filter-chip-back:hover {
-        color: var(--d200);
-        background: var(--wash-4);
-        transform: none;
-      }
-      /* Suggestion pills, product/agent/time names */
-      .filter-chip-sugg {
-        color: var(--d200);
-        border-color: var(--wash-8);
-      }
-      .filter-chip-sugg:hover {
-        color: var(--d50);
-        background: rgba(var(--qa-accent-rgb), 0.12);
-        border-color: rgba(var(--qa-accent-rgb), 0.3);
-        transform: translateY(-1px);
-      }
-      .filter-chip.pressed {
-        background: rgba(139,79,244,0.10);
-        border-color: rgba(139,79,244,0.28);
-        color: rgba(210,185,255,0.9);
+      .filter-tray-prompts { display: flex; align-items: center; flex: 1 0 100%; flex-wrap: nowrap; gap: 5px; min-width: 0; padding-top: 5px; border-top: 1px solid var(--wash-6); position: relative; z-index: 1; }
+      .filter-tray-prompt-label { color: var(--d400); font-size: 9px; font-weight: 700; letter-spacing: 0.04em; white-space: nowrap; padding-right: 2px; }
+      .filter-chip-prompt { color: var(--d300); border-color: rgba(97,173,241,0.18); background: rgba(97,173,241,0.055); font-size: 10px; padding: 4px 9px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+      .filter-chip-prompt:hover { color: var(--d50); background: rgba(97,173,241,0.14); border-color: rgba(97,173,241,0.34); }
+      @media (max-width: 600px) {
+        .filter-tray-inner { max-height: min(180px, 35vh); overflow-y: auto; }
+        .filter-tray-prompts { align-items: flex-start; overflow-x: auto; flex-wrap: nowrap; scrollbar-width: none; }
+        .filter-tray-prompts::-webkit-scrollbar { display: none; }
+        .filter-chip-prompt { flex: 0 0 auto; }
       }
       /* ── GRID OPTION A (Asymmetrical Split) ── */
       .tier-1-grid {
@@ -3057,7 +3001,7 @@
       .ai-insight[data-severity="positive"] { --ins-tone: var(--ok); }
       .ai-insight[data-severity] {
         background:
-          linear-gradient(135deg, color-mix(in srgb, var(--ins-tone) 12%, transparent) 0%, color-mix(in srgb, var(--ins-tone) 4%, transparent) 45%, transparent 78%),
+          linear-gradient(90deg, color-mix(in srgb, var(--ins-tone) 17%, transparent) 0%, color-mix(in srgb, var(--ins-tone) 7%, transparent) calc(var(--pct, 0) * 1%), transparent calc(var(--pct, 0) * 1% + 14%)),
           linear-gradient(180deg, var(--wash-2) 0%, transparent 55%),
           color-mix(in srgb, var(--card-bg) 85%, transparent);
         box-shadow: inset 0 1px 0 var(--wash-4);
@@ -4219,6 +4163,19 @@
         line-height: 1.6;
         color: var(--d50);
       }
+      .qa-chat-filter-card { display: grid; gap: 9px; min-width: min(320px, 72vw); padding: 11px 12px; border: 1px solid var(--card-border); border-radius: 10px; background: var(--wash-2); }
+      .qa-chat-filter-card[data-state="needs-clarification"] { border-color: rgba(247,144,9,0.28); }
+      .qa-chat-filter-title { color: var(--d50); font-size: 12px; font-weight: 700; }
+      .qa-chat-filter-copy { margin: 0; color: var(--d300); font-size: 11px; line-height: 1.5; }
+      .qa-chat-filter-changes { display: flex; flex-wrap: wrap; gap: 5px; }
+      .qa-chat-filter-chip { padding: 4px 7px; border: 1px solid var(--wash-7); border-radius: 999px; background: var(--brand-dim); color: var(--d200); font-size: 10px; }
+      .qa-chat-filter-actions { display: flex; align-items: center; gap: 6px; }
+      .qa-chat-filter-status { margin-left: auto; color: var(--d400); font-size: 10px; }
+      .qa-chat-filter-card button { min-height: 27px; padding: 0 9px; border: 0; border-radius: 7px; background: transparent; color: var(--d300); font: 600 10px var(--font-sans); cursor: pointer; }
+      .qa-chat-filter-card button:hover { background: var(--wash-4); color: var(--d50); }
+      .qa-chat-filter-card button[data-qa-filter-apply] { background: var(--brand); color: #fff; }
+      .qa-chat-filter-card button[data-qa-filter-apply]:disabled { opacity: .45; cursor: not-allowed; }
+      .qa-chat-filter-card button:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
       .typing-dots span {
         width: 6px;
         height: 6px;
@@ -7008,8 +6965,9 @@
            .app-topnav (100). */
         z-index: 20;
         display: flex;
-        align-items: center;
-        justify-content: flex-end;         /* control sits at the right edge */
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: flex-start;       /* filters align with the content's left edge */
         padding: 10px var(--gps-pad-x);
         /* No fill and no hairline: the bar is a positioning shell only, so the
            page background and the #appEllipse glow read straight through it,
@@ -7018,84 +6976,111 @@
         font-family: "Urbanist", sans-serif;
       }
       .gps-controls {
-        display: flex; align-items: center; gap: 8px;
-        min-width: 0; max-width: 100%;
+        display: flex; align-items: center; gap: 4px;
+        width: 100%; min-width: 0; max-width: 100%;
       }
-      .gps-filter-btn {
-        display: inline-flex; align-items: center; gap: 7px;
-        min-height: 32px; padding: 5px 10px;
-        background: var(--wash-3); border: 1px solid var(--wash-6);
+      .gps-action-group { display: flex; align-items: center; gap: 4px; margin-left: auto; flex-shrink: 0; }
+      .gps-action-group .gps-export-btn { flex-shrink: 0; }
+      .gps-views-btn { color: var(--d300); }
+      .fp-applied-filters {
+        display: flex; align-items: center; flex-wrap: wrap; gap: 8px;
+        width: 100%; min-width: 0; margin-top: 8px;
+      }
+      .fp-applied-filters[hidden] { display: none; }
+      .fp-applied-pill {
+        display: inline-flex; align-items: center; min-width: 0; max-width: 100%;
+        background: var(--brand-dim); border-radius: 999px;
+      }
+      .fp-applied-edit, .fp-applied-reset {
+        border: 0; background: transparent; color: var(--d300);
+        font-family: inherit; font-size: 12px; line-height: 1.4;
+        cursor: pointer; border-radius: 999px; min-height: 28px;
+      }
+      .fp-applied-edit {
+        min-width: 0; padding: 4px 12px;
+        overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      }
+      .fp-applied-edit b { color: var(--ai-text); }
+      .fp-applied-reset { padding: 4px 10px; }
+      .fp-applied-edit:hover, .fp-applied-reset:hover {
+        background: var(--wash-4); color: var(--d50);
+      }
+      .fp-applied-filters button:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+      /* Toolbar triggers: no border, transparent at rest, tinted when a
+         non-default value is applied or the popover is open. */
+      .gps-filter-btn, .gps-export-btn, .gps-btn {
+        display: inline-flex; align-items: center; gap: 6px;
+        min-height: 30px; min-width: 0; padding: 0 9px;
+        background: transparent; border: 0;
         border-radius: 8px; color: var(--d300);
         font-family: inherit; font-size: 12px; font-weight: 600;
-        line-height: 1.4; white-space: nowrap; cursor: pointer;
-        transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
+        line-height: 1.4; white-space: nowrap; text-align: left; cursor: pointer;
+        transition: background var(--transition-fast), color var(--transition-fast);
       }
-      .gps-filter-btn:hover { background: var(--wash-6); color: var(--d50); }
-      .gps-filter-btn:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+      .gps-filter-btn:hover, .gps-export-btn:hover, .gps-btn:hover { background: var(--wash-3); color: var(--d50); }
+      .gps-filter-btn:focus-visible, .gps-export-btn:focus-visible, .gps-btn:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
       .gps-filter-btn svg { width: 10px; height: 10px; color: var(--d400); flex-shrink: 0; }
-      .gps-export-btn {
-        display: inline-flex; align-items: center; gap: 7px;
-        min-height: 32px; padding: 5px 10px;
-        background: var(--wash-3); border: 1px solid var(--wash-6);
-        border-radius: 8px; color: var(--d300);
-        font-family: inherit; font-size: 12px; font-weight: 600;
-        line-height: 1.4; white-space: nowrap; cursor: pointer;
-        transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
+      .gps-filter-btn svg.fp-ico { width: 14px; height: 14px; }
+      .gps-filter-btn.gps-views-btn > svg { width: 14px; height: 14px; color: var(--d300); }
+      .gps-export-btn svg { width: 14px; height: 14px; color: var(--d400); flex-shrink: 0; }
+      .gps-filter-btn.is-applied, .gps-filter-btn[aria-expanded="true"],
+      .gps-btn.is-applied, .gps-btn[aria-expanded="true"] {
+        background: rgba(97,173,241,0.12); color: #c5dcff;
       }
-      .gps-export-btn:hover { background: var(--wash-6); color: var(--d50); }
-      .gps-export-btn:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
-      .gps-export-btn svg { width: 15px; height: 15px; color: var(--d400); flex-shrink: 0; }
+      .gps-filter-btn.is-applied:hover, .gps-filter-btn[aria-expanded="true"]:hover,
+      .gps-btn.is-applied:hover, .gps-btn[aria-expanded="true"]:hover { background: rgba(97,173,241,0.18); }
       .gps-date-btn { gap: 6px; }
-      .gps-date-btn .gps-date-clear { width: 15px; height: 15px; margin-left: -1px; }
-      .gps-date-btn .gps-date-calendar { width: 15px; height: 15px; margin-left: 1px; }
+      .gps-date-btn .gps-date-calendar { width: 14px; height: 14px; margin-left: 1px; }
+      .fp-badge {
+        display: inline-flex; align-items: center; justify-content: center;
+        min-width: 16px; height: 16px; padding: 0 5px; border-radius: 8px;
+        background: rgba(51,105,255,0.22); color: #c5dcff;
+        font-size: 10px; font-weight: 700; line-height: 1;
+      }
+      .fp-badge[hidden] { display: none; }
+      .fp-tool-dialog {
+        position: fixed; z-index: 230; inset: auto; width: min(400px, calc(100vw - 24px)); max-width: none; max-height: min(520px, calc(100dvh - 24px));
+        margin: 0; padding: 0; overflow: hidden; color: var(--d50);
+        background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px;
+        box-shadow: 0 12px 40px rgba(0,0,0,0.4), 0 0 0 1px rgba(0,0,0,0.16); font-family: var(--font-sans);
+      }
+      .fp-tool-dialog::backdrop { background: transparent; }
+      .fp-tool-dialog[open] { display: flex; flex-direction: column; }
+      .fp-tool-dialog.fp-tool-views { width: min(340px, calc(100vw - 24px)); }
+      .fp-tool-head { display: flex; align-items: flex-start; gap: 10px; padding: 16px 18px 12px; border-bottom: 1px solid var(--wash-6); }
+      .fp-tool-head > div { min-width: 0; flex: 1; }
+      .fp-tool-head h2 { margin: 0; color: var(--d50); font-size: 15px; font-weight: 700; line-height: 1.35; }
+      .fp-tool-head p { margin: 3px 0 0; color: var(--d400); font-size: 11px; line-height: 1.45; }
+      .fp-tool-close { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; flex: none; padding: 0; border: 0; border-radius: 7px; background: transparent; color: var(--d400); cursor: pointer; }
+      .fp-tool-close:hover { background: var(--wash-4); color: var(--d50); }
+      .fp-tool-close svg { width: 14px; height: 14px; }
+      .fp-tool-body { display: grid; gap: 10px; padding: 14px 18px; overflow: auto; }
+      .fp-tool-input { width: 100%; min-height: 38px; padding: 9px 11px; resize: vertical; border: 1px solid var(--wash-8); border-radius: 8px; background: var(--wash-3); color: var(--d50); font: 500 12px/1.5 var(--font-sans); }
+      textarea.fp-tool-input { min-height: 66px; max-height: 130px; }
+      .fp-tool-input:focus { outline: 2px solid rgba(51,105,255,0.3); border-color: var(--brand); }
+      .fp-tool-input::placeholder { color: var(--d500); }
+      .fp-tool-note, .fp-tool-error { margin: 0; color: var(--d400); font-size: 10.5px; line-height: 1.5; }
+      .fp-tool-error { color: var(--err); }
+      .fp-tool-foot { display: flex; align-items: center; justify-content: flex-end; gap: 6px; padding: 10px 18px; border-top: 1px solid var(--wash-6); }
+      .fp-tool-foot .fp-tool-note { margin-right: auto; }
+      .fp-tool-primary { min-height: 30px; padding: 0 12px; border: 0; border-radius: 7px; background: var(--brand); color: #fff; font: 600 11px var(--font-sans); cursor: pointer; }
+      .fp-tool-primary:hover { filter: brightness(1.1); }
+      .fp-tool-primary:disabled { opacity: .45; cursor: not-allowed; }
+      .fp-tool-secondary { min-height: 30px; padding: 0 10px; border: 0; border-radius: 7px; background: transparent; color: var(--d300); font: 600 11px var(--font-sans); cursor: pointer; }
+      .fp-tool-secondary:hover { background: var(--wash-4); color: var(--d50); }
+      .fp-view-list { display: grid; gap: 6px; }
+      .fp-view-row { display: flex; align-items: center; gap: 8px; padding: 8px 9px; border: 1px solid var(--wash-6); border-radius: 8px; background: var(--wash-2); }
+      .fp-view-load { min-width: 0; flex: 1; padding: 0; border: 0; background: none; color: var(--d200); text-align: left; cursor: pointer; }
+      .fp-view-load strong { display: block; overflow: hidden; font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+      .fp-view-load small { display: block; margin-top: 2px; color: var(--d400); font-size: 10px; }
+      .fp-view-delete { padding: 5px 7px; border: 0; border-radius: 6px; background: transparent; color: var(--d400); font: 500 10px var(--font-sans); cursor: pointer; }
+      .fp-view-delete:hover { background: var(--wash-4); color: var(--err); }
       @media (max-width: 700px) {
         .gps-bar { --gps-pad-x: 16px; overflow-x: auto; justify-content: flex-start; }
-        .gps-controls { margin-left: auto; }
-        .gps-filter-btn, .gps-export-btn { font-size: 11px; padding-inline: 8px; }
+        .gps-controls { margin-left: 0; }
+        .gps-filter-btn, .gps-export-btn, .gps-btn { font-size: 11px; padding-inline: 8px; }
       }
-      /* Visually hidden, but part of the trigger's accessible name, so the
-         control still announces as "Product scope: Upland" now that the
-         printed label is gone. */
-      .gps-sr {
-        position: absolute; width: 1px; height: 1px;
-        margin: -1px; padding: 0; border: 0;
-        overflow: hidden; white-space: nowrap;
-        clip-path: inset(50%);
-      }
-
       .gps { position: relative; display: inline-flex; flex-shrink: 0; }
-
-      .gps-btn {
-        display: flex; align-items: center; gap: 6px;
-        min-width: 170px;
-        padding: 5px 9px 5px 11px;
-        background: var(--wash-3);
-        border: 1px solid var(--wash-6);
-        /* 8px, NOT 10px: the global focus rule (index.html:424) sets
-           border-radius:8px on :focus-visible, so any other value makes the
-           control visibly reshape when tabbed to. */
-        border-radius: 8px;
-        font-family: "Urbanist", sans-serif;
-        font-size: 12px; font-weight: 600; line-height: 1.4;
-        color: var(--d300);
-        cursor: pointer; white-space: nowrap; text-align: left;
-        transition: background var(--transition-fast),
-                    border-color var(--transition-fast),
-                    color var(--transition-fast);
-      }
-      .gps-btn:hover { background: var(--wash-6); color: var(--d50); }
-      .gps-btn[aria-expanded="true"] {
-        background: rgba(51,105,255,0.10);
-        border-color: rgba(99,169,255,0.30);
-        color: #c5dcff;
-      }
-      /* "not the default scope", driven off the pre-paint attribute so it
-         cannot flash the wrong state. */
-      :root[data-scope]:not([data-scope="all"]) .gps-btn {
-        background: rgba(51,105,255,0.10);
-        border-color: rgba(99,169,255,0.32);
-        color: #c5dcff;
-      }
       .gps-chev {
         width: 10px; height: 10px; margin-left: auto; flex-shrink: 0;
         color: var(--d400);
@@ -7103,125 +7088,145 @@
       }
       .gps-btn[aria-expanded="true"] .gps-chev { transform: rotate(180deg); color: currentColor; }
 
-      /* Trigger label rendered by CSS from <html data-scope>, set pre-paint.
-         display:none excludes the other three from the accessible name, so
-         aria-labelledby stays correct with no JS. */
-      .gps-btn-label > [data-scope-label] { display: none; }
-      :root:not([data-scope])          .gps-btn-label > [data-scope-label="all"],
-      :root[data-scope="all"]          .gps-btn-label > [data-scope-label="all"],
-      :root[data-scope="upland"]       .gps-btn-label > [data-scope-label="upland"],
-      :root[data-scope="asteris"]      .gps-btn-label > [data-scope-label="asteris"],
-      :root[data-scope="secondstreet"] .gps-btn-label > [data-scope-label="secondstreet"] {
-        display: inline;
-      }
 
-      .gps-panel {
-        /* Anchored right, not left: the trigger sits at the page edge, so a
-           244px panel opening rightward would run off the viewport. */
-        position: absolute; top: calc(100% + 6px); right: 0;
-        z-index: 220;
-        width: 244px;
-        background: var(--card-bg);        /* #141b24 dark, #ffffff light */
+      /* ── Filter popovers (.fp-*) ─────────────────────────────────────
+         Fixed-positioned and placed by the engine under the clicked trigger,
+         so the bar's overflow on small screens cannot clip them. No scrim. */
+      .fp-pop {
+        position: fixed; z-index: 220; top: 0; left: 0;
+        max-width: calc(100vw - 16px);
+        background: var(--card-bg);
         border: 1px solid var(--card-border);
         border-radius: 12px;
-        padding: 6px;
         box-shadow: 0 12px 40px rgba(0,0,0,0.45), 0 0 0 1px rgba(0,0,0,0.2);
         font-family: "Urbanist", sans-serif;
-        text-align: left;
-        transform-origin: top right;
-        animation: gpsPanelIn 140ms cubic-bezier(0.22,1,0.36,1);
+        text-align: left; color: var(--d300);
+        animation: fpIn 140ms cubic-bezier(0.22,1,0.36,1);
       }
-      .gps-panel[hidden] { display: none; }
-      @keyframes gpsPanelIn {
-        from { opacity: 0; transform: translateY(-4px) scale(0.98); }
+      .fp-pop[hidden] { display: none; }
+      .fp-pop-main { width: 520px; }
+      .fp-pop-single { width: 300px; }
+      @keyframes fpIn {
+        from { opacity: 0; transform: translateY(-4px); }
         to   { opacity: 1; transform: none; }
       }
       @media (prefers-reduced-motion: reduce) {
-        .gps-panel { animation: none; }
-        .gps-chev  { transition: none; }
+        .fp-pop { animation: none; }
+        .gps-chev { transition: none; }
       }
-
-      .gps-search {
-        display: flex; align-items: center; gap: 8px;
-        padding: 7px 9px; margin-bottom: 4px;
-        background: var(--wash-3);
-        border: 1px solid var(--wash-6);
-        border-radius: 8px;
-        transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+      .fp-cols { display: grid; grid-template-columns: 168px minmax(0, 1fr); min-height: 232px; }
+      .fp-fields {
+        display: flex; flex-direction: column; gap: 2px;
+        padding: 8px; max-height: 300px; overflow-y: auto;
+        border-right: 1px solid var(--wash-6);
       }
-      /* --brand-glow is declared in none of these five files, hence the literal. */
-      .gps-search:focus-within {
-        border-color: var(--brand);
-        box-shadow: 0 0 0 3px rgba(51,105,255,0.18);
-      }
-      .gps-search > svg { width: 13px; height: 13px; color: var(--d500); flex-shrink: 0; }
-      .gps-search input {
-        flex: 1; min-width: 0;
-        background: none; border: 0;
-        font-family: "Urbanist", sans-serif;
-        font-size: 12px; font-weight: 600; color: var(--d50);
-      }
-      .gps-search input::placeholder { color: var(--d500); font-weight: 500; }
-      /* The row owns the focus ring. Without this the global rule
-         (index.html:409) draws a second one on the bare input. */
-      .gps-search input:focus,
-      .gps-search input:focus-visible { outline: none; }
-
-      .gps-list {
-        list-style: none; margin: 0; padding: 0;
-        max-height: 220px; overflow-y: auto;
-        scrollbar-width: thin; scrollbar-color: var(--wash-6) transparent;
-      }
-      .gps-list::-webkit-scrollbar { width: 6px; }
-      .gps-list::-webkit-scrollbar-track { background: transparent; }
-      .gps-list::-webkit-scrollbar-thumb { background: var(--wash-6); border-radius: 4px; }
-      .gps-list::-webkit-scrollbar-thumb:hover { background: var(--card-border); }
-
-      .gps-opt {
-        display: flex; align-items: center; gap: 8px;
-        padding: 7px 9px; border-radius: 7px;
-        font-size: 12px; font-weight: 600; color: var(--d300);
-        cursor: pointer; white-space: nowrap;
+      .fp-field {
+        display: flex; align-items: center; justify-content: space-between; gap: 8px;
+        min-height: 30px; padding: 0 9px;
+        border: 0; border-radius: 8px; background: transparent; color: var(--d300);
+        font-family: inherit; font-size: 12px; font-weight: 600; line-height: 1.4;
+        text-align: left; cursor: pointer;
         transition: background var(--transition-fast), color var(--transition-fast);
       }
-      /* Dot reserved on every row so selection never shifts the text. */
-      .gps-opt::before {
-        content: ""; width: 5px; height: 5px; border-radius: 50%;
-        background: transparent; flex-shrink: 0;
-      }
-      .gps-opt[hidden] { display: none; }
-      .gps-opt.is-active { background: var(--wash-3); color: var(--d50); }
-      .gps-opt[aria-selected="true"] { background: rgba(51,105,255,0.10); color: #61adf1; }
-      .gps-opt[aria-selected="true"]::before { background: #61adf1; }
-      .gps-opt[aria-selected="true"].is-active { background: rgba(51,105,255,0.18); }
+      .fp-field:hover { background: var(--wash-3); color: var(--d50); }
+      .fp-field[aria-selected="true"] { background: rgba(97,173,241,0.12); color: #c5dcff; }
+      .fp-detail { padding: 8px; max-height: 300px; overflow-y: auto; min-width: 0; }
+      .fp-empty { margin: 0; padding: 8px 6px; color: var(--d500); font-size: 12px; font-weight: 500; }
+      .fp-empty[hidden], .fp-editor[hidden] { display: none; }
+      .fp-pop-single .fp-editor { padding: 8px 8px 4px; }
+      .fp-pop button:focus-visible { outline: 2px solid var(--brand); outline-offset: 1px; }
 
-      .gps-empty {
-        padding: 14px 9px; text-align: center;
-        font-size: 11.5px; font-weight: 500; color: var(--d500);
+      .fp-search {
+        display: flex; align-items: center; gap: 6px;
+        height: 30px; padding: 0 8px; margin-bottom: 4px;
+        background: var(--wash-3); border: 1px solid var(--wash-6); border-radius: 8px;
+        transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
       }
-      .gps-empty[hidden] { display: none; }
+      .fp-search:focus-within { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(51,105,255,0.18); }
+      .fp-search > svg { width: 14px; height: 14px; color: var(--d500); flex-shrink: 0; }
+      .fp-search input {
+        flex: 1; min-width: 0; background: none; border: 0;
+        font-family: inherit; font-size: 12px; font-weight: 600; color: var(--d50);
+      }
+      .fp-search input::placeholder { color: var(--d500); font-weight: 500; }
+      .fp-search input:focus, .fp-search input:focus-visible { outline: none; }
+      .fp-list { max-height: 220px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--wash-6) transparent; }
+      .fp-list::-webkit-scrollbar { width: 6px; }
+      .fp-list::-webkit-scrollbar-thumb { background: var(--wash-6); border-radius: 4px; }
+      .fp-opt {
+        display: flex; align-items: center; gap: 8px;
+        min-height: 28px; padding: 0 8px; border-radius: 7px;
+        font-size: 12px; font-weight: 600; color: var(--d300); cursor: pointer;
+        transition: background var(--transition-fast), color var(--transition-fast);
+      }
+      .fp-opt[hidden] { display: none; }
+      .fp-opt:hover { background: var(--wash-3); color: var(--d50); }
+      .fp-opt:has(input:checked) { background: rgba(97,173,241,0.12); color: #61adf1; }
+      .fp-opt:has(input:focus-visible) { outline: 2px solid var(--brand); outline-offset: -2px; }
+      .fp-opt input { width: 14px; height: 14px; margin: 0; accent-color: var(--brand); flex-shrink: 0; }
+      .fp-opt input:focus-visible { outline: none; }
+      .fp-none { padding: 10px 8px; text-align: center; font-size: 11.5px; font-weight: 500; color: var(--d500); }
+      .fp-none[hidden] { display: none; }
+
+      .fp-date { display: grid; gap: 8px; }
+      .fp-label { display: grid; gap: 4px; font-size: 11px; font-weight: 600; color: var(--d400); }
+      .fp-input {
+        height: 30px; padding: 0 8px; min-width: 0;
+        background: var(--wash-3); border: 1px solid var(--wash-6); border-radius: 8px;
+        color: var(--d50); color-scheme: dark;
+        font-family: inherit; font-size: 12px; font-weight: 600;
+      }
+      :root[data-theme="light"] .fp-input { color-scheme: light; }
+      .fp-input:focus-visible { outline: 2px solid var(--brand); outline-offset: 1px; }
+      .fp-input[aria-invalid="true"] { border-color: var(--err); }
+      .fp-error { margin: 0; font-size: 11px; font-weight: 600; color: var(--err); }
+      .fp-error[hidden] { display: none; }
+
+      .fp-foot {
+        display: flex; align-items: center; justify-content: space-between; gap: 8px;
+        padding: 6px 8px; border-top: 1px solid var(--wash-6);
+      }
+      .fp-foot-actions { display: flex; gap: 4px; margin-left: auto; }
+      .fp-btn {
+        min-height: 28px; padding: 0 12px; border: 0; border-radius: 8px;
+        background: transparent; color: var(--d300);
+        font-family: inherit; font-size: 12px; font-weight: 600; cursor: pointer;
+        transition: background var(--transition-fast), color var(--transition-fast);
+      }
+      .fp-btn:hover { background: var(--wash-3); color: var(--d50); }
+      .fp-btn-primary { background: var(--brand); color: #fff; }
+      .fp-btn-primary:hover { background: var(--brand); color: #fff; filter: brightness(1.12); }
+      .fp-link {
+        min-height: 28px; padding: 0 6px; border: 0; border-radius: 6px; background: none;
+        color: var(--d400); font-family: inherit; font-size: 11px; font-weight: 600; cursor: pointer;
+      }
+      .fp-link:hover { color: var(--d50); }
+      @media (max-width: 560px) {
+        .fp-cols { grid-template-columns: 124px minmax(0, 1fr); }
+      }
 
       /* ── Light theme, scoped chrome corrections ──────────────────────
          Only the literals above need flipping. --wash-3/--wash-6/--d50/
          --d300/--d400/--d500/--card-bg/--card-border/--brand invert at the
          token layer already (design-system.md §4). */
       :root[data-theme="light"] .gps-btn[aria-expanded="true"],
-      :root[data-theme="light"]:root[data-scope]:not([data-scope="all"]) .gps-btn {
-        background: rgba(51,105,255,0.10);
-        border-color: rgba(51,105,255,0.32);
+      :root[data-theme="light"]:root[data-scope]:not([data-scope="all"]) .gps-btn,
+      :root[data-theme="light"] .gps-filter-btn.is-applied,
+      :root[data-theme="light"] .gps-filter-btn[aria-expanded="true"],
+      :root[data-theme="light"] .fp-field[aria-selected="true"],
+      :root[data-theme="light"] .fp-badge {
         color: #1f5fd0;
       }
-      :root[data-theme="light"] .gps-panel {
+      :root[data-theme="light"] .fp-pop {
         box-shadow: 0 12px 40px rgba(16,24,40,0.16), 0 0 0 1px rgba(16,24,40,0.04);
       }
-      :root[data-theme="light"] .gps-opt[aria-selected="true"] { color: #1f5fd0; }
-      :root[data-theme="light"] .gps-opt[aria-selected="true"]::before { background: #1f5fd0; }
+      :root[data-theme="light"] .fp-opt:has(input:checked) { color: #1f5fd0; }
       /* ══ end global product scope ════════════════════════════════════ */
 </style>
     <!-- The canvas shell above: full-width geometry and the conversation
          column. Loaded last so it overrides the inline canvas rules, the
          same order sales.css has over aimy-ds.css. -->
-    <link rel="stylesheet" href="assets/aimy-canvas.css?v=5" />
+    <link rel="stylesheet" href="assets/aimy-canvas.css?v=6" />
     <link rel="stylesheet" href="assets/aimy-sessions.css?v=2" />
 
     <!-- The responsive layer above both: one UI scale for large screens,
@@ -7481,66 +7486,44 @@
              tracked with aria-activedescendant. Focus lands in the input,
              never on an option, so the options are not tabbable. -->
         <div class="gps-bar" id="gpsBar">
-          <div class="gps-controls" aria-label="Dashboard filters">
-            <div class="interaction-type-filter" aria-label="Interaction type filter">
-              <div class="interaction-type-toggle" role="radiogroup" aria-label="Interaction type">
-                <button class="interaction-type-option" type="button" role="radio" aria-checked="true" data-interaction-type="all">All interactions</button>
-                <button class="interaction-type-option" type="button" role="radio" aria-checked="false" data-interaction-type="calls">Calls</button>
-                <button class="interaction-type-option" type="button" role="radio" aria-checked="false" data-interaction-type="tickets">Tickets</button>
-              </div>
-            </div>
-            <button class="gps-filter-btn" type="button" aria-haspopup="listbox" aria-label="Filter by client">
-              All clients
+          <div class="gps-controls" role="toolbar" aria-label="Dashboard filters">
+            <button class="gps-filter-btn fp-main-btn" id="fpMainBtn" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="fpMain">
+              <svg class="fp-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5h18l-7 8v6l-4 2v-8z"></path></svg>
+              Filter
+              <span class="fp-badge" id="fpMainBadge" hidden></span>
+            </button>
+            <button class="gps-filter-btn" id="fpInteractionBtn" type="button" data-fp-field="interaction" aria-haspopup="dialog" aria-expanded="false" aria-controls="fpPop" aria-label="Filter by interaction type">
+              <span data-fp-label>Interaction</span>
+              <span class="fp-badge" data-fp-badge hidden></span>
+              <svg viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="1 1 5 5 9 1"></polyline></svg>
+            </button>
+            <button class="gps-filter-btn" id="fpClientBtn" type="button" data-fp-field="client" aria-haspopup="dialog" aria-expanded="false" aria-controls="fpPop" aria-label="Filter by client">
+              <span data-fp-label>Client</span>
+              <span class="fp-badge" data-fp-badge hidden></span>
               <svg viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="1 1 5 5 9 1"></polyline></svg>
             </button>
           <div class="gps" id="gpsRoot">
-            <button class="gps-btn" id="gpsBtn" type="button"
-                    aria-haspopup="listbox" aria-expanded="false"
-                    aria-controls="gpsPanel">
-              <span class="gps-btn-label" id="gpsBtnLabel">
-                <span class="gps-sr">Product scope:</span>
-                <span data-scope-label="all">All products</span>
-                <span data-scope-label="upland">Upland</span>
-                <span data-scope-label="asteris">Asteris</span>
-                <span data-scope-label="secondstreet">SecondStreet</span>
-              </span>
+            <button class="gps-btn gps-filter-btn" id="gpsBtn" type="button" data-fp-field="product"
+                    aria-haspopup="dialog" aria-expanded="false"
+                    aria-controls="fpPop" aria-label="Filter by product">
+              <span data-fp-label>Product</span>
+              <span class="fp-badge" data-fp-badge hidden></span>
               <svg class="gps-chev" viewBox="0 0 10 6" fill="none" stroke="currentColor"
                    stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
                    aria-hidden="true">
                 <polyline points="1 1 5 5 9 1"></polyline>
               </svg>
             </button>
-
-            <div class="gps-panel" id="gpsPanel" hidden>
-              <div class="gps-search">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                     stroke-linecap="round" aria-hidden="true">
-                  <circle cx="11" cy="11" r="7"></circle>
-                  <path d="M20 20l-3.6-3.6"></path>
-                </svg>
-                <input id="gpsSearch" type="text"
-                       role="combobox" aria-expanded="true"
-                       aria-controls="gpsList" aria-autocomplete="list"
-                       aria-label="Search products" placeholder="Search products"
-                       autocomplete="off" autocorrect="off" spellcheck="false" />
-              </div>
-
-              <ul class="gps-list" id="gpsList" role="listbox" aria-label="Product scope">
-                <li class="gps-opt" id="gps-opt-all"          role="option" data-value="all"          aria-selected="true">All products</li>
-                <li class="gps-opt" id="gps-opt-upland"       role="option" data-value="upland"       aria-selected="false">Upland</li>
-                <li class="gps-opt" id="gps-opt-asteris"      role="option" data-value="asteris"      aria-selected="false">Asteris</li>
-                <li class="gps-opt" id="gps-opt-secondstreet" role="option" data-value="secondstreet" aria-selected="false">SecondStreet</li>
-              </ul>
-
-              <!-- Outside the <ul>: a non-option <li> inside role="listbox" is
-                   invalid. role="status" announces the zero-match case. -->
-              <div class="gps-empty" id="gpsEmpty" role="status" hidden>No products match.</div>
-            </div>
           </div>
-            <button class="gps-filter-btn gps-date-btn" type="button" aria-label="Change date range">
-              <span>01 Jan 2026 ~ 15 Sep 2026</span>
-              <svg class="gps-date-clear" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+            <button class="gps-filter-btn gps-date-btn" id="fpDateBtn" type="button" data-fp-field="date" aria-haspopup="dialog" aria-expanded="false" aria-controls="fpPop" aria-label="Change date range">
+              <span data-fp-label>Date range</span>
+              <span class="fp-badge" data-fp-badge hidden></span>
               <svg class="gps-date-calendar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4.5" width="18" height="17" rx="2"></rect><path d="M16 2.5v4M8 2.5v4M3 9h18"></path></svg>
+            </button>
+            <div class="gps-action-group">
+            <button class="gps-filter-btn gps-views-btn" id="fpViewsBtn" type="button" aria-haspopup="dialog">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4.5A2.5 2.5 0 0 1 8.5 2H20v18H8.5A2.5 2.5 0 0 0 6 22V4.5Z"></path><path d="M6 5h11M6 19.5A2.5 2.5 0 0 1 8.5 17H20"></path></svg>
+              Views
             </button>
             <button class="gps-export-btn" type="button" aria-label="Export dashboard">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -7550,6 +7533,35 @@
               </svg>
               Export
             </button>
+            </div>
+          </div>
+
+          <!-- Filter popovers. Moved to <body> by the engine so the bar's
+               overflow on small screens cannot clip them. -->
+          <div class="fp-pop fp-pop-main" id="fpMain" role="dialog" aria-label="Filters" hidden>
+            <div class="fp-cols">
+              <div class="fp-fields" id="fpFields" role="tablist" aria-orientation="vertical" aria-label="Filter fields"></div>
+              <div class="fp-detail" id="fpDetail" role="tabpanel">
+                <p class="fp-empty" id="fpDetailEmpty">Select a field to create a filter.</p>
+                <div class="fp-editor" id="fpMainEditor" hidden></div>
+              </div>
+            </div>
+            <div class="fp-foot">
+              <button class="fp-link" id="fpClearAll" type="button">Clear all</button>
+              <span class="fp-foot-actions">
+                <button class="fp-btn" id="fpMainCancel" type="button">Cancel</button>
+                <button class="fp-btn fp-btn-primary" id="fpMainApply" type="button">Apply</button>
+              </span>
+            </div>
+          </div>
+          <div class="fp-pop fp-pop-single" id="fpPop" role="dialog" aria-label="Filter" hidden>
+            <div class="fp-editor" id="fpSingleEditor"></div>
+            <div class="fp-foot">
+              <span class="fp-foot-actions">
+                <button class="fp-btn" id="fpCancel" type="button">Cancel</button>
+                <button class="fp-btn fp-btn-primary" id="fpApply" type="button">Apply</button>
+              </span>
+            </div>
           </div>
         </div>
 
@@ -8882,7 +8894,7 @@
                 <span>Patterns, risks, and recommended actions from your audited interactions</span>
               </div>
               <div class="ai-insights">
-                <article class="ai-insight" data-classification="highest-impact" data-severity="critical" data-rank="1" tabindex="0" aria-labelledby="ai-insight-status-name">
+                <article class="ai-insight" data-classification="highest-impact" data-severity="critical" data-rank="1" tabindex="0" style="--pct:71" aria-labelledby="ai-insight-status-name">
                   <div class="ai-insight__row">
                     <h3 class="ai-insight__name" id="ai-insight-status-name">Ticket status accuracy</h3>
                     <span class="ai-insight__metric ai-insight__metric--err">71%<small>of 369</small></span>
@@ -8905,7 +8917,7 @@
                   </div>
                 </article>
 
-                <article class="ai-insight" data-classification="persistent-gap" data-severity="warning" data-rank="3" tabindex="0" aria-labelledby="ai-insight-grammar-name">
+                <article class="ai-insight" data-classification="persistent-gap" data-severity="warning" data-rank="3" tabindex="0" style="--pct:55" aria-labelledby="ai-insight-grammar-name">
                   <div class="ai-insight__row">
                     <h3 class="ai-insight__name" id="ai-insight-grammar-name">Grammar &amp; clarity</h3>
                     <span class="ai-insight__metric ai-insight__metric--warn">55%<small>of 369</small></span>
@@ -8928,7 +8940,7 @@
                   </div>
                 </article>
 
-                <article class="ai-insight" data-classification="improving" data-severity="positive" data-rank="4" tabindex="0" aria-labelledby="ai-insight-cadence-name">
+                <article class="ai-insight" data-classification="improving" data-severity="positive" data-rank="4" tabindex="0" style="--pct:47" aria-labelledby="ai-insight-cadence-name">
                   <div class="ai-insight__row">
                     <h3 class="ai-insight__name" id="ai-insight-cadence-name">Update cadence</h3>
                     <span class="ai-insight__metric ai-insight__metric--ok">47%<small>of 369</small></span>
@@ -8951,12 +8963,12 @@
                   </div>
                 </article>
 
-                <article class="ai-insight" data-classification="emerging-risk" data-severity="critical" data-rank="2" tabindex="0" aria-labelledby="ai-insight-frt-name">
+                <article class="ai-insight" data-classification="emerging-risk" data-severity="critical" data-rank="2" tabindex="0" style="--pct:60" aria-labelledby="ai-insight-frt-name">
                   <div class="ai-insight__row">
                     <h3 class="ai-insight__name" id="ai-insight-frt-name">First response time</h3>
-                    <span class="ai-insight__metric ai-insight__metric--err">71%<small>of 369</small></span>
+                    <span class="ai-insight__metric ai-insight__metric--err">60%<small>of 369</small></span>
                   </div>
-                  <p class="ai-insight__problem">Slipping in Objectif Lune &amp; Adestra, 4 pts under goal.</p>
+                  <p class="ai-insight__problem">Slipping in Objectif Lune &amp; Adestra, 15 pts under goal.</p>
                   <p class="ai-insight__solution">
                     <svg viewBox="0 0 18 20" aria-hidden="true"><use href="#aimy-logo-small"/></svg>
                     Rebalance 2 agents into the busy shift.
@@ -8967,7 +8979,7 @@
                             data-entry-mode="review"
                             data-aimy-topic="goal-frt"
                             data-aimy-undo="the 2-agent rebalance"
-                            data-aimy-review="First response time is at 71%, 4 pts under the 75% goal and falling in Objectif Lune and Adestra. Show the queues driving the delay and the 2-agent rebalance I queued for the shift.">
+                            data-aimy-review="First response time is at 60%, 15 pts under the 75% goal and falling in Objectif Lune and Adestra. Show the queues driving the delay and the 2-agent rebalance I queued for the shift.">
                       <svg class="em-ico" aria-hidden="true"><use href="#em-ico-review"/></svg>
                       Review first response time
                     </button>
@@ -9341,12 +9353,12 @@
           <!-- Filter tray, appears above the bar on input focus -->
           <div class="filter-tray" id="filterTray" role="toolbar" aria-label="Filter by dimension">
             <div class="filter-tray-inner">
-              <span class="filter-tray-label">Filter via AiMY</span>
-              <button class="filter-chip" data-filter="Company">Company</button>
-              <button class="filter-chip" data-filter="Product">Product</button>
-              <button class="filter-chip" data-filter="Agents">Agents</button>
-              <button class="filter-chip" data-filter="Time Period">Time Period</button>
-              <button class="filter-chip" data-action="clear-filters">Reset all</button>
+              <div class="filter-tray-prompts" aria-label="Filter prompt suggestions">
+                <span class="filter-tray-label">Filter via AiMY</span>
+                <button class="filter-chip filter-chip-prompt" type="button" data-chat-prompt="Calls for the last 30 days">Calls for the last 30 days</button>
+                <button class="filter-chip filter-chip-prompt" type="button" data-chat-prompt="Tickets for client Second Street">Tickets for client Second Street</button>
+                <button class="filter-chip filter-chip-prompt" type="button" data-chat-prompt="Calls from 2026-08-01 to 2026-09-15">Calls from 2026-08-01 to 2026-09-15</button>
+              </div>
             </div>
           </div>
 
@@ -10758,6 +10770,7 @@
 
         /* ── DOM refs ─────────────────────────────── */
         const floatBar = document.getElementById("aimyFloatBar");
+        window.aimyFloatBar = floatBar;
         const floatInput = document.getElementById("aimyFloatInput");
         const floatSend = document.getElementById("aimyFloatSend");
         const floatHint = document.getElementById("aimyFloatHint");
@@ -10777,53 +10790,9 @@
      Keywords that suggest a filter / dashboard-mutation intent.
      Anything else is treated as a conversational chat intent.
      Replace with a real classifier or pre-screen LLM call in prod.  */
-        const FILTER_KWS = [
-          "filter",
-          "show only",
-          "show me",
-          "hide",
-          "only",
-          "last week",
-          "this week",
-          "last month",
-          "today",
-          "this month",
-          "last quarter",
-          "this quarter",
-          "this year",
-          "last year",
-          "past",
-          "previous",
-          "all agents",
-          "by team",
-          "by product",
-          "by company",
-          "sort",
-          "group",
-          "compare",
-          "date",
-          "time period",
-          "period",
-        ];
-
-        function detectIntent(text) {
-          const lo = text.toLowerCase().trim();
-          for (const kw of FILTER_KWS) {
-            if (lo.includes(kw)) return "filter";
-          }
-          return "chat";
-        }
-
         /* ── Floating bar: hint visibility ──────── */
         floatInput.addEventListener("input", () => {
           floatHint.style.opacity = floatInput.value.length ? "0" : "1";
-          // Reset tray if user deleted the dimension prefix
-          if (activeDimension) {
-            const expectedPrefix = FILTER_PREFIXES[activeDimension];
-            if (expectedPrefix && !floatInput.value.startsWith(expectedPrefix)) {
-              resetTrayToDefault();
-            }
-          }
         });
 
         /* ── Floating bar: Enter / Send ──────────── */
@@ -10841,15 +10810,13 @@
             return;
           }
 
-          const intent = detectIntent(text);
-
-          if (intent === "filter") {
-            applyFilter(text);
-          } else {
-            // Reset filter tray before opening canvas
-            if (typeof resetTrayToDefault === 'function') resetTrayToDefault();
-            openOverlay(text);
+          if (window.AIMY_QA_FILTERS && window.AIMY_QA_FILTERS.isFilterIntent(text)) {
+            floatInput.value = '';
+            floatHint.style.opacity = '1';
+            window.AIMY_CHAT_UI.submitFilterRequest(text, false);
+            return;
           }
+          openOverlay(text);
         }
 
         /* ── Execute dismiss with user-typed reason ──────────────────── */
@@ -10902,52 +10869,9 @@
         /* ── Filter simulation ────────────────────────────────────────────
      In production dispatch a CustomEvent the agent layer subscribes to. */
         function applyFilter(text) {
-          floatSend.classList.add("thinking");
-          floatInput.disabled = true;
-
-          setTimeout(() => {
-            floatSend.classList.remove("thinking");
-            floatInput.disabled = false;
-            floatInput.value = "";
-            floatHint.style.opacity = "1";
-            // Reset filter tray to default chip state after send
-            if (typeof resetTrayToDefault === 'function') resetTrayToDefault();
-
-            // Update active filter strip
-            const parsed = parseFilterFromText(text);
-            if (parsed) {
-              if (parsed.key.toLowerCase() === "interaction type") {
-                const value = parsed.value.toLowerCase();
-                const type = value === "calls" ? "calls" : value === "tickets" ? "tickets" : "all";
-                setInteractionType(type);
-              } else {
-                activeFilters[parsed.key] = parsed.value;
-                renderActiveStrip();
-              }
-            }
-
-            // Restart flash animation
-            floatBar.classList.remove("filter-applied");
-            void floatBar.offsetWidth;
-            floatBar.classList.add("filter-applied");
-
-            window.dispatchEvent(
-              new CustomEvent("aimy:filter-applied", {
-                detail: { query: text, timestamp: Date.now() },
-              }),
-            );
-
-            showToast({
-              title: "Filters updated",
-              sub:
-                "\u201C" +
-                text.slice(0, 50) +
-                (text.length > 50 ? "\u2026" : "") +
-                "\u201D",
-            });
-
-            floatInput.focus();
-          }, 900);
+          floatInput.value = '';
+          floatHint.style.opacity = '1';
+          window.AIMY_CHAT_UI.submitFilterRequest(text, false);
         }
 
         /* ── Open overlay ─────────────────────────────────────────────── */
@@ -11135,12 +11059,14 @@
 
           const wrap = document.createElement("div");
           wrap.className = "chat-msg aimy";
+          const rendered = meta && meta.render && typeof window[meta.render] === "function"
+            ? window[meta.render](meta.label || "") : text;
           wrap.innerHTML =
             '<div class="msg-avatar aimy-av">' +
             '<svg width="23" height="25" viewBox="0 0 18 20"><use href="#aimy-logo-small"/></svg>' +
             "</div>" +
             '<div class="msg-bubble">' +
-            text +
+            rendered +
             "</div>";
           thread.appendChild(wrap);
           scrollThread();
@@ -11152,6 +11078,39 @@
            appendPermissionDenied called an undefined function and rendered
            nothing, the canvas opened onto an empty thread. */
         window.appendAiMsg = appendAiMsg;
+        window.renderQaFilterProposal = function (proposalId) {
+          const api = window.AIMY_QA_FILTERS;
+          const proposal = api && api.getProposal(proposalId);
+          if (!proposal) return '<div class="qa-chat-filter-card"><strong class="qa-chat-filter-title">Filter proposal unavailable</strong><p class="qa-chat-filter-copy">This proposal may have expired. Review the active filters and try again.</p></div>';
+          const esc = escHtml;
+          const chips = (proposal.changes || []).map(item => '<span class="qa-chat-filter-chip">' + esc(item) + '</span>').join('');
+          const kept = proposal.kept && proposal.kept.length
+            ? '<p class="qa-chat-filter-copy">Keeping active: ' + esc(proposal.kept.join('; ')) + '.</p>' : '';
+          if (proposal.status === 'no-change') {
+            return '<div class="qa-chat-filter-card" data-state="no-change"><strong class="qa-chat-filter-title">No changes needed</strong><p class="qa-chat-filter-copy">' + esc(proposal.message) + '</p></div>';
+          }
+          if (proposal.status === 'needs-clarification') {
+            return '<div class="qa-chat-filter-card" data-state="needs-clarification"><strong class="qa-chat-filter-title">I need a little more detail</strong><p class="qa-chat-filter-copy">' + esc(proposal.message) + '</p><p class="qa-chat-filter-copy">Supported filters: interaction type, client, product, and date range. No filters were changed.</p></div>';
+          }
+          const statusText = proposal.status === 'applied' ? 'Applied' : proposal.status === 'cancelled' ? 'Cancelled' : '';
+          const buttons = proposal.status === 'pending'
+            ? '<button type="button" data-qa-filter-apply="' + esc(proposal.id) + '">Apply</button><button type="button" data-qa-filter-cancel="' + esc(proposal.id) + '">Cancel</button>'
+            : '<span class="qa-chat-filter-status">' + statusText + '</span>';
+          return '<div class="qa-chat-filter-card" data-state="' + esc(proposal.status) + '"><strong class="qa-chat-filter-title">' +
+            (proposal.status === 'applied' ? 'Filters applied' : proposal.status === 'cancelled' ? 'Filter changes cancelled' : 'Review filter changes') +
+            '</strong><div class="qa-chat-filter-changes">' + chips + '</div>' + kept +
+            (proposal.status === 'pending' ? '<p class="qa-chat-filter-copy">Nothing changes until you apply. This updates filter state only; dashboard metrics are not recalculated by this prototype.</p>' : '') +
+            '<div class="qa-chat-filter-actions">' + buttons + '</div></div>';
+        };
+        window.AIMY_CHAT_UI = {
+          submitFilterRequest: function (text, alreadyOpen) {
+            if (!alreadyOpen) openOverlay();
+            appendUserMsg(text);
+            const result = window.AIMY_QA_FILTERS.prepare(text);
+            appendAiMsg('', { render: 'renderQaFilterProposal', label: result.id });
+            if (window.AimyChat) window.AimyChat.sync();
+          },
+        };
 
         function showTypingIndicator() {
           const existing = document.getElementById("aimyTyping");
@@ -12014,6 +11973,12 @@
         function handleOverlaySend() {
           const text = overlayInput.value.trim();
           if (!text || isTyping) return;
+          if (window.AIMY_QA_FILTERS && window.AIMY_QA_FILTERS.isFilterIntent(text)) {
+            overlayInput.value = '';
+            autoResizeTextarea();
+            window.AIMY_CHAT_UI.submitFilterRequest(text, true);
+            return;
+          }
           appendUserMsg(text);
           overlayInput.value = "";
           autoResizeTextarea();
@@ -12053,10 +12018,11 @@
        the user focuses the input. It hides on blur (with a short
        delay so clicks on chips register before the tray disappears). */
         const filterTray = document.getElementById("filterTray");
+        const filterTrayInner = filterTray.querySelector(".filter-tray-inner");
         const activeFilterStrip = null;
         const afsClearAll = null;
         let trayHideTimer = null;
-        let activeFilters = {}; // { Company: "Upland", "Time Period": "This week", … }
+        let activeFilters = {}; // { Client, Product, "Interaction type", "Date range" }
         let interactionType = "all";
         document.body.dataset.interactionType = interactionType;
         const INTERACTION_TYPES = {
@@ -12070,10 +12036,6 @@
           const changed = interactionType !== next;
           interactionType = next;
           document.body.dataset.interactionType = next;
-          document.querySelectorAll(".interaction-type-option").forEach((button) => {
-            const selected = button.dataset.interactionType === next;
-            button.setAttribute("aria-checked", String(selected));
-          });
           if (next === "all") delete activeFilters["Interaction type"];
           else activeFilters["Interaction type"] = INTERACTION_TYPES[next];
           renderActiveStrip();
@@ -12085,18 +12047,11 @@
           return next;
         }
 
-        document.querySelectorAll(".interaction-type-option").forEach((button) => {
-          button.addEventListener("click", () => setInteractionType(button.dataset.interactionType));
-          button.addEventListener("keydown", (event) => {
-            if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
-            event.preventDefault();
-            const options = Array.from(document.querySelectorAll(".interaction-type-option"));
-            const index = options.indexOf(button);
-            const next = options[(index + (event.key === "ArrowRight" ? 1 : -1) + options.length) % options.length];
-            setInteractionType(next.dataset.interactionType);
-            next.focus();
-          });
-        });
+        window.AIMY_INTERACTION = {
+          options: INTERACTION_TYPES,
+          get: function () { return interactionType; },
+          set: setInteractionType,
+        };
 
         function showTray() {
           clearTimeout(trayHideTimer);
@@ -12117,114 +12072,22 @@
         filterTray.addEventListener("focusin", showTray);
         filterTray.addEventListener("focusout", hideTray);
 
-        /* ── Filter chip click, contextual suggestions ──────────────
-       Clicking a dimension chip:
-         1. Pre-fills the input with the dimension prefix
-         2. Swaps the chip row to suggestion pills for that dimension
-         3. Clicking a suggestion pill appends the value and fires
-         4. Deleting the prefix text resets the tray to default chips */
-
-        const FILTER_PREFIXES = {
-          "Company":     "Filter by Company: ",
-          "Product":     "Filter by Product: ",
-          "Agents":      "Filter by Agents: ",
-          "Time Period":  "Filter by Time Period: ",
-          "Interaction type": "Filter by Interaction type: ",
-        };
-
-        const FILTER_SUGGESTIONS = {
-          "Company":     ["Upland", "MacPractice"],
-          "Product":     ["Objectif Lune", "Adestra", "InterFax", "Qvidian", "RightAnswers", "Second Street"],
-          "Agents":      ["Salma Ehab", "Omar Adel", "Sara Hassan", "Karim Nour", "Ahmed Mahfouz"],
-          "Time Period":  ["This week", "Last 30 days", "Last 90 days", "Q2 2026", "Custom range"],
-          "Interaction type": ["All interactions", "Calls", "Tickets"],
-        };
-
-        // Cache the default inner HTML so we can restore it
-        const filterTrayInner = filterTray.querySelector(".filter-tray-inner");
-        const defaultTrayHTML = filterTrayInner.innerHTML;
-        let activeDimension = null; // currently expanded dimension key
-
-        function renderSuggestionChips(key) {
-          const prefix   = FILTER_PREFIXES[key];
-          const suggs    = FILTER_SUGGESTIONS[key] || [];
-          activeDimension = key;
-
-          // Build new inner HTML: label → back chip → suggestion chips
-          let html = `<span class="filter-tray-label">${key}</span>`;
-          html += `<button class="filter-chip filter-chip-back" data-action="reset-tray" aria-label="Back to filters">← Back</button>`;
-          suggs.forEach(s => {
-            html += `<button class="filter-chip filter-chip-sugg" data-suggestion="${s}" data-prefix="${prefix}">${s}</button>`;
-          });
-          filterTrayInner.innerHTML = html;
-
-          // Wire back button
-          filterTrayInner.querySelector("[data-action='reset-tray']").addEventListener("click", () => {
-            resetTrayToDefault();
-            floatInput.value = "";
-            floatInput.dispatchEvent(new Event("input"));
-            floatInput.focus();
-          });
-
-          // Wire suggestion pills
-          filterTrayInner.querySelectorAll(".filter-chip-sugg").forEach(pill => {
-            pill.addEventListener("click", () => {
-              const val = pill.dataset.suggestion;
-              const pfx = pill.dataset.prefix;
-              floatInput.value = pfx + val;
-              floatInput.dispatchEvent(new Event("input"));
+        /* ── Filter prompt suggestions ───────────────────────────────── */
+        function wireChatPromptSuggestions() {
+          filterTrayInner.querySelectorAll('[data-chat-prompt]').forEach(button => {
+            button.addEventListener('click', () => {
+              floatInput.value = button.dataset.chatPrompt;
+              floatInput.dispatchEvent(new Event('input', { bubbles: true }));
               floatInput.focus();
-              const len = floatInput.value.length;
-              floatInput.setSelectionRange(len, len);
-              // Brief press state
-              pill.classList.add("pressed");
-              setTimeout(() => pill.classList.remove("pressed"), 300);
+              const end = floatInput.value.length;
+              floatInput.setSelectionRange(end, end);
             });
           });
         }
 
-        function resetTrayToDefault() {
-          activeDimension = null;
-          filterTrayInner.innerHTML = defaultTrayHTML;
-          // Re-wire the default dimension chips
-          wireDimensionChips();
-        }
+        wireChatPromptSuggestions();
 
-        function wireDimensionChips() {
-          filterTrayInner.querySelectorAll(".filter-chip[data-filter]").forEach(chip => {
-            chip.addEventListener("click", () => {
-              const key = chip.dataset.filter;
-              if (chip.dataset.action === "clear-filters") {
-                floatInput.value = "";
-                floatInput.dispatchEvent(new Event("input"));
-                clearAllFilters();
-                floatInput.focus();
-                return;
-              }
-              const prefix = FILTER_PREFIXES[key] || `Filter by ${key}: `;
-              floatInput.value = prefix;
-              floatInput.dispatchEvent(new Event("input"));
-              floatInput.focus();
-              const len = prefix.length;
-              floatInput.setSelectionRange(len, len);
-              // Render contextual suggestion chips
-              renderSuggestionChips(key);
-            });
-          });
-        }
-
-        // Initial wire-up of default chips
-        wireDimensionChips();
-
-        /* ── Active filter strip management ────────────────────────────
-       When a filter is *sent* (applyFilter called), parse the text
-       to extract the dimension + value and show an active chip.     */
-        function parseFilterFromText(text) {
-          // Matches "Filter by Company: Upland" → { key: "Company", value: "Upland" }
-          const match = text.match(/Filter by ([^:]+):\s*(.+)/i);
-          if (match) return { key: match[1].trim(), value: match[2].trim() };
-          return null;
-        }
+        /* ── Active filter strip state ───────────────────────────────── */
 
         function renderActiveStrip() {
           if (!activeFilterStrip) return;
@@ -12262,6 +12125,7 @@
           activeFilters = {};
           setInteractionType("all", { silent: true });
           renderActiveStrip();
+          if (window.AIMY_QA_FILTERS) window.AIMY_QA_FILTERS.reset();
         }
 
         if (afsClearAll) afsClearAll.addEventListener("click", clearAllFilters);
@@ -12284,7 +12148,7 @@
           /* The dimensions are a closed set, so a slug can be turned back into
              the label it came from. Round-tripping "Time Period" through a URL
              key is otherwise the one thing that can silently go wrong. */
-          var DIMS = Object.keys(FILTER_PREFIXES).filter(function (k) { return k !== "Interaction type"; });
+          var DIMS = [];
           function slug(k) {
             return "f_" + String(k).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
           }
@@ -12296,9 +12160,9 @@
 
           window.AIMY_SURFACE = {
             initials: "NW",
-            SCALAR: ["view", "scenario", "chart", "interaction"].concat(DIMS.map(slug)),
-            MULTI: [],
-            DEFAULTS: { view: "manager", scenario: "critical", interaction: "all" },
+            SCALAR: ["view", "scenario", "chart", "interaction", "qa_filters", "qa_interaction", "qa_from", "qa_to"].concat(DIMS.map(slug)),
+            MULTI: ["qa_client", "qa_product"],
+            DEFAULTS: { view: "manager", scenario: "critical", interaction: "all", qa_filters: "", qa_interaction: "all", qa_from: "2026-01-01", qa_to: "2026-09-15" },
 
             read: function () {
               var out = { scenario: activeScenario };
@@ -12311,6 +12175,17 @@
               if (tog && tog.getAttribute("aria-expanded") === "true") out.chart = "1";
               out.interaction = interactionType;
               Object.keys(activeFilters).forEach(function (k) { out[slug(k)] = activeFilters[k]; });
+              if (window.AIMY_QA_FILTERS) {
+                var qa = window.AIMY_QA_FILTERS.get();
+                if (qa.interaction !== "all" || qa.client.length || qa.product.length || qa.from !== "2026-01-01" || qa.to !== "2026-09-15") {
+                  out.qa_filters = "1";
+                  out.qa_interaction = qa.interaction;
+                  out.qa_client = qa.client.slice();
+                  out.qa_product = qa.product.slice();
+                  out.qa_from = qa.from;
+                  out.qa_to = qa.to;
+                }
+              }
               return out;
             },
 
@@ -12322,6 +12197,17 @@
                 DIMS.forEach(function (k) { if (v[slug(k)]) activeFilters[k] = v[slug(k)]; });
                 setInteractionType(v.interaction || "all", { silent: true });
                 renderActiveStrip();
+                if (v.qa_filters === "1" && window.AIMY_QA_FILTERS) {
+                  window.AIMY_QA_FILTERS.restore({
+                    interaction: v.qa_interaction || "all",
+                    client: v.qa_client || [],
+                    product: v.qa_product || [],
+                    from: v.qa_from || "2026-01-01",
+                    to: v.qa_to || "2026-09-15"
+                  });
+                } else if (window.__AIMY_CHAT_RESTORING_SESSION && window.AIMY_QA_FILTERS) {
+                  window.AIMY_QA_FILTERS.restore({ interaction: "all", client: [], product: [], from: "2026-01-01", to: "2026-09-15" });
+                }
 
                 /* The detected state. `setScenario` repaints the pill, the
                    confidence signals, the chip row and the alternatives, so
@@ -12354,7 +12240,7 @@
           /* ── Keeping the URL honest about what is on screen ──
              Two write paths, so two places call it. `replaceState`, not push:
              setting a filter is not a navigation and should not cost a Back. */
-          function sync() { if (!APPLYING && window.AimyChat) window.AimyChat.sync(); }
+            function sync() { if (!APPLYING && !window.__AIMY_SURFACE_RESTORING && !window.__AIMY_QA_FILTER_RESTORING && window.AimyChat) window.AimyChat.sync(); }
 
           var baseRender = renderActiveStrip;
           renderActiveStrip = function () { baseRender.apply(this, arguments); sync(); };
@@ -12379,11 +12265,16 @@
         /* ── Filter trigger buttons → Canvas injection ─────────────────
            (Legacy global kept for any external callers)               */
         window.injectFilter = function (filterKey) {
-          const prefix = FILTER_PREFIXES[filterKey] || `Filter by ${filterKey}: `;
-          floatInput.value = prefix;
-          floatInput.dispatchEvent(new Event("input"));
+          const prompts = {
+            client: 'Tickets for client Second Street',
+            product: 'Calls for product Upland',
+            interaction: 'Show only calls',
+            date: 'Calls for the last 30 days'
+          };
+          floatInput.value = prompts[String(filterKey || '').toLowerCase()] || '';
+          floatInput.dispatchEvent(new Event('input', { bubbles: true }));
           floatInput.focus();
-          const len = prefix.length;
+          const len = floatInput.value.length;
           floatInput.setSelectionRange(len, len);
         };
 
@@ -14135,9 +14026,15 @@
          'aimy:scope-changed', matching the 'aimy:filter-applied' convention
          at index.html:10052 / settings.html:7917.
 
+         The scope is a LIST of products (empty = all), so the dashboard can
+         be narrowed to several at once, the same way the client filter
+         accepts several clients. Storage holds a JSON array; a legacy plain
+         single id is migrated on read. The pre-paint attribute collapses the
+         list to 'all' | single id | 'multi' for the CSS label slots.
+
          It does NOT filter this page. Consumers opt in:
            window.addEventListener('aimy:scope-changed', function (e) {
-             e.detail.scope;  // 'all' | 'upland' | 'asteris' | 'secondstreet'
+             e.detail.scope;  // array of product ids, [] = all
            });
          Current value at any time: window.AIMY_SCOPE.get().
 
@@ -14150,214 +14047,973 @@
           { value: 'asteris',      label: 'Asteris'      },
           { value: 'secondstreet', label: 'SecondStreet' }
         ];
+        var PRODUCT_IDS = ['upland', 'asteris', 'secondstreet'];
 
-        var btn   = document.getElementById('gpsBtn');
-        var panel = document.getElementById('gpsPanel');
-        var input = document.getElementById('gpsSearch');
-        var list  = document.getElementById('gpsList');
-        var empty = document.getElementById('gpsEmpty');
-        if (!btn || !panel || !input || !list) return;
-
-        var opts = Array.prototype.slice.call(list.querySelectorAll('.gps-opt'));
-        var activeIdx = -1;
-
-        function isValid(v) {
-          for (var i = 0; i < OPTIONS.length; i++) if (OPTIONS[i].value === v) return true;
-          return false;
+        function normalize(list) {
+          if (list == null) list = [];
+          if (!Array.isArray(list)) list = [list];   /* a single id is fine */
+          var seen = {};
+          return list.filter(function (v) {
+            if (PRODUCT_IDS.indexOf(v) === -1 || seen[v]) return false;
+            seen[v] = true;
+            return true;
+          });
         }
         function read() {
           var v = null;
           try { v = localStorage.getItem(KEY); } catch (e) {}
-          return isValid(v) ? v : 'all';
-        }
-        function labelFor(v) {
-          for (var i = 0; i < OPTIONS.length; i++) if (OPTIONS[i].value === v) return OPTIONS[i].label;
-          return OPTIONS[0].label;
-        }
-        function isOpen()  { return !panel.hidden; }
-        function visible() { return opts.filter(function (o) { return !o.hidden; }); }
-
-        /* aria-selected only. The visible label and the active tint are CSS
-           off <html data-scope>, already correct at first paint. */
-        function syncSelected() {
-          var cur = read();
-          opts.forEach(function (o) {
-            o.setAttribute('aria-selected', o.getAttribute('data-value') === cur ? 'true' : 'false');
-          });
-        }
-
-        function setActive(i) {
-          var vis = visible();
-          opts.forEach(function (o) { o.classList.remove('is-active'); });
-          if (!vis.length || i < 0) {
-            activeIdx = -1;
-            input.removeAttribute('aria-activedescendant');
-            return;
+          if (!v) return [];
+          if (v.charAt(0) === '[') {
+            try { return normalize(JSON.parse(v)); } catch (e) { return []; }
           }
-          if (i > vis.length - 1) i = vis.length - 1;
-          activeIdx = i;
-          var el = vis[i];
-          el.classList.add('is-active');
-          input.setAttribute('aria-activedescendant', el.id);
-          /* keep the active row in view without scrolling the page */
-          var lr = list.getBoundingClientRect(), er = el.getBoundingClientRect();
-          /* scrollTop is LAYOUT px, the rect delta is VISUAL px. They are the
-             same below 1920, where currentCSSZoom is 1, and diverge above it. */
-          var lk = list.currentCSSZoom || 1;
-          if (er.bottom > lr.bottom)  list.scrollTop += (er.bottom - lr.bottom) / lk;
-          else if (er.top < lr.top)   list.scrollTop -= (lr.top - er.top) / lk;
+          return normalize([v]);   /* legacy single-id value */
         }
-
-        function filter(q) {
-          q = (q || '').trim().toLowerCase();
-          var n = 0;
-          opts.forEach(function (o) {
-            var hit = !q || o.textContent.trim().toLowerCase().indexOf(q) !== -1;
-            o.hidden = !hit;
-            if (hit) n++;
-          });
-          if (empty) empty.hidden = n !== 0;
-          if (!n) { setActive(-1); return; }   /* zero matches: nothing active,
-                                                  Enter is a no-op */
-          var vis = visible(), start = 0;
-          if (!q) {                            /* empty box: land on the current
-                                                  selection, not always row 0 */
-            for (var i = 0; i < vis.length; i++) {
-              if (vis[i].getAttribute('aria-selected') === 'true') { start = i; break; }
-            }
-          }
-          setActive(start);
+        function labelFor(list) {
+          if (!list.length) return OPTIONS[0].label;
+          return list.map(function (v) {
+            for (var i = 0; i < OPTIONS.length; i++) if (OPTIONS[i].value === v) return OPTIONS[i].label;
+            return v;
+          }).join(', ');
         }
-
-        function open() {
-          if (isOpen()) return;
-          panel.hidden = false;
-          btn.setAttribute('aria-expanded', 'true');
-          input.value = '';
-          filter('');
-          input.focus();
-        }
-
-        function close(refocus) {
-          if (!isOpen()) return;
-          panel.hidden = true;
-          btn.setAttribute('aria-expanded', 'false');
-          input.removeAttribute('aria-activedescendant');
-          activeIdx = -1;
-          opts.forEach(function (o) { o.classList.remove('is-active'); o.hidden = false; });
-          if (empty) empty.hidden = true;
-          if (refocus) btn.focus();
-        }
-
-        function choose(el) {
-          var next = el.getAttribute('data-value');
+        function choose(next) {
           var prev = read();
-          if (next !== prev) {
-            try { localStorage.setItem(KEY, next); } catch (e) {}
-            document.documentElement.setAttribute('data-scope', next);
-            syncSelected();
-            window.dispatchEvent(new CustomEvent('aimy:scope-changed', {
-              detail: { scope: next, label: labelFor(next), previous: prev, timestamp: Date.now() }
-            }));
-          }
-          close(true);
+          next = normalize(next);
+          if (next.length === prev.length && next.every(function (v, i) { return v === prev[i]; })) return;
+          try { localStorage.setItem(KEY, JSON.stringify(next)); } catch (e) {}
+          document.documentElement.setAttribute('data-scope',
+            next.length === 0 ? 'all' : next.length === 1 ? next[0] : 'multi');
+          window.dispatchEvent(new CustomEvent('aimy:scope-changed', {
+            detail: { scope: next.slice(), label: labelFor(next), previous: prev.slice(), timestamp: Date.now() }
+          }));
         }
-
-        btn.addEventListener('click', function (e) {
-          e.stopPropagation();
-          if (isOpen()) close(true); else open();
-        });
-
-        /* preventDefault also suppresses the click a <button> synthesises from
-           Enter/Space, so open() is not called twice. */
-        btn.addEventListener('keydown', function (e) {
-          if (e.key === 'ArrowDown' || e.key === 'ArrowUp' || e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            open();
-          }
-        });
-
-        input.addEventListener('input', function () { filter(input.value); });
-
-        input.addEventListener('keydown', function (e) {
-          var vis = visible();
-          switch (e.key) {
-            case 'Escape':    e.preventDefault(); close(true); break;
-            case 'Tab':       close(false); break;
-            case 'ArrowDown':
-              e.preventDefault();
-              if (vis.length) setActive(activeIdx < 0 ? 0 : (activeIdx + 1) % vis.length);
-              break;
-            case 'ArrowUp':
-              e.preventDefault();
-              if (vis.length) setActive(activeIdx < 0 ? vis.length - 1 : (activeIdx - 1 + vis.length) % vis.length);
-              break;
-            /* Home/End move the caret when there is text to move it through,
-               per the editable-combobox convention; they jump the list only
-               when the field is empty. */
-            case 'Home': if (input.value) break; e.preventDefault(); setActive(0); break;
-            case 'End':  if (input.value) break; e.preventDefault(); setActive(vis.length - 1); break;
-            case 'Enter':
-              e.preventDefault();
-              if (activeIdx >= 0 && vis[activeIdx]) choose(vis[activeIdx]);
-              break;
-          }
-        });
-
-        list.addEventListener('click', function (e) {
-          var el = e.target.closest && e.target.closest('.gps-opt');
-          if (!el) return;
-          e.stopPropagation();
-          choose(el);
-        });
-        list.addEventListener('mousemove', function (e) {
-          var el = e.target.closest && e.target.closest('.gps-opt');
-          if (!el) return;
-          var i = visible().indexOf(el);
-          if (i !== -1 && i !== activeIdx) setActive(i);
-        });
-
-        /* Outside click and Escape, same shape as the notifications panel.
-           The contains() guards are what let the search field be clicked
-           without dismissing the panel, which is exactly what the
-           .v2-dropdown fork does not do. */
-        document.addEventListener('click', function (e) {
-          if (isOpen() && !panel.contains(e.target) && !btn.contains(e.target)) close(false);
-        });
-        document.addEventListener('keydown', function (e) {
-          if (isOpen() && e.key === 'Escape') { e.preventDefault(); close(true); }
-        });
 
         /* Another tab changed the scope. Navigation is full page loads, so this
            only matters for two tabs open side by side. */
         window.addEventListener('storage', function (e) {
           if (e.key !== KEY) return;
-          document.documentElement.setAttribute('data-scope', read());
-          syncSelected();
+          var next = read();
+          document.documentElement.setAttribute('data-scope',
+            next.length === 0 ? 'all' : next.length === 1 ? next[0] : 'multi');
+          window.dispatchEvent(new CustomEvent('aimy:scope-synced'));
         });
 
         window.AIMY_SCOPE = {
           key: KEY,
           options: OPTIONS.slice(),
           get:   function ()  { return read(); },
-          label: function (v) { return labelFor(v == null ? read() : v); },
+          label: function (v) { return labelFor(v == null ? read() : normalize(v)); },
           set:   function (v) {
-            if (!isValid(v)) return false;
-            for (var i = 0; i < opts.length; i++) {
-              if (opts[i].getAttribute('data-value') === v) { choose(opts[i]); return true; }
-            }
+            /* Accepts an array of ids, a single id, or 'all' (clears). */
+            if (v === 'all' || v == null) { choose([]); return true; }
+            if (Array.isArray(v)) { choose(v); return true; }
+            if (PRODUCT_IDS.indexOf(v) !== -1) { choose([v]); return true; }
             return false;
           }
         };
 
         /* Normalise: the attribute is already set pre-paint on a return visit,
            this covers first visit and a rejected stored value. */
-        document.documentElement.setAttribute('data-scope', read());
-        syncSelected();
+        var initial = read();
+        document.documentElement.setAttribute('data-scope',
+          initial.length === 0 ? 'all' : initial.length === 1 ? initial[0] : 'multi');
       })();
     </script>
-    <script src="assets/aimy-canvas.js?v=7"></script>
+    <script>
+      /* ══ FILTER TOOLBAR ENGINE ═════════════════════════════════════════
+         Drives the toolbar triggers and their two popover kinds:
+           #fpMain  the Filter menu: fields on the left, the selected field's
+                    options on the right, Clear all / Cancel / Apply below.
+           #fpPop   one compact popover per trigger (interaction, client,
+                    product, date), Cancel / Apply below.
+         Both edit a DRAFT copy. Nothing is written until Apply; Cancel,
+         Escape and a click outside drop the draft. Apply writes through the
+         existing owners: window.AIMY_INTERACTION (canvas script) and
+         window.AIMY_SCOPE (persisted, 'aimy:scope-changed'). Client and date
+         range are held here and announced as 'aimy:client-filter-changed' and
+         'aimy:date-range-changed'.
+         Popovers are position:fixed and moved to <body>, so the bar's
+         overflow on small screens cannot clip them. */
+      (function () {
+        'use strict';
+        var scope = window.AIMY_SCOPE, inter = window.AIMY_INTERACTION;
+        var main = document.getElementById('fpMain');
+        var single = document.getElementById('fpPop');
+        var mainBtn = document.getElementById('fpMainBtn');
+        if (!scope || !inter || !main || !single || !mainBtn) return;
+
+        var fieldsEl = document.getElementById('fpFields');
+        var detailEmpty = document.getElementById('fpDetailEmpty');
+        var detailEl = document.getElementById('fpDetail');
+        var mainEditorEl = document.getElementById('fpMainEditor');
+        var singleEditorEl = document.getElementById('fpSingleEditor');
+        document.body.appendChild(main);
+        document.body.appendChild(single);
+        var appliedEl = el('div', 'fp-applied-filters');
+        appliedEl.id = 'fpAppliedFilters';
+        appliedEl.setAttribute('role', 'group');
+        appliedEl.setAttribute('aria-label', 'Applied dashboard filters');
+        appliedEl.hidden = true;
+        document.getElementById('gpsBar').appendChild(appliedEl);
+        var appliedSignature = '';
+        var toolDialog = document.createElement('dialog');
+        toolDialog.className = 'fp-tool-dialog';
+        toolDialog.setAttribute('aria-labelledby', 'fpToolTitle');
+        document.body.appendChild(toolDialog);
+        var toolOpener = null;
+        var VIEWS_KEY = 'aimy-qa-filter-views-v1';
+        var CHAT_PROPOSALS_KEY = 'aimy-qa-chat-filter-proposals-v1';
+        var DEFAULT_FROM = '2026-01-01', DEFAULT_TO = '2026-09-15';
+        var MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        var CLIENTS = ['Second Street', 'Adestra', 'AccuRoute', 'Filebound', 'Panviva', 'PSA', 'RightAnswers', 'InterFax', 'Objectif Lune', 'BA Insights'];
+        var CLIENT_ALIASES = {};
+        var DATE_MODES = { 'This week': 'week', 'Last week': 'lastweek', 'This month': 'month', 'Last month': 'lastmonth' };
+        var ORDER = ['interaction', 'client', 'product', 'date'];
+        var state = { client: [], from: DEFAULT_FROM, to: DEFAULT_TO };
+        var uid = 0;
+        var cur = null;
+
+        var FIELDS = {
+          interaction: {
+            label: 'Interaction type', type: 'radio', search: false,
+            options: function () {
+              return Object.keys(inter.options).map(function (k) { return { value: k, label: inter.options[k] }; });
+            }
+          },
+          client: {
+            label: 'Client', type: 'multi', search: true, allLabel: 'All clients',
+            options: function () { return CLIENTS.map(function (c) { return { value: c, label: c }; }); }
+          },
+          product: {
+            label: 'Product', type: 'multi', search: true, allLabel: 'All products',
+            options: function () { return scope.options.filter(function (o) { return o.value !== 'all'; }); }
+          },
+          date: { label: 'Date range', type: 'date' }
+        };
+
+        function el(tag, cls, text) {
+          var n = document.createElement(tag);
+          if (cls) n.className = cls;
+          if (text != null) n.textContent = text;
+          return n;
+        }
+        function readApplied() {
+          return { interaction: inter.get(), client: state.client.slice(), product: scope.get(), from: state.from, to: state.to };
+        }
+        function clone(d) {
+          return { interaction: d.interaction, client: d.client.slice(), product: d.product.slice(), from: d.from, to: d.to };
+        }
+        function count(key, d) {
+          if (key === 'interaction') return d.interaction !== 'all' ? 1 : 0;
+          if (key === 'product') return d.product.length;
+          if (key === 'client') return d.client.length;
+          return d.from !== DEFAULT_FROM || d.to !== DEFAULT_TO ? 1 : 0;
+        }
+        function fmt(s) {
+          var p = s.split('-');
+          return p[2] + ' ' + MONTHS[+p[1] - 1] + ' ' + p[0];
+        }
+        function validDate(s) {
+          if (!/^\d{4}-\d{2}-\d{2}$/.test(s)) return false;
+          var y = +s.slice(0, 4);
+          if (y < 2000 || y > 2100) return false;
+          var t = new Date(s + 'T00:00:00Z');
+          return !isNaN(t.getTime()) && t.toISOString().slice(0, 10) === s;
+        }
+        function dateMessage(d) {
+          if (!d.from || !d.to) return 'Enter both a start and an end date.';
+          if (!validDate(d.from) || !validDate(d.to)) return 'Enter valid dates between 2000 and 2100.';
+          if (d.from > d.to) return 'The start date must be on or before the end date.';
+          return '';
+        }
+
+        /* ── Toolbar state ─────────────────────────────────────────────── */
+        function trigger(key) { return document.querySelector('[data-fp-field="' + key + '"]'); }
+        function updateToolbar() {
+          var a = readApplied();
+          ORDER.forEach(function (k) {
+            var n = count(k, a), button = trigger(k), badge = button.querySelector('[data-fp-badge]');
+            button.classList.toggle('is-applied', n > 0);
+            badge.textContent = n;
+            badge.hidden = n === 0;
+            button.setAttribute('aria-label', FIELDS[k].label + ' filter' + (n ? ', ' + n + ' selected' : ''));
+          });
+          var total = ORDER.reduce(function (n, k) { return n + count(k, a); }, 0);
+          var badge = document.getElementById('fpMainBadge');
+          badge.textContent = total;
+          badge.hidden = total === 0;
+          mainBtn.classList.toggle('is-applied', total > 0);
+          updateAppliedPills(a);
+          if (!window.__AIMY_QA_FILTER_RESTORING && !window.__AIMY_SURFACE_RESTORING && window.AimyChat) window.AimyChat.sync();
+        }
+        function updateAppliedPills(a) {
+          var signature = JSON.stringify(a);
+          if (signature === appliedSignature) return;
+          appliedSignature = signature;
+          appliedEl.replaceChildren();
+          var labels = { interaction: 'Interaction type', client: 'Client', product: 'Product', date: 'Date range' };
+          ORDER.forEach(function (key) {
+            var selected = count(key, a);
+            if (!selected) return;
+            var full = key === 'interaction' ? inter.options[a.interaction]
+              : key === 'client' ? a.client.join(', ')
+              : key === 'product' ? a.product.map(scope.label).join(', ')
+              : fmt(a.from) + ' ~ ' + fmt(a.to);
+            var value = key === 'interaction' ? inter.options[a.interaction]
+              : key === 'client' ? listLabel(a.client)
+              : key === 'product' ? listLabel(a.product.map(scope.label))
+              : fmt(a.from) + ' ~ ' + fmt(a.to);
+            var pill = el('span', 'fp-applied-pill');
+            pill.dataset.filter = key;
+            var edit = el('button', 'fp-applied-edit');
+            edit.type = 'button';
+            edit.title = labels[key] + ': ' + full;
+            edit.setAttribute('aria-label', 'Edit ' + labels[key].toLowerCase() + ' filter: ' + full);
+            edit.setAttribute('aria-haspopup', 'dialog');
+            edit.setAttribute('aria-controls', 'fpPop');
+            edit.appendChild(el('b', '', labels[key] + ':'));
+            edit.appendChild(document.createTextNode(' ' + value));
+            edit.addEventListener('click', function () { openSingle(key, trigger(key)); });
+            pill.appendChild(edit);
+            appliedEl.appendChild(pill);
+          });
+          appliedEl.hidden = !appliedEl.children.length;
+          if (!appliedEl.hidden) {
+            var reset = el('button', 'fp-applied-reset', 'Reset all');
+            reset.type = 'button';
+            reset.addEventListener('click', function () { clearAll(); mainBtn.focus(); });
+            appliedEl.appendChild(reset);
+          }
+        }
+        function listLabel(values) {
+          var MAX = 2;
+          if (values.length <= MAX) return values.join(', ');
+          return values.slice(0, MAX).join(', ') + ' +' + (values.length - MAX);
+        }
+        function escapeHtml(value) {
+          return String(value == null ? '' : value).replace(/[&<>"']/g, function (ch) {
+            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch];
+          });
+        }
+        function showToolDialog(title, subtitle, body, footer, opener) {
+          if (cur) closeCur(false);
+          toolOpener = opener || document.activeElement;
+          toolDialog.classList.toggle('fp-tool-views', title === 'Saved views');
+          toolDialog.innerHTML = '<div class="fp-tool-head"><div><h2 id="fpToolTitle">' + escapeHtml(title) + '</h2><p>' + escapeHtml(subtitle) + '</p></div>' +
+            '<button class="fp-tool-close" type="button" data-tool-close aria-label="Close">' +
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"></path></svg></button></div>' +
+            '<div class="fp-tool-body">' + body + '</div><div class="fp-tool-foot">' + footer + '</div>';
+          toolDialog.querySelectorAll('[data-tool-close]').forEach(function (button) {
+            button.addEventListener('click', function () { toolDialog.close(); });
+          });
+          if (!toolDialog.open) toolDialog.show();
+          if (toolOpener) toolOpener.setAttribute('aria-expanded', 'true');
+          placeToolDialog();
+        }
+        function readChatProposals() {
+          try {
+            var data = JSON.parse(localStorage.getItem(CHAT_PROPOSALS_KEY) || '{}');
+            return data && typeof data === 'object' ? data : {};
+          } catch (e) { return {}; }
+        }
+        function saveChatProposals(data) {
+          try { localStorage.setItem(CHAT_PROPOSALS_KEY, JSON.stringify(data)); } catch (e) {}
+        }
+        function filterSignature(d) { return JSON.stringify({ interaction: d.interaction, client: d.client, product: d.product, from: d.from, to: d.to }); }
+        function createChatProposal(text) {
+          var parsed = parseFilterRequest(text), id = 'qaf-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
+          var proposal = {
+            id: id, status: parsed.error ? (parsed.noop ? 'no-change' : 'needs-clarification') : 'pending', message: parsed.error || '',
+            changes: parsed.changes || [], kept: parsed.kept || [], next: parsed.next || readApplied(),
+            base: readApplied(), signature: filterSignature(readApplied()), query: String(text || '').slice(0, 300)
+          };
+          var proposals = readChatProposals();
+          proposals[id] = proposal;
+          Object.keys(proposals).sort().slice(0, Math.max(0, Object.keys(proposals).length - 40)).forEach(function (key) { delete proposals[key]; });
+          saveChatProposals(proposals);
+          return proposal;
+        }
+        function getChatProposal(id) { return readChatProposals()[String(id || '')] || null; }
+        function setChatProposalStatus(id, status) {
+          var proposals = readChatProposals(), proposal = proposals[String(id || '')];
+          if (!proposal) return { ok: false, reason: 'missing' };
+          if (proposal.status !== 'pending') return { ok: false, reason: 'resolved', proposal: proposal };
+          if (status === 'applied' && filterSignature(readApplied()) !== proposal.signature) {
+            proposal.status = 'needs-clarification';
+            proposal.message = 'Your active filters changed after this proposal was created. Send the request again to preview it against the current filters.';
+            proposals[proposal.id] = proposal; saveChatProposals(proposals);
+            return { ok: false, reason: 'stale', proposal: proposal };
+          }
+          if (status === 'applied') {
+            proposal.status = 'applied';
+            proposals[proposal.id] = proposal; saveChatProposals(proposals);
+            commit(ORDER, proposal.next);
+          } else {
+            proposal.status = 'cancelled';
+            proposals[proposal.id] = proposal; saveChatProposals(proposals);
+          }
+          return { ok: true, proposal: proposal };
+        }
+        document.addEventListener('click', function (event) {
+          var apply = event.target.closest('[data-qa-filter-apply]');
+          var cancel = event.target.closest('[data-qa-filter-cancel]');
+          var control = apply || cancel;
+          if (!control) return;
+          var result = setChatProposalStatus(control.getAttribute(apply ? 'data-qa-filter-apply' : 'data-qa-filter-cancel'), apply ? 'applied' : 'cancelled');
+          var proposalId = control.getAttribute(apply ? 'data-qa-filter-apply' : 'data-qa-filter-cancel');
+          if (result.proposal && typeof window.renderQaFilterProposal === 'function') {
+            var card = control.closest('.qa-chat-filter-card');
+            if (card) card.outerHTML = window.renderQaFilterProposal(proposalId);
+          }
+          if (result.ok && apply && window.aimyFloatBar) {
+            window.aimyFloatBar.classList.remove('filter-applied');
+            void window.aimyFloatBar.offsetWidth;
+            window.aimyFloatBar.classList.add('filter-applied');
+          }
+          if (result.ok && apply) {
+            window.dispatchEvent(new CustomEvent('aimy:filter-applied', {
+              detail: { query: result.proposal.query, source: 'aimy-chat', filters: readApplied(), timestamp: Date.now() }
+            }));
+          }
+        });
+        window.AIMY_QA_FILTERS = {
+          get: readApplied,
+          analyze: parseFilterRequest,
+          isFilterIntent: isFilterIntent,
+          prepare: createChatProposal,
+          getProposal: getChatProposal,
+          restore: function (d) {
+            var safe = {
+              interaction: Object.prototype.hasOwnProperty.call(inter.options, d.interaction) ? d.interaction : 'all',
+              client: Array.isArray(d.client) ? d.client.filter(function (v) { return CLIENTS.indexOf(v) !== -1; }) : [],
+              product: Array.isArray(d.product) ? d.product.filter(function (v) { return scope.get().indexOf(v) !== -1 || scope.options.some(function (o) { return o.value === v && v !== 'all'; }); }) : [],
+              from: validDate(d.from) ? d.from : DEFAULT_FROM,
+              to: validDate(d.to) ? d.to : DEFAULT_TO
+            };
+            var prior = window.__AIMY_QA_FILTER_RESTORING;
+            window.__AIMY_QA_FILTER_RESTORING = true;
+            try { commit(ORDER, safe); } finally { window.__AIMY_QA_FILTER_RESTORING = prior; }
+          },
+          reset: clearAll
+        };
+        toolDialog.addEventListener('close', function () {
+          if (toolOpener) toolOpener.setAttribute('aria-expanded', 'false');
+          if (toolOpener && document.contains(toolOpener)) toolOpener.focus({ preventScroll: true });
+        });
+        function placeToolDialog() {
+          if (!toolDialog.open || !toolOpener || !document.contains(toolOpener)) return;
+          var anchor = toolOpener.getBoundingClientRect();
+          var margin = 8, gap = 6;
+          var width = toolDialog.offsetWidth, height = toolDialog.offsetHeight;
+          var desiredLeft = toolDialog.classList.contains('fp-tool-views')
+            ? anchor.left + (anchor.width - width) / 2
+            : anchor.left;
+          var left = Math.max(margin, Math.min(desiredLeft, window.innerWidth - width - margin));
+          var top = anchor.bottom + gap;
+          if (top + height > window.innerHeight - margin && anchor.top - height - gap >= margin) {
+            top = anchor.top - height - gap;
+          }
+          top = Math.max(margin, Math.min(top, window.innerHeight - height - margin));
+          toolDialog.style.left = left + 'px';
+          toolDialog.style.top = top + 'px';
+        }
+        toolDialog.addEventListener('click', function (event) {
+          if (event.target !== toolDialog) return;
+          var rect = toolDialog.getBoundingClientRect();
+          if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) {
+            toolDialog.close();
+          }
+        });
+        document.addEventListener('pointerdown', function (event) {
+          if (toolDialog.open && !toolDialog.contains(event.target) && !toolOpener.contains(event.target)) {
+            toolDialog.close();
+          }
+        });
+        window.addEventListener('resize', placeToolDialog);
+        window.addEventListener('scroll', placeToolDialog, true);
+        function isFilterIntent(text) {
+          var q = String(text || '').toLowerCase();
+          var explicit = /\b(filter|filters|filtered|apply|set|change|update|clear|remove|reset|only)\b/.test(q);
+          if (/^(what|why|how|when|where|who|can you explain|tell me about|did|does|is|are|was|were|do|has|have|show me why|show me how|show me what)\b/.test(q) && !/^(?:filter\s+(?:by|to|for)|show only|include|apply|set|change|update|clear|remove|reset)\b/.test(q)) return false;
+          var hasNamedClient = /\b(client|clients|customer|customers|account|accounts)\s+(?:filter\s+)?(?:by\s+)?[a-z0-9]/.test(q);
+          var hasNamedProduct = /\b(product|products|portfolio|portfolios)\s+(?:filter\s+)?(?:by\s+)?[a-z0-9]/.test(q);
+          return explicit || /\b(show|show me|include)\s+(all\s+)?(calls?|tickets?|chats?|interactions?|clients?|products?)\b/.test(q) ||
+            /\ball\s+(calls?|tickets?|chats?|interactions?|clients?|products?)\b/.test(q) ||
+            /\b(?:client|clients|customer|customers|account|accounts|product|products|portfolio|portfolios)\s+(?:filter\s+)?(?:by\s+)?[a-z0-9]/.test(q) ||
+            /\b(last|past)\s+\d+\s+days?\b|\b(?:this|last)\s+(?:week|month)\b|\byear to date\b|\bytd\b/.test(q) ||
+            /\b\d{4}-\d{2}-\d{2}\s+(?:to|through|until)\s+\d{4}-\d{2}-\d{2}\b/.test(q) ||
+            /\b(calls?|tickets?|chats?)\b.*\b(client|clients|product|products)\b|\b(client|clients|product|products)\b.*\b(calls?|tickets?|chats?)\b/.test(q) ||
+            /\b(calls?|tickets?|chats?)\b.*\b(for|from)\b/.test(q) ||
+            /\b(show|include)\b.*\b(calls?|tickets?|chats?)\b/.test(q) ||
+            hasNamedClient || hasNamedProduct ||
+            /\b(show|include|filter|only)\b.*\b(agents?|kpis?|outcomes?|sentiment|scores?|csat|teams?|reviewers?|languages?|disputes?|coaching)\b/.test(q);
+        }
+        function parseFilterRequest(text) {
+          var current = readApplied(), next = clone(current), query = String(text || '').trim().toLowerCase();
+          var touched = [], changes = [], errors = [], allClear = /\b(clear|remove|reset)\s+(all|every)(\s+(active|current))?\s+filters?\b|\b(clear|reset)\s+(all|filters?)\b/.test(query);
+          var channelMap = [
+            { re: /\b(calls?|voice calls?)\b/, value: 'calls' },
+            { re: /\btickets?\b/, value: 'tickets' },
+            { re: /\bchats?\b/, value: 'chats' }
+          ];
+          var channelHits = channelMap.filter(function (entry) { return entry.re.test(query); });
+          var clearInteraction = /\b(clear|remove|reset)\s+(the\s+)?(interaction|channel)(\s+type)?(\s+filters?)?\b|\ball interactions\b|\b(?:set|change|update|filter)\s+(?:the\s+)?(?:interaction|channel)(?:\s+type)?\s+(?:to\s+)?all\b/.test(query);
+          var clientValues = CLIENTS.filter(function (name) { return query.indexOf(name.toLowerCase()) !== -1; });
+          Object.keys(CLIENT_ALIASES).forEach(function (alias) {
+            if (query.indexOf(alias) !== -1 && clientValues.indexOf(CLIENT_ALIASES[alias]) === -1) clientValues.push(CLIENT_ALIASES[alias]);
+          });
+          var productValues = scope.options.filter(function (item) {
+            return item.value !== 'all' && query.indexOf(item.label.toLowerCase()) !== -1;
+          });
+          var clientFacet = /\b(client|clients|customer|customers|account|accounts)\b/.test(query);
+          var productFacet = /\b(product|products|portfolio|portfolios)\b/.test(query);
+          var clearClient = /\b(clear|remove|reset)\s+(the\s+)?(client|clients|customer|customers|account|accounts)(\s+filters?)?\b|\ball clients\b/.test(query);
+          var clearProduct = /\b(clear|remove|reset)\s+(the\s+)?(product|products|portfolio|portfolios)(\s+filters?)?\b|\ball products\b/.test(query);
+          var datePresets = query.match(/\b(?:last|past)\s+\d{1,3}\s+days?\b/g) || [];
+          var datePreset = query.match(/\b(?:last|past)\s+(\d{1,3})\s+days?\b/);
+          var dateCustom = query.match(/\b(\d{4}-\d{2}-\d{2})\s+(?:to|through|until)\s+(\d{4}-\d{2}-\d{2})\b/);
+          var dateMode = Object.keys(DATE_MODES).filter(function (name) { return query.indexOf(name.toLowerCase()) !== -1; })[0];
+          var clearDate = /\b(clear|remove|reset)\s+(the\s+)?(date range|date|time period)(\s+filters?)?\b|\byear to date\b|\bytd\b/.test(query);
+
+          if (allClear) {
+            next = { interaction: 'all', client: [], product: [], from: DEFAULT_FROM, to: DEFAULT_TO };
+            touched = ORDER.slice();
+            changes.push('Clear all active filters');
+          } else {
+            if (/\b(?:not|don't|do not|exclude|excluding|without|except|instead of)\b/.test(query)) errors.push('I can’t safely interpret exclusions yet. No filters were changed; choose the values to include instead.');
+            if (datePresets.length > 1 || (dateCustom && (datePreset || dateMode)) || (datePreset && dateMode)) errors.push('Use one date range per request.');
+            if (clearInteraction && channelHits.length) errors.push('Choose either all interactions or one interaction type, not both.');
+            if (clearInteraction) {
+              next.interaction = 'all'; touched.push('interaction'); changes.push('Interaction: All interactions');
+            } else if (channelHits.length) {
+              var uniqueChannels = channelHits.filter(function (item, index, all) {
+                return all.findIndex(function (other) { return other.value === item.value; }) === index;
+              });
+              if (uniqueChannels.length > 1) errors.push('Name one interaction type at a time: calls, tickets, or chats.');
+              else if (!Object.prototype.hasOwnProperty.call(inter.options, uniqueChannels[0].value)) errors.push('Chats are not available in the current interaction filter. Choose calls or tickets instead.');
+              else { next.interaction = uniqueChannels[0].value; touched.push('interaction'); changes.push('Interaction: ' + inter.options[next.interaction]); }
+            }
+
+            if (clearClient) {
+              next.client = []; touched.push('client'); changes.push('Client: All clients');
+            } else if (clientValues.length) {
+              if (!clientFacet && productFacet) errors.push('That name can match a client and a product here. Say “client ' + clientValues[0] + '” or “product ' + clientValues[0] + '”.');
+              else { next.client = clientValues; touched.push('client'); changes.push('Client: ' + clientValues.join(', ')); }
+            } else if (clientFacet && /\b(filter|set|change|update|show|include)\b/.test(query)) {
+              errors.push('Name a client from the available client list, or say “all clients” to clear this filter.');
+            }
+
+            if (clearProduct) {
+              next.product = []; touched.push('product'); changes.push('Product: All products');
+            } else if (productValues.length) {
+              if ((!productFacet && clientFacet) || (!productFacet && !clientFacet && !clientValues.length)) errors.push('“' + productValues[0].label + '” may refer to a client or product in this dashboard. Specify “client” or “product” so I apply the right filter.');
+              else { next.product = productValues.map(function (item) { return item.value; }); touched.push('product'); changes.push('Product: ' + productValues.map(function (item) { return item.label; }).join(', ')); }
+            } else if (productFacet && /\b(filter|set|change|update|show|include)\b/.test(query)) {
+              errors.push('Name a product from the available product list, or say “all products” to clear this filter.');
+            }
+
+            if (clearDate) {
+              next.from = DEFAULT_FROM; next.to = DEFAULT_TO; touched.push('date'); changes.push('Date range: Year to date');
+            } else if (datePreset) {
+              var days = Number(datePreset[1]);
+              if (days < 1 || days > 365) errors.push('Choose a relative date range from 1 to 365 days.');
+              else {
+                var end = new Date(DEFAULT_TO + 'T00:00:00Z');
+                end.setUTCDate(end.getUTCDate() - days + 1);
+                next.from = end.toISOString().slice(0, 10); next.to = DEFAULT_TO;
+                touched.push('date'); changes.push('Date range: Last ' + days + ' days');
+              }
+            } else if (dateMode) {
+              var mode = DATE_MODES[dateMode], anchor = new Date(DEFAULT_TO + 'T00:00:00Z');
+              var day = anchor.getUTCDay() || 7;
+              if (mode === 'week') {
+                anchor.setUTCDate(anchor.getUTCDate() - day + 1);
+                next.from = anchor.toISOString().slice(0, 10); next.to = DEFAULT_TO;
+              } else if (mode === 'lastweek') {
+                anchor.setUTCDate(anchor.getUTCDate() - day - 6);
+                var weekStart = new Date(anchor); weekStart.setUTCDate(weekStart.getUTCDate() + 6);
+                next.from = anchor.toISOString().slice(0, 10); next.to = weekStart.toISOString().slice(0, 10);
+              } else if (mode === 'month') {
+                next.from = DEFAULT_TO.slice(0, 8) + '01'; next.to = DEFAULT_TO;
+              } else {
+                var prevMonth = new Date(Date.UTC(anchor.getUTCFullYear(), anchor.getUTCMonth(), 0));
+                next.from = new Date(Date.UTC(prevMonth.getUTCFullYear(), prevMonth.getUTCMonth(), 1)).toISOString().slice(0, 10);
+                next.to = prevMonth.toISOString().slice(0, 10);
+              }
+              touched.push('date'); changes.push('Date range: ' + dateMode);
+            } else if (dateCustom) {
+              if (validDate(dateCustom[1]) && validDate(dateCustom[2]) && dateCustom[1] <= dateCustom[2]) {
+                next.from = dateCustom[1]; next.to = dateCustom[2]; touched.push('date'); changes.push('Date range: ' + fmt(next.from) + ' ~ ' + fmt(next.to));
+              } else errors.push('Enter a valid date range, with the start on or before the end.');
+            }
+          }
+
+          if (/\b(agent|agents|kpi|outcome|sentiment|score|csat|team|reviewer|language|dispute|coaching|company|companies|failed|failure|failures|failing|fail|passed|pass)\b/.test(query)) {
+            errors.push('That request includes a filter this dashboard toolbar does not support yet. Supported: interaction type, client, product, date range.');
+          }
+          if (!allClear) {
+            var residue = query;
+            channelMap.forEach(function (entry) { residue = residue.replace(new RegExp(entry.re.source, 'gi'), ' '); });
+            CLIENTS.forEach(function (name) { residue = residue.replace(new RegExp(name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').toLowerCase(), 'g'), ' '); });
+            Object.keys(CLIENT_ALIASES).forEach(function (alias) { residue = residue.replace(new RegExp(alias, 'g'), ' '); });
+            scope.options.forEach(function (item) {
+              if (item.value !== 'all') residue = residue.replace(new RegExp(item.label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').toLowerCase(), 'g'), ' ');
+            });
+            residue = residue.replace(/\b(?:last|past)\s+\d{1,3}\s+days?\b|\b(?:this|last)\s+(?:week|month)\b|\b\d{4}-\d{2}-\d{2}\s+(?:to|through|until)\s+\d{4}-\d{2}-\d{2}\b|\byear to date\b|\bytd\b/g, ' ')
+              .replace(/\b(?:please|can|could|you|i|me|want|need|filter|filters|filtered|apply|set|change|update|clear|remove|reset|only|show|include|all|every|active|current|the|a|an|to|for|from|in|on|between|and|or|with|by|interaction|interactions|channel|type|client|clients|customer|customers|account|accounts|product|products|portfolio|portfolios|date|range|time|period|filtering)\b/g, ' ')
+              .replace(/[^a-z0-9]+/g, ' ').trim();
+            if (residue) errors.push('I could not interpret “' + residue + '”. No filters were changed.');
+          }
+          if (!allClear && !touched.length && !errors.length) errors.push('I could not identify a supported filter. Try “show only calls”, “client Second Street”, “product Upland”, or “last 30 days”.');
+          if (errors.length) return { error: errors.join(' '), touched: [], changes: [], next: current };
+
+          touched = ORDER.filter(function (key) { return touched.indexOf(key) !== -1; });
+          var kept = ORDER.filter(function (key) { return touched.indexOf(key) === -1 && count(key, current) > 0; }).map(function (key) {
+            var value = key === 'interaction' ? inter.options[current.interaction]
+              : key === 'client' ? current.client.join(', ')
+              : key === 'product' ? current.product.map(scope.label).join(', ')
+              : fmt(current.from) + ' ~ ' + fmt(current.to);
+            return FIELDS[key].label + ': ' + value;
+          });
+          var changed = touched.filter(function (key) { return count(key, current) !== count(key, next) || JSON.stringify(current[key]) !== JSON.stringify(next[key]) || (key === 'date' && (current.from !== next.from || current.to !== next.to)); });
+          if (!changed.length) {
+            var noChange = allClear ? 'All supported filters are already clear.'
+              : touched.length && touched.every(function (key) { return !count(key, current) && !count(key, next); })
+                ? touched.map(function (key) { return FIELDS[key].label; }).join(', ') + ' filters are already clear.'
+                : touched.length ? touched.map(function (key) { return FIELDS[key].label; }).join(', ') + ' already match the requested values.'
+                : 'Those filter values are already active.';
+            return { error: noChange + ' No changes were made.', noop: true, touched: [], changes: [], next: current };
+          }
+          var details = changed.map(function (key) {
+            if (key === 'interaction') return 'Interaction: ' + (next.interaction === 'all' ? 'All interactions' : inter.options[next.interaction]);
+            if (key === 'client') return 'Client: ' + (next.client.length ? next.client.join(', ') : 'All clients');
+            if (key === 'product') return 'Product: ' + (next.product.length ? next.product.map(scope.label).join(', ') : 'All products');
+            return 'Date range: ' + (next.from === DEFAULT_FROM && next.to === DEFAULT_TO ? 'Year to date' : fmt(next.from) + ' ~ ' + fmt(next.to));
+          });
+          return { next: next, touched: changed, changes: details, kept: kept };
+        }
+        function readSavedViews() {
+          try {
+            var views = JSON.parse(localStorage.getItem(VIEWS_KEY) || '[]');
+            return Array.isArray(views) ? views.filter(function (view) {
+              return view && typeof view.name === 'string' && view.filters;
+            }).slice(0, 12) : [];
+          } catch (e) { return []; }
+        }
+        function writeSavedViews(views) {
+          try { localStorage.setItem(VIEWS_KEY, JSON.stringify(views)); return true; }
+          catch (e) { return false; }
+        }
+        function openViews(opener) {
+          var views = readSavedViews();
+          var body = '<div class="fp-view-list" id="fpViewList"></div>' +
+            '<div><label class="fp-tool-note" for="fpViewName">Save current filters as</label>' +
+            '<input class="fp-tool-input" id="fpViewName" type="text" maxlength="48" placeholder="e.g. Weekly ticket review"></div>' +
+            '<p class="fp-tool-error" id="fpViewError" hidden></p>';
+          var footer = '<span class="fp-tool-note">Saved in this browser.</span><button class="fp-tool-secondary" type="button" data-tool-close>Done</button>' +
+            '<button class="fp-tool-primary" type="button" id="fpSaveViewBtn">Save current view</button>';
+          showToolDialog('Saved views', 'Load a saved filter set or save the current dashboard scope.', body, footer, opener);
+          var list = toolDialog.querySelector('#fpViewList');
+          var error = toolDialog.querySelector('#fpViewError');
+          function renderViews() {
+            views = readSavedViews();
+            if (!views.length) {
+              list.innerHTML = '<p class="fp-tool-note">No saved views yet. Save the current filters below.</p>';
+              return;
+            }
+            list.innerHTML = views.map(function (view, index) {
+              var selected = ORDER.reduce(function (total, key) { return total + count(key, view.filters); }, 0);
+              return '<div class="fp-view-row"><button class="fp-view-load" type="button" data-load-view="' + index + '"><strong>' + escapeHtml(view.name) + '</strong><small>' + selected + ' selected filter' + (selected === 1 ? '' : 's') + '</small></button>' +
+                '<button class="fp-view-delete" type="button" data-delete-view="' + index + '" aria-label="Delete ' + escapeHtml(view.name) + '">Delete</button></div>';
+            }).join('');
+            list.querySelectorAll('[data-load-view]').forEach(function (button) {
+              button.addEventListener('click', function () {
+                var view = views[Number(button.dataset.loadView)];
+                if (!view) return;
+                commit(ORDER, clone(view.filters));
+                toolDialog.close();
+              });
+            });
+            list.querySelectorAll('[data-delete-view]').forEach(function (button) {
+              button.addEventListener('click', function () {
+                views.splice(Number(button.dataset.deleteView), 1);
+                writeSavedViews(views);
+                renderViews();
+              });
+            });
+          }
+          renderViews();
+          toolDialog.querySelector('#fpSaveViewBtn').addEventListener('click', function () {
+            var name = toolDialog.querySelector('#fpViewName').value.trim();
+            error.hidden = true;
+            if (!name) { error.textContent = 'Enter a name for this view.'; error.hidden = false; return; }
+            if (views.some(function (view) { return view.name.toLowerCase() === name.toLowerCase(); })) {
+              error.textContent = 'A view with that name already exists.'; error.hidden = false; return;
+            }
+            if (views.length >= 12) { error.textContent = 'You can save up to 12 views. Delete one to make room.'; error.hidden = false; return; }
+            views.push({ name: name, filters: clone(readApplied()) });
+            if (!writeSavedViews(views)) { error.textContent = 'Could not save this view in browser storage.'; error.hidden = false; views.pop(); return; }
+            renderViews();
+            toolDialog.querySelector('#fpViewName').value = '';
+          });
+        }
+        function sameList(a, b) {
+          return a.length === b.length && a.every(function (v, i) { return v === b[i]; });
+        }
+        function commit(keys, d) {
+          var has = function (k) { return keys.indexOf(k) >= 0; };
+          if (has('interaction')) inter.set(d.interaction);
+          if (has('product') && !sameList(scope.get(), d.product)) scope.set(d.product);
+          if (has('client') && !sameList(state.client, d.client)) {
+            state.client = d.client.slice();
+            window.dispatchEvent(new CustomEvent('aimy:client-filter-changed', { detail: { clients: state.client.slice() } }));
+          }
+          if (has('date') && (d.from !== state.from || d.to !== state.to)) {
+            state.from = d.from; state.to = d.to;
+            window.dispatchEvent(new CustomEvent('aimy:date-range-changed', { detail: { from: state.from, to: state.to } }));
+          }
+          updateToolbar();
+        }
+
+        /* ── Editors ───────────────────────────────────────────────────── */
+        function buildEditor(key, d, onChange) {
+          var f = FIELDS[key], root = el('div');
+          var api = { el: root, focus: function () {}, validate: function () { return true; } };
+
+          if (f.type === 'date') {
+            var box = el('div', 'fp-date');
+            var err = el('p', 'fp-error');
+            err.setAttribute('role', 'alert');
+            err.hidden = true;
+            var inputs = {};
+            var makeField = function (label, prop) {
+              var lab = el('label', 'fp-label', label);
+              var input = el('input', 'fp-input');
+              input.type = 'date';
+              input.min = '2000-01-01';
+              input.max = '2100-12-31';
+              input.value = d[prop];
+              input.addEventListener('input', function () {
+                d[prop] = input.value;
+                if (!err.hidden) check();
+                onChange();
+              });
+              lab.appendChild(input);
+              box.appendChild(lab);
+              inputs[prop] = input;
+            };
+            makeField('From', 'from');
+            makeField('To', 'to');
+            box.appendChild(err);
+            var check = function () {
+              var msg = dateMessage(d);
+              var fromOk = validDate(d.from) && !(validDate(d.to) && d.from > d.to);
+              var toOk = validDate(d.to) && !(validDate(d.from) && d.from > d.to);
+              err.textContent = msg;
+              err.hidden = !msg;
+              inputs.from.setAttribute('aria-invalid', String(!!msg && !fromOk));
+              inputs.to.setAttribute('aria-invalid', String(!!msg && !toOk));
+              return !msg;
+            };
+            api.validate = function () {
+              var ok = check();
+              if (!ok) (inputs.from.getAttribute('aria-invalid') === 'true' ? inputs.from : inputs.to).focus();
+              return ok;
+            };
+            api.focus = function () { inputs.from.focus(); };
+            root.appendChild(box);
+            return api;
+          }
+
+          var multi = f.type === 'multi';
+          var name = 'fp-' + key + '-' + (++uid);
+          var rows = [];
+          var search = null;
+          var list = el('div', 'fp-list');
+          list.setAttribute('role', 'group');
+          list.setAttribute('aria-label', f.label);
+          var none = el('div', 'fp-none', 'No matches.');
+          none.hidden = true;
+
+          var addRow = function (value, label, kind) {
+            var lab = el('label', 'fp-opt');
+            var input = el('input');
+            input.type = kind === 'radio' ? 'radio' : 'checkbox';
+            if (kind === 'radio') input.name = name;
+            input.value = value;
+            lab.appendChild(input);
+            lab.appendChild(document.createTextNode(label));
+            list.appendChild(lab);
+            rows.push({ lab: lab, input: input, kind: kind });
+            return input;
+          };
+          var syncMulti = function (changed) {
+            var all = rows[0].input;
+            if (changed === all && all.checked) rows.forEach(function (r) { if (r.kind === 'check') r.input.checked = false; });
+            d[key] = rows.filter(function (r) { return r.kind === 'check' && r.input.checked; }).map(function (r) { return r.input.value; });
+            all.checked = d[key].length === 0;
+            onChange();
+          };
+
+          if (multi) {
+            addRow('', f.allLabel, 'all').checked = d[key].length === 0;
+            f.options().forEach(function (o) { addRow(o.value, o.label, 'check').checked = d[key].indexOf(o.value) >= 0; });
+          } else {
+            f.options().forEach(function (o) { addRow(o.value, o.label, 'radio').checked = d[key] === o.value; });
+          }
+          list.addEventListener('change', function (e) {
+            var row = rows.filter(function (r) { return r.input === e.target; })[0];
+            if (!row) return;
+            if (multi) syncMulti(row.input);
+            else { d[key] = row.input.value; onChange(); }
+          });
+
+          if (f.search) {
+            var wrap = el('div', 'fp-search');
+            wrap.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.6-3.6"></path></svg>';
+            search = el('input');
+            search.type = 'text';
+            search.placeholder = 'Search';
+            search.setAttribute('aria-label', 'Search ' + f.label.toLowerCase());
+            search.autocomplete = 'off';
+            search.spellcheck = false;
+            search.addEventListener('input', function () {
+              var q = search.value.trim().toLowerCase(), n = 0;
+              rows.forEach(function (r) {
+                var hit = !q || r.lab.textContent.toLowerCase().indexOf(q) !== -1;
+                r.lab.hidden = !hit;
+                if (hit) n++;
+              });
+              none.hidden = n !== 0;
+            });
+            wrap.appendChild(search);
+            root.appendChild(wrap);
+          }
+          root.appendChild(list);
+          root.appendChild(none);
+
+          root.addEventListener('keydown', function (e) {
+            if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+            var ins = rows.filter(function (r) { return !r.lab.hidden; }).map(function (r) { return r.input; });
+            if (e.target === search) {
+              if (e.key === 'ArrowDown' && ins.length) { e.preventDefault(); ins[0].focus(); }
+              return;
+            }
+            var i = ins.indexOf(e.target);
+            if (i === -1) return;
+            if (multi) {
+              e.preventDefault();
+              var next = ins[i + (e.key === 'ArrowDown' ? 1 : -1)];
+              if (next) next.focus(); else if (search) search.focus();
+            } else if (e.key === 'ArrowUp' && i === 0 && search) {
+              e.preventDefault();
+              search.focus();
+            }
+          });
+
+          api.focus = function () {
+            if (search) { search.focus(); return; }
+            var checked = rows.filter(function (r) { return r.input.checked; })[0] || rows[0];
+            checked.input.focus();
+          };
+          return api;
+        }
+
+        /* ── Placement ─────────────────────────────────────────────────── */
+        function place(pop, anchor) {
+          var k = pop.currentCSSZoom || 1, m = 8;
+          var r = anchor.getBoundingClientRect();
+          var vw = document.documentElement.clientWidth / k, vh = window.innerHeight / k;
+          var w = pop.offsetWidth, h = pop.offsetHeight;
+          var left = r.left / k;
+          if (left + w > vw - m) left = r.right / k - w;
+          left = Math.max(m, Math.min(left, vw - w - m));
+          var top = r.bottom / k + 6;
+          if (top + h > vh - m && r.top / k - 6 - h > m) top = r.top / k - 6 - h;
+          pop.style.left = left + 'px';
+          pop.style.top = Math.max(m, top) + 'px';
+        }
+
+        function closeCur(refocus) {
+          if (!cur) return;
+          var c = cur;
+          cur = null;
+          c.pop.hidden = true;
+          c.trigger.setAttribute('aria-expanded', 'false');
+          (c.mode === 'main' ? mainEditorEl : singleEditorEl).replaceChildren();
+          if (refocus) c.trigger.focus();
+        }
+
+        function openSingle(key, trig) {
+          if (cur && cur.trigger === trig) { closeCur(true); return; }
+          closeCur(false);
+          var d = clone(readApplied());
+          var editor = buildEditor(key, d, function () {});
+          singleEditorEl.replaceChildren(editor.el);
+          single.setAttribute('aria-label', FIELDS[key].label + ' filter');
+          single.hidden = false;
+          place(single, trig);
+          trig.setAttribute('aria-expanded', 'true');
+          cur = { pop: single, trigger: trig, mode: 'single', key: key, draft: d, editor: editor };
+          editor.focus();
+        }
+
+        /* ── Main menu ─────────────────────────────────────────────────── */
+        function refreshBadges() {
+          Array.prototype.forEach.call(fieldsEl.children, function (tab) {
+            var n = count(tab.dataset.key, cur.draft);
+            var badge = tab.querySelector('.fp-badge');
+            badge.textContent = n;
+            badge.hidden = n === 0;
+            tab.setAttribute('aria-label', FIELDS[tab.dataset.key].label + (n ? ', ' + n + ' selected' : ''));
+          });
+        }
+        function selectField(key, focusEditor) {
+          cur.key = key;
+          Array.prototype.forEach.call(fieldsEl.children, function (tab) {
+            var on = tab.dataset.key === key;
+            tab.setAttribute('aria-selected', String(on));
+            tab.tabIndex = on || (!key && tab === fieldsEl.firstChild) ? 0 : -1;
+          });
+          mainEditorEl.replaceChildren();
+          detailEmpty.hidden = !!key;
+          mainEditorEl.hidden = !key;
+          if (!key) { detailEl.removeAttribute('aria-labelledby'); cur.editor = null; return; }
+          detailEl.setAttribute('aria-labelledby', 'fpTab-' + key);
+          cur.editor = buildEditor(key, cur.draft, refreshBadges);
+          mainEditorEl.appendChild(cur.editor.el);
+          if (focusEditor) cur.editor.focus();
+        }
+        function openMain() {
+          closeCur(false);
+          cur = { pop: main, trigger: mainBtn, mode: 'main', key: null, draft: clone(readApplied()), editor: null };
+          fieldsEl.replaceChildren();
+          ORDER.forEach(function (k) {
+            var tab = el('button', 'fp-field');
+            tab.type = 'button';
+            tab.id = 'fpTab-' + k;
+            tab.dataset.key = k;
+            tab.setAttribute('role', 'tab');
+            tab.appendChild(el('span', '', FIELDS[k].label));
+            var badge = el('span', 'fp-badge');
+            tab.appendChild(badge);
+            fieldsEl.appendChild(tab);
+          });
+          main.hidden = false;
+          selectField(null);
+          refreshBadges();
+          place(main, mainBtn);
+          mainBtn.setAttribute('aria-expanded', 'true');
+          fieldsEl.firstChild.focus();
+        }
+        fieldsEl.addEventListener('click', function (e) {
+          var tab = e.target.closest('.fp-field');
+          if (tab && cur && cur.mode === 'main') selectField(tab.dataset.key, false);
+        });
+        fieldsEl.addEventListener('keydown', function (e) {
+          if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+          var tabs = Array.prototype.slice.call(fieldsEl.children);
+          var i = tabs.indexOf(document.activeElement);
+          if (i === -1) return;
+          e.preventDefault();
+          var next = tabs[(i + (e.key === 'ArrowDown' ? 1 : -1) + tabs.length) % tabs.length];
+          next.focus();
+          selectField(next.dataset.key, false);
+        });
+
+        function applyMain() {
+          var d = cur.draft;
+          if (dateMessage(d)) {
+            selectField('date', false);
+            cur.editor.validate();
+            return;
+          }
+          commit(ORDER, d);
+          closeCur(true);
+        }
+        function clearAll() {
+          commit(ORDER, { interaction: 'all', client: [], product: [], from: DEFAULT_FROM, to: DEFAULT_TO });
+          closeCur(true);
+        }
+
+        /* ── Wiring ────────────────────────────────────────────────────── */
+        mainBtn.addEventListener('click', function () {
+          if (cur && cur.mode === 'main') closeCur(true); else openMain();
+        });
+        document.getElementById('fpViewsBtn').addEventListener('click', function () {
+          openViews(this);
+        });
+        ORDER.forEach(function (key) {
+          var trig = trigger(key);
+          trig.addEventListener('click', function (e) {
+            openSingle(key, trig);
+          });
+          trig.addEventListener('keydown', function (e) {
+            if (e.key === 'ArrowDown' && !(cur && cur.trigger === trig)) { e.preventDefault(); openSingle(key, trig); }
+          });
+        });
+        document.getElementById('fpApply').addEventListener('click', function () {
+          if (!cur || cur.mode !== 'single' || !cur.editor.validate()) return;
+          commit([cur.key], cur.draft);
+          closeCur(true);
+        });
+        document.getElementById('fpCancel').addEventListener('click', function () { closeCur(true); });
+        document.getElementById('fpMainApply').addEventListener('click', function () { if (cur && cur.mode === 'main') applyMain(); });
+        document.getElementById('fpMainCancel').addEventListener('click', function () { closeCur(true); });
+        document.getElementById('fpClearAll').addEventListener('click', clearAll);
+
+        document.addEventListener('pointerdown', function (e) {
+          if (cur && !cur.pop.contains(e.target) && !cur.trigger.contains(e.target)) closeCur(false);
+        });
+        document.addEventListener('keydown', function (e) {
+          if (!cur) return;
+          if (e.key === 'Escape') {
+            e.preventDefault();
+            e.stopPropagation();
+            closeCur(true);
+            return;
+          }
+          if (e.key !== 'Tab' || !cur.pop.contains(e.target)) return;
+          var items = Array.prototype.filter.call(
+            cur.pop.querySelectorAll('button, input'),
+            function (n) { return !n.disabled && n.tabIndex >= 0 && n.offsetParent !== null; }
+          );
+          if (!items.length) return;
+          var first = items[0], last = items[items.length - 1];
+          if (e.shiftKey && e.target === first) { e.preventDefault(); last.focus(); }
+          else if (!e.shiftKey && e.target === last) { e.preventDefault(); first.focus(); }
+        }, true);
+        window.addEventListener('resize', function () { if (cur) place(cur.pop, cur.trigger); });
+        window.addEventListener('aimy:scope-synced', updateToolbar);
+        window.addEventListener('aimy:scope-changed', updateToolbar);
+        new MutationObserver(updateToolbar).observe(document.body, { attributes: true, attributeFilter: ['data-interaction-type'] });
+        updateToolbar();
+      })();
+    </script>
+    <script src="assets/aimy-canvas.js?v=9"></script>
     <script src="assets/aimy-rail.js?v=3"></script>
+    <script>
+      /* Cards rendered from live data carry no --pct, so read it off the metric each card displays. */
+      (function () {
+        "use strict";
+        var queued = false;
+        function sync() {
+          queued = false;
+          Array.prototype.forEach.call(document.querySelectorAll(".ai-insight"), function (card) {
+            var metric = card.querySelector(".ai-insight__metric");
+            var value = metric ? parseFloat(metric.textContent) : NaN;
+            if (isNaN(value)) return;
+            card.style.setProperty("--pct", Math.max(0, Math.min(100, value)));
+          });
+        }
+        function queue() {
+          if (queued) return;
+          queued = true;
+          requestAnimationFrame(sync);
+        }
+        sync();
+        new MutationObserver(queue).observe(document.body, { childList: true, subtree: true, characterData: true });
+      })();
+    </script>
     <script>
       /* Reads the shared availability flag the rail script owns. Loaded
          after it on purpose — the flag has to exist before this asks. */

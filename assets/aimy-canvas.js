@@ -125,7 +125,11 @@
     /* A page that cannot repaint must not take the column down with it — but
        it must not fail quietly either, or a surface that stopped restoring
        looks identical to one that has nothing to restore. */
-    if (CFG.apply) { try { CFG.apply(vals); } catch (e) { console.warn("AiMY canvas: this page could not apply a stored surface.", e); } }
+    if (CFG.apply) {
+      window.__AIMY_SURFACE_RESTORING = true;
+      try { CFG.apply(vals); } catch (e) { console.warn("AiMY canvas: this page could not apply a stored surface.", e); }
+      finally { window.__AIMY_SURFACE_RESTORING = false; }
+    }
     paintChats();
   }
 
@@ -152,13 +156,21 @@
     });
     var s = p.toString();
     history.pushState(null, "", s ? "?" + s : location.pathname);
-    refresh();
+    window.__AIMY_CHAT_RESTORING_SESSION = true;
+    try { refresh(); } finally { window.__AIMY_CHAT_RESTORING_SESSION = false; }
   }
 
   /* For the page to call after it changes its own surface, so the URL keeps
      naming what is on screen. `replaceState`, not `push`: setting a filter is
      not a navigation and should not cost a press of Back. */
-  function sync() { history.replaceState(null, "", qs()); }
+  function sync() {
+    history.replaceState(null, "", qs());
+    var s = ensure(threadKey());
+    s.state = qs();
+    s.page = PAGE;
+    s.at = new Date().toISOString().slice(0, 10);
+    save();
+  }
 
   /* ═══════════════════════════════════════════════
      THREADS, SESSIONS, AND THE COLUMN THAT LISTS THEM
@@ -323,7 +335,7 @@
     }
     var body = "";
     if (t.render && typeof window[t.render] === "function") {
-      try { body = window[t.render](); } catch (e) { body = esc(t.text); }
+      try { body = window[t.render](t.text); } catch (e) { body = esc(t.text); }
     } else {
       body = t.text;
     }
@@ -424,9 +436,9 @@
     var found = recent.filter(function (k) { return k === here || hits(k); });
 
     host.innerHTML =
-      '<button class="btn btn-brand btn-sm ov-chat-new" type="button" data-newchat>'
+      '<button class="btn btn-brand btn-sm ov-chat-new" type="button" data-newchat aria-label="New conversation">'
       + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>'
-      + "New conversation</button>"
+      + "New</button>"
       + '<label class="ov-chat-find">'
       + '<span class="s-sr">Find a conversation</span>'
       + '<input class="ov-chat-input" type="search" id="chatFind" placeholder="Find a conversation&hellip;"'

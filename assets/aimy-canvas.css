@@ -145,17 +145,28 @@
    have the primitive look exactly as they did and the two that do not now
    match them. */
 .ov-chat-new {
-  width: 100%; margin-bottom: 8px;
-  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
-  font-family: var(--font-sans); font-size: 10.5px; font-weight: 700;
-  padding: 5px 11px; border-radius: var(--r-md);
-  background: var(--brand); color: #fff;
-  border: 1px solid var(--brand); cursor: pointer; white-space: nowrap;
-  transition: background-color var(--t-fast), border-color var(--t-fast);
+  width: 100%; margin-bottom: 12px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  font-family: var(--font-sans); font-size: 12px; font-weight: 700;
+  padding: 9px 14px; border-radius: 12px;
+  background: linear-gradient(120deg, var(--brand), rgb(var(--qa-accent-rgb, 139, 79, 244)));
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.18); cursor: pointer; white-space: nowrap;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), 0 4px 14px rgba(var(--qa-accent-rgb, 139, 79, 244), 0.28);
+  transition: filter var(--t-fast), transform var(--t-fast), box-shadow var(--t-fast);
 }
-.ov-chat-new:hover { background: #4d7fff; border-color: #4d7fff; }
+:root .ov-chat-new { background: linear-gradient(120deg, var(--brand), rgb(var(--qa-accent-rgb, 139, 79, 244))); border-color: rgba(255, 255, 255, 0.18); }
+:root .ov-chat-new:hover {
+  background: linear-gradient(120deg, var(--brand), rgb(var(--qa-accent-rgb, 139, 79, 244)));
+  border-color: rgba(255, 255, 255, 0.28);
+  filter: brightness(1.1); transform: translateY(-1px);
+}
+:root .ov-chat-new:active { transform: none; }
 .ov-chat-new:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
-.ov-chat-new svg { width: 14px; height: 14px; flex-shrink: 0; }
+.ov-chat-new svg { width: 14px; height: 14px; flex-shrink: 0; stroke-width: 2.2; }
+@media (prefers-reduced-motion: reduce) {
+  :root .ov-chat-new:hover { transform: none; }
+}
 /* Find a conversation. Second in the column, because a list you scroll to
    search is a list you have already failed to search. */
 .ov-chat-find { display: block; margin-bottom: 20px; }

@@ -2121,7 +2121,7 @@ body { overflow:hidden; padding-bottom:0; }
     const completed = Boolean(state.completed[state.interactionKey]);
     els.scoreState.textContent = completed ? 'Completed' : provisional ? 'In review' : state.role === 'auditor' ? 'Reviewing' : 'Final';
     els.scoreState.classList.toggle('complete', completed || (state.role !== 'auditor' && !provisional));
-    els.scoreFormula.innerHTML = '<strong>' + meta.passWeight + '</strong> passed pts ÷ <strong>' + meta.scorableWeight + '</strong> scorable pts · ' + meta.coverage + '% coverage · ' + PASS_THRESHOLD + '% pass threshold';
+    els.scoreFormula.innerHTML = '<strong>' + meta.passWeight + '</strong> passed weights ÷ <strong>' + meta.scorableWeight + '</strong> scorable weights · ' + meta.coverage + '% coverage · ' + PASS_THRESHOLD + '% pass threshold';
     const reviewed = d.kpis.filter(k => decisionFor(k)).length;
     els.settledCopy.textContent = reviewed + ' reviewed · ' + (d.kpis.length - reviewed) + ' remaining';
     els.summaryStats.innerHTML =
@@ -2190,7 +2190,7 @@ body { overflow:hidden; padding-bottom:0; }
           '<div class="kpi-heading"><div class="kpi-title-row"><h2 class="kpi-title">' + escapeHtml(kpi.title) + '</h2><span class="kpi-code">' + escapeHtml(kpi.code) + '</span></div><p class="kpi-question">' + escapeHtml(kpi.question) + '</p></div>' +
           '<div class="kpi-head-right">' +
             (decision ? '<span class="verdict-chip manual">Manual ' + verdictLabel(final) + '</span>' : '<span class="verdict-chip ' + kpi.verdict + '">AiMY ' + verdictLabel(kpi.verdict) + '</span>') +
-            '<span class="weight">' + kpi.weight + ' pts</span>' +
+            '<span class="weight">' + kpi.weight + ' weights</span>' +
             '<button class="card-toggle" type="button" data-card-toggle aria-expanded="' + expanded + '">' + (expanded ? 'Hide details' : 'Show details') + '</button>' +
           '</div>' +
         '</div>' +
