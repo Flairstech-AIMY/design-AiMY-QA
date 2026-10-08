@@ -234,6 +234,14 @@
   -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 28px), transparent 100%);
           mask-image: linear-gradient(to bottom, #000 calc(100% - 28px), transparent 100%);
 }
+:root .overlay-thread {
+   scrollbar-width: none;
+}
+:root .overlay-thread::-webkit-scrollbar {
+   display: none;
+   width: 0;
+   height: 0;
+}
 .overlay-thread.is-at-end {
   -webkit-mask-image: none;
           mask-image: none;
