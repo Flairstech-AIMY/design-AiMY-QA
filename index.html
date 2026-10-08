@@ -339,9 +339,6 @@
          label from a 45% blue to --ai-text, which brightened the strip and
          changed its look. The dark values below are the originals; light gets
          its own muted equivalents rather than the dark ones being altered. */
-      :root[data-theme="light"] .filter-chip { color: rgba(16,24,40,0.62); }
-      :root[data-theme="light"] .filter-tray-label { color: rgba(31,95,208,0.72); }
-      :root[data-theme="light"] .filter-chip:hover { color: rgba(16,24,40,0.92); }
 
       /* Solid-green confirm buttons: dark text works on dark-theme --ok
          (#7fae94) but, not on light's darker #3f6b52. */
@@ -409,7 +406,6 @@
 
       /* Scrollbars */
       /* Panels whose fill is a literal dark colour rather than a token. */
-      :root[data-theme="light"] .filter-tray-inner { background: rgba(255,255,255,0.97); border-color: var(--card-border); }
       :root[data-theme="light"] .overlay-input-bar,
       :root[data-theme="light"] .aimy-float-bar { border-color: var(--card-border); }
       :root[data-theme="light"] .v2-dropdown-panel,
@@ -1113,129 +1109,6 @@
       }
       .afs-clear-all:hover { color: rgba(168, 204, 255, 0.6); }
 
-      /* ── Filter tray ─────────────────────────────────────────────────── */
-      .filter-tray {
-        position: absolute;
-        bottom: calc(100% + 6px);
-        left: 0;
-        right: 0;
-        display: flex;
-        justify-content: center;
-        pointer-events: none;
-        opacity: 0;
-        transform: translateY(5px);
-        transition:
-          opacity 160ms ease,
-          transform 160ms cubic-bezier(0.22,1,0.36,1);
-      }
-      .filter-tray.visible {
-        opacity: 1;
-        transform: translateY(0);
-        pointer-events: all;
-      }
-      .filter-tray-inner {
-        display: flex;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 5px;
-        background: rgba(14, 20, 30, 0.75);
-        border: 1px solid rgba(99, 169, 255, 0.10);
-        border-radius: 12px;
-        padding: 6px 10px;
-        backdrop-filter: blur(24px) saturate(1.5);
-        -webkit-backdrop-filter: blur(24px) saturate(1.5);
-        box-shadow:
-          inset 0 1px 0 var(--wash-5),
-          0 4px 20px rgba(0,0,0,0.35),
-          0 0 24px rgba(51,105,255,0.06);
-        max-width: min(880px, calc(100vw - 32px));
-        width: 100%;
-        position: relative;
-        overflow: hidden;
-      }
-      .filter-tray-inner::before {
-        content: "";
-        position: absolute;
-        top: 0; left: 0; right: 0;
-        height: 1px;
-        background: linear-gradient(
-          90deg,
-          transparent,
-          rgba(99,169,255,0.35) 30%,
-          rgba(139,79,244,0.25) 60%,
-          transparent
-        );
-        background-size: 200% 100%;
-        animation: glassShimmer 3.5s linear 2;
-      }
-      .filter-tray-inner::after {
-        content: "";
-        position: absolute;
-        inset: 0;
-        border-radius: inherit;
-        background: linear-gradient(180deg, var(--wash-2) 0%, transparent 55%);
-        pointer-events: none;
-      }
-      .filter-tray-label {
-        font-size: 9px;
-        font-weight: 700;
-        color: rgba(99,169,255,0.45);
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        white-space: nowrap;
-        padding-right: 7px;
-        border-right: 1px solid var(--wash-6);
-        margin-right: 1px;
-        flex: 0 0 auto;
-        border-right: 1px solid var(--wash-6);
-        padding-right: 7px;
-        margin: 0 1px 0 0;
-        color: rgba(99,169,255,0.7);
-        position: relative;
-        z-index: 1;
-      }
-      .filter-tray-prompts .filter-tray-label { flex: 0 0 auto; }
-      .filter-chip {
-        background: var(--wash-3);
-        border: 1px solid var(--wash-7);
-        border-radius: 20px;
-        padding: 4px 12px;
-        font-size: 10.5px;
-        font-weight: 600;
-        color: rgba(255,255,255,0.55);
-        cursor: pointer;
-        font-family: "Urbanist", sans-serif;
-        white-space: nowrap;
-        position: relative;
-        z-index: 1;
-        box-shadow: inset 0 1px 0 var(--wash-6);
-        transition:
-          background   150ms ease,
-          border-color 150ms ease,
-          color        150ms ease,
-          box-shadow   150ms ease,
-          transform    150ms cubic-bezier(0.34,1.56,0.64,1);
-      }
-      .filter-chip:hover {
-        background: rgba(51,105,255,0.10);
-        border-color: rgba(99,169,255,0.28);
-        color: rgba(197,220,255,0.9);
-        transform: translateY(-1px);
-        box-shadow:
-          inset 0 1px 0 var(--wash-8),
-          0 0 10px rgba(51,105,255,0.12);
-      }
-      .filter-chip:active  { transform: translateY(0) scale(0.97); }
-      .filter-tray-prompts { display: flex; align-items: center; flex: 1 0 100%; flex-wrap: nowrap; gap: 5px; min-width: 0; padding-top: 5px; border-top: 1px solid var(--wash-6); position: relative; z-index: 1; }
-      .filter-tray-prompt-label { color: var(--d400); font-size: 9px; font-weight: 700; letter-spacing: 0.04em; white-space: nowrap; padding-right: 2px; }
-      .filter-chip-prompt { color: var(--d300); border-color: rgba(97,173,241,0.18); background: rgba(97,173,241,0.055); font-size: 10px; padding: 4px 9px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
-      .filter-chip-prompt:hover { color: var(--d50); background: rgba(97,173,241,0.14); border-color: rgba(97,173,241,0.34); }
-      @media (max-width: 600px) {
-        .filter-tray-inner { max-height: min(180px, 35vh); overflow-y: auto; }
-        .filter-tray-prompts { align-items: flex-start; overflow-x: auto; flex-wrap: nowrap; scrollbar-width: none; }
-        .filter-tray-prompts::-webkit-scrollbar { display: none; }
-        .filter-chip-prompt { flex: 0 0 auto; }
-      }
       /* ── GRID OPTION A (Asymmetrical Split) ── */
       .tier-1-grid {
         display: grid;
@@ -4037,39 +3910,6 @@
         pointer-events: all;
       }
 
-      /* Close button, top right corner */
-      .overlay-close {
-        position: absolute;
-        top: 24px;
-        right: 28px;
-        width: 36px;
-        height: 36px;
-        border-radius: 10px;
-        background: var(--wash-5);
-        border: 1px solid var(--wash-8);
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), opacity 200ms 100ms ease;
-        color: var(--d300);
-        opacity: 0;
-      }
-      .overlay-close:hover {
-        background: var(--wash-8);
-        border-color: var(--wash-11);
-        color: var(--d50);
-      }
-      .overlay-close svg {
-        width: 16px;
-        height: 16px;
-        stroke: currentColor;
-        stroke-width: 2;
-      }
-      .aimy-overlay.open .overlay-close {
-        opacity: 1;
-      }
-
       /* Context continuity bar. Sits below the badge, shows what AiMY is basing on */
       .overlay-context-bar {
         position: absolute;
@@ -4086,6 +3926,8 @@
         transition: opacity 200ms 150ms ease;
         pointer-events: none;
       }
+      :root .aimy-overlay .overlay-context-bar { top: 60px; }
+      :root #overlayThread { padding-top: 112px; }
       .aimy-overlay.open .overlay-context-bar {
         opacity: 1;
       }
@@ -4113,6 +3955,41 @@
         padding: 2px 8px;
         white-space: nowrap;
         flex-shrink: 0;
+      }
+      @keyframes chatTurnEnter {
+        from { opacity: 0; transform: translate3d(18px, 9px, 0) scale(0.965); }
+        to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+      }
+      @keyframes contextCueEnter {
+        from { opacity: 0; transform: translate3d(0, 5px, 0); }
+        to { opacity: 1; transform: translate3d(0, 0, 0); }
+      }
+      @keyframes suggestionAccepted {
+        0% { opacity: 1; transform: scale(1); }
+        42% { opacity: 0.58; transform: scale(0.96); }
+        100% { opacity: 1; transform: scale(1); }
+      }
+      @keyframes suggestionSend {
+        from { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+        to { opacity: 0; transform: translate3d(0, -8px, 0) scale(0.97); }
+      }
+      .chat-msg.chat-msg-entering {
+        animation: chatTurnEnter 300ms cubic-bezier(0.16, 1, 0.3, 1) both;
+      }
+      .overlay-context-label.context-cue-entering {
+        animation: contextCueEnter 220ms cubic-bezier(0.16, 1, 0.3, 1) both;
+      }
+      .overlay-context-tag.context-cue-entering {
+        animation: contextCueEnter 240ms cubic-bezier(0.16, 1, 0.3, 1) both;
+      }
+      .overlay-filter-suggestion.is-selecting,
+      .overlay-sugg-chip.is-selecting {
+        animation: suggestionAccepted 180ms cubic-bezier(0.4, 0, 1, 1) both;
+        pointer-events: none;
+      }
+      .overlay-sugg-chip.is-sending {
+        animation: suggestionSend 170ms cubic-bezier(0.4, 0, 1, 1) both;
+        pointer-events: none;
       }
 
       /* Conversation thread area */
@@ -4215,6 +4092,57 @@
           opacity 300ms 80ms ease;
       }
 
+      .overlay-filter-suggestions {
+        display: grid;
+        gap: 8px;
+        margin-bottom: 10px;
+      }
+      .overlay-filter-suggestions-heading {
+        color: var(--d300);
+        font-size: 11px;
+        font-weight: 700;
+      }
+      .overlay-filter-suggestion-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+      .overlay-filter-suggestion {
+        min-height: 30px;
+        padding: 5px 10px;
+        border: 1px solid var(--wash-8);
+        border-radius: 999px;
+        background: var(--wash-3);
+        color: var(--d300);
+        font: 600 11px/1.3 "Urbanist", sans-serif;
+        cursor: pointer;
+        transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
+      }
+      .overlay-filter-suggestion:active,
+      .overlay-sugg-chip:active {
+        transform: scale(0.97);
+        transition-duration: 80ms;
+      }
+      .overlay-filter-suggestion:hover {
+        background: var(--wash-7);
+        border-color: rgba(var(--qa-accent-rgb), 0.42);
+        color: var(--d50);
+      }
+      .overlay-filter-suggestion:focus-visible {
+        outline: 2px solid var(--qa-accent);
+        outline-offset: 2px;
+      }
+      @media (max-width: 600px) {
+        .overlay-filter-suggestion-list {
+          flex-wrap: nowrap;
+          overflow-x: auto;
+          padding: 2px 2px 5px;
+          scrollbar-width: none;
+        }
+        .overlay-filter-suggestion-list::-webkit-scrollbar { display: none; }
+        .overlay-filter-suggestion { flex: 0 0 auto; }
+      }
+
       .overlay-input {
         flex: 1;
         background: none;
@@ -4286,6 +4214,16 @@
       /* ── Accessibility: reduced motion ───────────────────────────────────
          Remove position-based animations; keep opacity for comprehension. */
       @media (prefers-reduced-motion: reduce) {
+        .chat-msg.chat-msg-entering,
+        .overlay-context-label.context-cue-entering,
+        .overlay-context-tag.context-cue-entering,
+        .overlay-filter-suggestion.is-selecting,
+        .overlay-sugg-chip.is-selecting,
+        .overlay-sugg-chip.is-sending {
+          animation: none !important;
+        }
+        .overlay-filter-suggestion:active,
+        .overlay-sugg-chip:active { transform: none; }
         .signal-badge-dot,
         .eval-live-dot.spike,
         .aimy-toast-progress,
@@ -6668,10 +6606,6 @@
         color: var(--d500); font-size: 13px; line-height: 1;
       }
       .overlay-resume .ores-x:hover { color: var(--d50); background: var(--wash-7); }
-      /* The filter tray occupies the same slot when the input is focused.
-         The user is composing a new question, so the resume cue steps aside. */
-      .filter-tray.visible ~ .overlay-resume { display: none; }
-
       /* ── Theme toggle ───────────────────────────────────────────────────
          design-system.md §4: dark is the default, light is opt-in, the choice
          persists to localStorage under `aimy-ds-theme`, and it is applied
@@ -6982,6 +6916,18 @@
       .gps-action-group { display: flex; align-items: center; gap: 4px; margin-left: auto; flex-shrink: 0; }
       .gps-action-group .gps-export-btn { flex-shrink: 0; }
       .gps-views-btn { color: var(--d300); }
+      .gps-describe-btn, .gps-views-btn { position: relative; }
+      .gps-describe-btn { color: var(--ai-text); background: var(--brand-dim); }
+      .gps-describe-label { white-space: nowrap; }
+      .gps-describe-shortcut, .gps-views-shortcut {
+        display: inline-flex; align-items: center; gap: 3px;
+        margin-left: 4px; padding: 2px 5px; border: 1px solid var(--card-border);
+        border-radius: 4px; background: var(--wash-3);
+        color: var(--d300); font: 500 10px/1 var(--font-sans); white-space: nowrap;
+        pointer-events: none;
+      }
+      .gps-describe-btn:hover { color: var(--d50); background: rgba(51,105,255,0.18); }
+      .gps-filter-btn.gps-describe-btn > .gps-describe-icon { width: 20px; height: 20px; flex: 0 0 20px; color: currentColor; }
       .fp-applied-filters {
         display: flex; align-items: center; flex-wrap: wrap; gap: 8px;
         width: 100%; min-width: 0; margin-top: 8px;
@@ -7226,7 +7172,7 @@
     <!-- The canvas shell above: full-width geometry and the conversation
          column. Loaded last so it overrides the inline canvas rules, the
          same order sales.css has over aimy-ds.css. -->
-    <link rel="stylesheet" href="assets/aimy-canvas.css?v=6" />
+    <link rel="stylesheet" href="assets/aimy-canvas.css?v=11" />
     <link rel="stylesheet" href="assets/aimy-sessions.css?v=2" />
 
     <!-- The responsive layer above both: one UI scale for large screens,
@@ -7255,7 +7201,7 @@
              magnifier = automatic investigation, AiMY mark = prepared prompt,
              scales = reviewed action. Referenced via <use href="#em-ico-*">. -->
         <symbol id="em-ico-direct" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></symbol>
-        <symbol id="em-ico-investigate" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></symbol>
+        <symbol id="em-ico-investigate" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></symbol>
         <symbol id="em-ico-prompt" viewBox="0 0 151.43 147.66"><use href="#aimy-logo-small"/></symbol>
         <symbol id="em-ico-review" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"/><path d="M5 7h14"/><path d="M5 7l-2 6h4z"/><path d="M19 7l-2 6h4z"/></symbol>
         <!-- Main_AiMY_Logo_small symbol, reused in float bar, overlay badge, chat avatars -->
@@ -7488,7 +7434,7 @@
         <div class="gps-bar" id="gpsBar">
           <div class="gps-controls" role="toolbar" aria-label="Dashboard filters">
             <button class="gps-filter-btn fp-main-btn" id="fpMainBtn" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="fpMain">
-              <svg class="fp-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5h18l-7 8v6l-4 2v-8z"></path></svg>
+              <svg class="fp-ico lucide lucide-funnel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 20a1 1 0 0 0 .553.895l2 1A1 1 0 0 0 14 21v-7a2 2 0 0 1 .517-1.341L21.74 4.67A1 1 0 0 0 21 3H3a1 1 0 0 0-.742 1.67l7.225 7.989A2 2 0 0 1 10 14z"></path></svg>
               Filter
               <span class="fp-badge" id="fpMainBadge" hidden></span>
             </button>
@@ -7518,18 +7464,24 @@
             <button class="gps-filter-btn gps-date-btn" id="fpDateBtn" type="button" data-fp-field="date" aria-haspopup="dialog" aria-expanded="false" aria-controls="fpPop" aria-label="Change date range">
               <span data-fp-label>Date range</span>
               <span class="fp-badge" data-fp-badge hidden></span>
-              <svg class="gps-date-calendar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4.5" width="18" height="17" rx="2"></rect><path d="M16 2.5v4M8 2.5v4M3 9h18"></path></svg>
+              <svg class="gps-date-calendar lucide lucide-calendar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v3"></path><path d="M16 2v3"></path><rect x="3" y="3" width="18" height="18" rx="2"></rect><path d="M3 9h18"></path></svg>
             </button>
             <div class="gps-action-group">
-            <button class="gps-filter-btn gps-views-btn" id="fpViewsBtn" type="button" aria-haspopup="dialog">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4.5A2.5 2.5 0 0 1 8.5 2H20v18H8.5A2.5 2.5 0 0 0 6 22V4.5Z"></path><path d="M6 5h11M6 19.5A2.5 2.5 0 0 1 8.5 17H20"></path></svg>
+            <button class="gps-filter-btn gps-describe-btn" id="fpDescribeBtn" type="button" aria-haspopup="dialog" aria-controls="aimyOverlay" aria-label="Describe a filter (F)">
+              <svg class="gps-describe-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><defs><linearGradient id="gpsDescribeStarGradient" x1="3" y1="18" x2="21" y2="5" gradientUnits="userSpaceOnUse"><stop stop-color="#3369ff"></stop><stop offset="1" stop-color="#9b5cff"></stop></linearGradient></defs><path d="M9.5 3.5c-.55 4.02-1.39 6.11-2.9 7.6C5.1 12.6 3.02 13.45 0 14c4.02.55 6.11 1.39 7.6 2.9 1.5 1.5 2.35 3.58 2.9 7.1.55-3.52 1.39-5.6 2.9-7.1 1.5-1.51 2.35-2.35 7.6-2.9-4.02-.55-6.1-1.4-7.6-2.9-1.51-1.49-2.35-3.58-2.9-7.6Z" fill="url(#gpsDescribeStarGradient)" transform="translate(1.5 -0.5) scale(.92)"></path><path d="M19 1.5c-.22 1.64-.57 2.49-1.18 3.1-.61.61-1.46.96-3.1 1.18 1.64.22 2.49.57 3.1 1.18.61.61.96 1.46 1.18 3.04.22-1.58.57-2.43 1.18-3.04.61-.61 1.46-.96 3.1-1.18-1.64-.22-2.49-.57-3.1-1.18-.61-.61-1.46-.96-1.18-3.1Z" fill="url(#gpsDescribeStarGradient)"></path></svg>
+              <span class="gps-describe-label">Describe a filter</span>
+              <kbd class="gps-describe-shortcut" aria-hidden="true"><span>F</span></kbd>
+            </button>
+            <button class="gps-filter-btn gps-views-btn" id="fpViewsBtn" type="button" aria-haspopup="dialog" aria-label="Views (V)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M17 3a2 2 0 0 1 2 2v15a1 1 0 0 1-1.496.868l-4.512-2.578a2 2 0 0 0-1.984 0l-4.512 2.578A1 1 0 0 1 5 20V5a2 2 0 0 1 2-2z"></path></svg>
               Views
+              <kbd class="gps-views-shortcut" aria-hidden="true"><span>V</span></kbd>
             </button>
             <button class="gps-export-btn" type="button" aria-label="Export dashboard">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M12 3v12"></path>
+              <svg class="lucide lucide-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M12 15V3"></path>
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                 <path d="m7 10 5 5 5-5"></path>
-                <path d="M5 21h14"></path>
               </svg>
               Export
             </button>
@@ -8531,9 +8483,6 @@
          them into milky grey slabs; a recess on white is a faint dark
          tint, so the alpha is carried across rather than the colour.
       ══════════════════════════════════════════════════════════════════ */
-      :root[data-theme="light"] .filter-tray-inner { box-shadow: inset 0 1px 0 var(--wash-5),
-          0 4px 20px rgba(16,24,40,0.105),
-          0 0 24px rgba(51,105,255,0.06); }
       :root[data-theme="light"] .bcard:hover { box-shadow: 0 8px 32px rgba(16,24,40,0.09),
           0 0 0 1px var(--wash-4); }
       :root[data-theme="light"] .bcard.tier-primary { box-shadow: 0 12px 40px rgba(16,24,40,0.135),
@@ -9350,18 +9299,6 @@
         <!-- ════ FLOATING AIMY INPUT BAR (scoped to app-main) ══════════ -->
         <div class="aimy-float-wrap" id="aimyFloatWrap">
 
-          <!-- Filter tray, appears above the bar on input focus -->
-          <div class="filter-tray" id="filterTray" role="toolbar" aria-label="Filter by dimension">
-            <div class="filter-tray-inner">
-              <div class="filter-tray-prompts" aria-label="Filter prompt suggestions">
-                <span class="filter-tray-label">Filter via AiMY</span>
-                <button class="filter-chip filter-chip-prompt" type="button" data-chat-prompt="Calls for the last 30 days">Calls for the last 30 days</button>
-                <button class="filter-chip filter-chip-prompt" type="button" data-chat-prompt="Tickets for client Second Street">Tickets for client Second Street</button>
-                <button class="filter-chip filter-chip-prompt" type="button" data-chat-prompt="Calls from 2026-08-01 to 2026-09-15">Calls from 2026-08-01 to 2026-09-15</button>
-              </div>
-            </div>
-          </div>
-
           <div class="aimy-float-bar" id="aimyFloatBar">
             <div class="aimy-float-icon" id="aimyFloatIcon" role="button" tabindex="0"
                  aria-label="Open the AiMY canvas" style="cursor:pointer;">
@@ -9429,23 +9366,6 @@
                here intact, and they now position against this rather than
                against the overlay, which has become a row. -->
           <div class="overlay-main">
-            <!-- Close button -->
-            <button
-              class="overlay-close"
-              id="overlayClose"
-              aria-label="Close conversation"
-            >
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <line x1="18" y1="6" x2="6" y2="18"></line>
-                <line x1="6" y1="6" x2="18" y2="18"></line>
-              </svg>
-            </button>
-
             <!-- Context continuity bar, driven by active scenario / open context -->
             <div class="overlay-context-bar" id="overlayContextBar" aria-hidden="true">
               <span class="overlay-context-label">Based on</span>
@@ -9464,6 +9384,14 @@
 
             <!-- Input bar inside overlay -->
             <div class="overlay-input-wrap" id="overlayInputWrap">
+              <div class="overlay-filter-suggestions" id="overlayFilterSuggestions" aria-label="Suggested filter requests">
+                <span class="overlay-filter-suggestions-heading">Describe a filter</span>
+                <div class="overlay-filter-suggestion-list">
+                  <button class="overlay-filter-suggestion" type="button" data-overlay-filter-prompt="Calls for the last 30 days">Calls for the last 30 days</button>
+                  <button class="overlay-filter-suggestion" type="button" data-overlay-filter-prompt="Tickets for client Second Street">Tickets for client Second Street</button>
+                  <button class="overlay-filter-suggestion" type="button" data-overlay-filter-prompt="Calls from 2026-08-01 to 2026-09-15">Calls from Aug 1 to Sep 15</button>
+                </div>
+              </div>
               <div class="overlay-input-bar">
                 <div class="aimy-float-icon">
                   <svg width="23" height="25" viewBox="0 0 18 20">
@@ -9474,8 +9402,8 @@
                   class="overlay-input"
                   id="overlayInput"
                   rows="1"
-                  aria-label="Ask AiMY"
-                  placeholder="Ask AiMY anything&hellip;"
+                  aria-label="Ask AiMY or describe a filter"
+                  placeholder="Ask AiMY anything, or describe a filter&hellip;"
                   spellcheck="false"
                   autocomplete="off"
                 ></textarea>
@@ -10775,7 +10703,7 @@
         const floatSend = document.getElementById("aimyFloatSend");
         const floatHint = document.getElementById("aimyFloatHint");
         const overlay = document.getElementById("aimyOverlay");
-        const overlayClose = document.getElementById("overlayClose");
+        const overlayMain = overlay.querySelector(".overlay-main");
         const thread = document.getElementById("overlayThread");
         const suggestions = document.getElementById("overlaySuggestions");
         const overlayInput = document.getElementById("overlayInput");
@@ -10908,6 +10836,22 @@
            shared notifications panel and the float-bar logo both go through
            this adapter. Same name and contract in all six files. */
         window.aimyOpenCanvas = function (q) { openOverlay(q || null); };
+        const describeFilterButton = document.getElementById("fpDescribeBtn");
+        const viewsButton = document.getElementById("fpViewsBtn");
+        if (describeFilterButton) {
+          describeFilterButton.addEventListener("click", () => window.aimyOpenCanvas());
+        }
+        document.addEventListener("keydown", (event) => {
+          if (event.defaultPrevented || event.isComposing || event.repeat) return;
+          if (event.ctrlKey || event.altKey || event.shiftKey || event.metaKey) return;
+          const active = document.activeElement;
+          if (active && active.closest && active.closest('input, textarea, select, [contenteditable]:not([contenteditable="false"]), [role="textbox"]')) return;
+          const key = String(event.key).toLowerCase();
+          const target = key === "f" ? describeFilterButton : key === "v" ? viewsButton : null;
+          if (!target) return;
+          event.preventDefault();
+          target.click();
+        }, true);
 
         function openOverlay(initialText) {
           overlayOpen = true;
@@ -10927,7 +10871,11 @@
             const tags = (typeof activeScenario !== 'undefined' && scenarioContextMap[activeScenario])
               ? scenarioContextMap[activeScenario]
               : ['today\u2019s quality data'];
-            tagsEl.innerHTML = tags.map(t => '<span class="overlay-context-tag">' + t + '</span>').join('');
+            const contextLabel = document.querySelector('.overlay-context-label');
+            if (contextLabel) animateContextCue(contextLabel);
+            tagsEl.innerHTML = tags.map((t, index) =>
+              '<span class="overlay-context-tag context-cue-entering" style="animation-delay:' + Math.min(index * 60, 120) + 'ms">' + t + '</span>'
+            ).join('');
           })();
 
           // Populate scenario-aware suggestion chips (only when thread is empty)
@@ -10996,8 +10944,7 @@
               pill.classList.remove("is-visible");
               setTimeout(function () { thread.scrollTop = thread.scrollHeight; overlayInput.focus(); }, 60);
             });
-            /* Appended LAST so `.filter-tray.visible ~ .overlay-resume` can
-               match it, sibling combinators only look forward. */
+            /* Appended last to keep the resume cue above the floating bar. */
             wrap.appendChild(pill);
           }
           pill.innerHTML =
@@ -11016,11 +10963,75 @@
           showResumePill();
           setTimeout(() => floatInput.focus(), 160);
         }
+        window.aimyCloseCanvas = closeOverlay;
 
-        overlayClose.addEventListener("click", closeOverlay);
+        function animateChatTurn(node) {
+          if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+          node.classList.add('chat-msg-entering');
+          node.addEventListener('animationend', (event) => {
+            if (event.target === node) node.classList.remove('chat-msg-entering');
+          });
+        }
+
+        function animateContextCue(node) {
+          node.classList.remove('context-cue-entering');
+          if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+          void node.offsetWidth;
+          node.classList.add('context-cue-entering');
+          node.addEventListener('animationend', (event) => {
+            if (event.target === node) node.classList.remove('context-cue-entering');
+          }, { once: true });
+        }
+
+        function acknowledgeSuggestion(button, onComplete) {
+          if (!button || button.disabled) return;
+          if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            onComplete();
+            return;
+          }
+          button.disabled = true;
+          button.classList.remove('is-selecting');
+          void button.offsetWidth;
+          button.classList.add('is-selecting');
+          var finished = false;
+          function finish() {
+            if (finished) return;
+            finished = true;
+            button.classList.remove('is-selecting');
+            button.disabled = false;
+            onComplete();
+          }
+          button.addEventListener('animationend', finish, { once: true });
+          window.setTimeout(finish, 260);
+        }
+
+        function sendOverlaySuggestion(button, text) {
+          if (!button || button.disabled || isTyping) return;
+          if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            overlayInput.value = text;
+            autoResizeTextarea();
+            handleOverlaySend();
+            return;
+          }
+          button.disabled = true;
+          button.classList.add('is-sending');
+          let finished = false;
+          function finish() {
+            if (finished) return;
+            finished = true;
+            button.classList.remove('is-sending');
+            button.disabled = false;
+            overlayInput.value = text;
+            autoResizeTextarea();
+            handleOverlaySend();
+          }
+          button.addEventListener('animationend', finish, { once: true });
+          window.setTimeout(finish, 240);
+        }
+
         overlay.addEventListener("click", (e) => {
-          // Close if clicking the bare frosted glass (not the inner content)
-          if (e.target === overlay) closeOverlay();
+          // Close when the user clicks the empty canvas space around the conversation.
+          if (e.target === overlay || e.target === overlayMain || e.target === thread) closeOverlay();
         });
         document.addEventListener("keydown", (e) => {
           if (e.key === "Escape" && overlayOpen) closeOverlay();
@@ -11039,6 +11050,7 @@
             '<div class="msg-bubble">' +
             escHtml(text) +
             "</div>";
+          animateChatTurn(wrap);
           thread.appendChild(wrap);
           scrollThread();
           /* The node is the message; this is the message as DATA, which is
@@ -11068,6 +11080,7 @@
             '<div class="msg-bubble">' +
             rendered +
             "</div>";
+          animateChatTurn(wrap);
           thread.appendChild(wrap);
           scrollThread();
           if (window.AimyChat) window.AimyChat.record("aimy", text, meta);
@@ -11096,10 +11109,13 @@
           const buttons = proposal.status === 'pending'
             ? '<button type="button" data-qa-filter-apply="' + esc(proposal.id) + '">Apply</button><button type="button" data-qa-filter-cancel="' + esc(proposal.id) + '">Cancel</button>'
             : '<span class="qa-chat-filter-status">' + statusText + '</span>';
+          const statusCopy = proposal.status === 'applied'
+            ? '<p class="qa-chat-filter-copy">Filters applied. Closing this chat so you can see the updated dashboard.</p>'
+            : proposal.status === 'pending'
+              ? '<p class="qa-chat-filter-copy">Nothing changes until you apply. This updates filter state only; dashboard metrics are not recalculated by this prototype.</p>' : '';
           return '<div class="qa-chat-filter-card" data-state="' + esc(proposal.status) + '"><strong class="qa-chat-filter-title">' +
             (proposal.status === 'applied' ? 'Filters applied' : proposal.status === 'cancelled' ? 'Filter changes cancelled' : 'Review filter changes') +
-            '</strong><div class="qa-chat-filter-changes">' + chips + '</div>' + kept +
-            (proposal.status === 'pending' ? '<p class="qa-chat-filter-copy">Nothing changes until you apply. This updates filter state only; dashboard metrics are not recalculated by this prototype.</p>' : '') +
+            '</strong><div class="qa-chat-filter-changes">' + chips + '</div>' + kept + statusCopy +
             '<div class="qa-chat-filter-actions">' + buttons + '</div></div>';
         };
         window.AIMY_CHAT_UI = {
@@ -12001,6 +12017,14 @@
         }
         overlayInput.addEventListener("input", autoResizeTextarea);
 
+        document.getElementById("overlayFilterSuggestions").addEventListener("click", (event) => {
+          const button = event.target.closest("[data-overlay-filter-prompt]");
+          if (!button || isTyping) return;
+          acknowledgeSuggestion(button, () => {
+            window.AIMY_CHAT_UI.submitFilterRequest(button.dataset.overlayFilterPrompt, true);
+          });
+        });
+
         /* ── Suggestion chips inside overlay ────────────────────────── */
         // Expose openOverlay so external IIFEs (summary card signals) can call it
         window.openOverlay = openOverlay;
@@ -12009,19 +12033,10 @@
 
         window.overlaySuggestion = function (btn) {
           const text = btn.textContent.trim();
-          overlayInput.value = text;
-          autoResizeTextarea();
-          handleOverlaySend();
+          sendOverlaySuggestion(btn, text);
         };
-        /* ── Filter tray, show/hide on float bar focus ─────────────────
-       The tray lives above the float bar and is only revealed when
-       the user focuses the input. It hides on blur (with a short
-       delay so clicks on chips register before the tray disappears). */
-        const filterTray = document.getElementById("filterTray");
-        const filterTrayInner = filterTray.querySelector(".filter-tray-inner");
         const activeFilterStrip = null;
         const afsClearAll = null;
-        let trayHideTimer = null;
         let activeFilters = {}; // { Client, Product, "Interaction type", "Date range" }
         let interactionType = "all";
         document.body.dataset.interactionType = interactionType;
@@ -12052,40 +12067,6 @@
           get: function () { return interactionType; },
           set: setInteractionType,
         };
-
-        function showTray() {
-          clearTimeout(trayHideTimer);
-          filterTray.classList.add("visible");
-        }
-
-        function hideTray() {
-          trayHideTimer = setTimeout(() => {
-            filterTray.classList.remove("visible");
-          }, 160);
-        }
-
-        floatInput.addEventListener("focus", showTray);
-        floatInput.addEventListener("blur", hideTray);
-
-        // Keep tray open while interacting with it
-        filterTray.addEventListener("mousedown", (e) => e.preventDefault()); // prevent input blur
-        filterTray.addEventListener("focusin", showTray);
-        filterTray.addEventListener("focusout", hideTray);
-
-        /* ── Filter prompt suggestions ───────────────────────────────── */
-        function wireChatPromptSuggestions() {
-          filterTrayInner.querySelectorAll('[data-chat-prompt]').forEach(button => {
-            button.addEventListener('click', () => {
-              floatInput.value = button.dataset.chatPrompt;
-              floatInput.dispatchEvent(new Event('input', { bubbles: true }));
-              floatInput.focus();
-              const end = floatInput.value.length;
-              floatInput.setSelectionRange(end, end);
-            });
-          });
-        }
-
-        wireChatPromptSuggestions();
 
         /* ── Active filter strip state ───────────────────────────────── */
 
@@ -14373,6 +14354,9 @@
             window.dispatchEvent(new CustomEvent('aimy:filter-applied', {
               detail: { query: result.proposal.query, source: 'aimy-chat', filters: readApplied(), timestamp: Date.now() }
             }));
+            window.setTimeout(function () {
+              if (typeof window.aimyCloseCanvas === 'function') window.aimyCloseCanvas();
+            }, 1000);
           }
         });
         window.AIMY_QA_FILTERS = {
@@ -14989,7 +14973,7 @@
         updateToolbar();
       })();
     </script>
-    <script src="assets/aimy-canvas.js?v=9"></script>
+    <script src="assets/aimy-canvas.js?v=13"></script>
     <script src="assets/aimy-rail.js?v=3"></script>
     <script>
       /* Cards rendered from live data carry no --pct, so read it off the metric each card displays. */
