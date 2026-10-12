@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>My QA · AiMY QA</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    (function () {
+      try {
+        if (localStorage.getItem('aimy-ds-theme') === 'light') document.documentElement.setAttribute('data-theme', 'light');
+        var s = localStorage.getItem('aimy-qa-scope'), list = [];
+        if (s) {
+          if (s.charAt(0) === '[') { try { var p = JSON.parse(s); if (Array.isArray(p)) list = p; } catch (e) {} }
+          else list = [s];
+        }
+        list = list.filter(function (v) { return ['upland', 'asteris', 'secondstreet'].indexOf(v) !== -1; });
+        document.documentElement.setAttribute('data-scope', !list.length ? 'all' : list.length === 1 ? list[0] : 'multi');
+      } catch (e) {}
+      document.documentElement.setAttribute('data-qa-results-scope', 'mine');
+    })();
+  </script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      color-scheme: dark;
+      --body-bg: #0f1215; --card-bg: #141b24; --card-bg-raised: #1c2630;
+      --card-border: rgba(255,255,255,.07); --card-border-hover: rgba(255,255,255,.14);
+      --d950:#080b10; --d900:#0d1117; --d850:#141b24; --d800:#1c2630; --d750:#233040;
+      --d700:#2e3d50; --d600:#8091a5; --d500:#8394a8; --d400:#93a2b4; --d300:#a8b5c5;
+      --d200:#c3ceda; --d100:#dee5ed; --d50:#f5f7fb;
+      --brand:#3369ff; --brand-dim:rgba(51,105,255,.15); --qa-accent:#8b4ff4;
+      --qa-accent-dim:rgba(139,79,244,.15); --qa-accent-rgb:139,79,244;
+      --ai-text:#61adf1; --ok:#4ed6a1; --ok-bg:rgba(78,214,161,.14);
+      --warn:#f7c95c; --warn-bg:rgba(247,201,92,.14); --err:#ff7282; --err-bg:rgba(255,114,130,.14);
+      --wash-2:rgba(255,255,255,.03); --wash-3:rgba(255,255,255,.04); --wash-4:rgba(255,255,255,.065);
+      --wash-5:rgba(255,255,255,.06); --wash-6:rgba(255,255,255,.07); --wash-7:rgba(255,255,255,.08);
+      --wash-8:rgba(255,255,255,.10); --wash-11:rgba(255,255,255,.19);
+      --font-sans:'Poppins',system-ui,sans-serif; --fs-base:16px; --topbar-height:60px; --sidebar-width:220px;
+      --transition-fast:150ms;
+      font-family:var(--font-sans); color:var(--d50); background:var(--body-bg);
+    }
+    :root[data-theme="light"] {
+      color-scheme:light;
+      --body-bg:#eef1f6; --card-bg:#fff; --card-bg-raised:#f7f9fc;
+      --card-border:rgba(16,24,40,.10); --card-border-hover:rgba(16,24,40,.18);
+      --d950:#f7fafc; --d900:#eef2f6; --d850:#e4eaf0; --d800:#d8e0e8; --d750:#c8d2dc;
+      --d700:#b0bcca; --d600:#6e7d8d; --d500:#637280; --d400:#566472; --d300:#3a4653;
+      --d200:#2a3540; --d100:#1c2630; --d50:#10151b; --brand-dim:rgba(51,105,255,.12);
+      --qa-accent-dim:rgba(139,79,244,.12); --ai-text:#1f5fd0;
+      --ok:#3f6b52; --ok-bg:rgba(63,107,82,.14); --warn:#7a613c; --warn-bg:rgba(122,97,60,.14);
+      --err:#8a473f; --err-bg:rgba(138,71,63,.14);
+      --wash-2:rgba(16,24,40,.04); --wash-3:rgba(16,24,40,.05); --wash-4:rgba(16,24,40,.065);
+      --wash-5:rgba(16,24,40,.075); --wash-6:rgba(16,24,40,.09); --wash-7:rgba(16,24,40,.1);
+      --wash-8:rgba(16,24,40,.13); --wash-11:rgba(16,24,40,.24);
+    }
+    body { min-width:320px; min-height:100vh; display:flex; flex-direction:column; overflow:hidden; background:var(--body-bg); }
+    button,a { font:inherit; }
+    .app-topnav { height:var(--topbar-height); flex:none; display:flex; align-items:center; gap:18px; padding:0 24px; border-bottom:1px solid var(--wash-6); background:var(--body-bg); }
+    .brand { display:inline-flex; align-items:center; gap:10px; color:var(--d50); text-decoration:none; font-weight:700; font-size:14px; }
+    .brand-mark { width:28px; height:28px; display:grid; place-items:center; border:1px solid rgba(var(--qa-accent-rgb),.3); border-radius:8px; background:linear-gradient(135deg,rgba(139,79,244,.18),rgba(51,105,255,.14)); color:var(--ai-text); }
+    .brand-mark svg { width:17px; height:17px; }
+    .topnav-link { color:var(--d300); font-size:12px; text-decoration:none; }
+    .topnav-link:hover { color:var(--d50); }
+    .topnav-spacer { flex:1; }
+    .topnav-state { color:var(--d500); font-size:11px; }
+    .app-body { flex:1; min-height:0; display:flex; }
+    .app-sidebar { width:var(--sidebar-width); flex:none; padding:20px 12px; border-right:1px solid var(--wash-6); }
+    .sidebar-label { padding:4px 12px 10px; color:var(--d500); font-size:10px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; }
+    .sidebar-link { min-height:38px; display:flex; align-items:center; gap:11px; padding:8px 12px; border:1px solid transparent; border-radius:8px; color:var(--d300); font-size:12px; text-decoration:none; }
+    .sidebar-link svg { width:17px; height:17px; flex:none; color:var(--d400); }
+    .sidebar-link:hover { background:var(--wash-3); color:var(--d50); }
+    .sidebar-link.active { background:var(--qa-accent-dim); border-color:rgba(var(--qa-accent-rgb),.22); color:var(--qa-accent); }
+    .app-main { position:relative; min-width:0; flex:1; display:flex; flex-direction:column; }
+    .gps-bar { flex:none; padding:12px 24px 0; overflow:hidden; }
+    .gps-controls { display:flex; align-items:center; gap:4px; min-height:34px; overflow-x:auto; scrollbar-width:none; }
+    .gps-controls::-webkit-scrollbar { display:none; }
+    .gps-filter-btn { min-width:0; min-height:30px; display:inline-flex; flex:none; align-items:center; gap:6px; padding:0 9px; border:0; border-radius:8px; background:transparent; color:var(--d300); font-size:12px; font-weight:600; line-height:1.4; white-space:nowrap; text-decoration:none; cursor:pointer; }
+    .gps-filter-btn svg { width:14px; height:14px; flex:none; color:var(--d400); }
+    .gps-filter-btn:hover { background:var(--wash-3); color:var(--d50); }
+    .gps-filter-btn.is-applied,.gps-filter-btn[aria-current="page"] { background:rgba(97,173,241,.12); color:#c5dcff; }
+    .gps-filter-btn.is-applied:hover,.gps-filter-btn[aria-current="page"]:hover { background:rgba(97,173,241,.18); }
+    .gps-main-filter { background:var(--wash-3); }
+    .gps-main-filter svg { width:16px; height:16px; }
+    .gps-static-filter svg { width:13px; height:13px; }
+    .gps-divider { width:1px; height:18px; flex:none; margin:0 4px; background:var(--wash-7); }
+    .gps-back { margin-left:auto; }
+    .toolbar-badge { min-width:17px; height:17px; display:inline-grid; place-items:center; padding:0 4px; border-radius:999px; background:var(--brand-dim); color:var(--ai-text); font-size:10px; font-weight:700; }
+    .dashboard-scroll { flex:1; min-height:0; overflow:auto; scrollbar-gutter:stable; padding:30px clamp(18px,3vw,44px) 70px; }
+    .qa-page-header { max-width:900px; margin:0 0 22px; }
+    .qa-page-header h1 { margin:0; color:var(--d50); font-size:24px; font-weight:700; line-height:1.3; }
+    .qa-page-header p { margin:7px 0 0; color:var(--d400); font-size:12px; line-height:1.55; }
+    .qa-scope-indicator { display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin:0 0 14px; color:var(--d400); font-size:11px; }
+    .qa-scope-indicator[hidden] { display:none; }
+    .qa-scope-indicator strong { color:var(--d200); font-weight:600; }
+    .qa-results-workspace { min-width:0; max-width:1500px; }
+    .qa-results-empty { max-width:900px; padding:26px 28px; margin:4px 0 18px; border:1px solid var(--card-border); border-radius:14px; background:var(--card-bg); }
+    .qa-results-empty h2 { margin:0 0 8px; color:var(--d50); font-size:17px; }
+    .qa-results-empty p { max-width:70ch; margin:0; color:var(--d400); font-size:12px; line-height:1.65; }
+    .qa-results-empty-actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:18px; }
+    .qa-results-button { min-height:34px; padding:7px 13px; border:1px solid var(--wash-8); border-radius:8px; background:rgba(97,173,241,.12); color:#c5dcff; font:600 12px/1.4 var(--font-sans); cursor:pointer; }
+    :root[data-theme="light"] .qa-results-button { color:#1f5fd0; }
+    .qa-results-button.secondary { background:var(--wash-3); color:var(--d200); }
+    .qa-results-button:hover { background:var(--wash-5); }
+    .qa-results-button:focus-visible,.gps-filter-btn:focus-visible,.sidebar-link:focus-visible,.qa-results-table-scroll:focus-visible { outline:2px solid var(--brand); outline-offset:2px; }
+    .qa-results-stats { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; margin-bottom:18px; }
+    .qa-results-stat { min-width:0; padding:16px 18px; border:1px solid var(--card-border); border-radius:12px; background:var(--card-bg); }
+    .qa-results-stat-label { color:var(--d300); font-size:11px; font-weight:600; }
+    .qa-results-stat-value { margin:9px 0 6px; color:var(--d50); font-size:24px; font-weight:700; line-height:1.2; font-variant-numeric:tabular-nums; }
+    .qa-results-stat-detail { color:var(--d400); font-size:10px; line-height:1.5; }
+    .qa-results-panel { margin:0 0 16px; overflow:hidden; border:1px solid var(--card-border); border-radius:13px; background:var(--card-bg); }
+    .qa-results-panel-head { padding:15px 17px; border-bottom:1px solid var(--wash-6); }
+    .qa-results-panel-head h2 { margin:0; color:var(--d50); font-size:14px; }
+    .qa-results-panel-head p { margin:4px 0 0; color:var(--d400); font-size:11px; }
+    .qa-results-table-scroll { overflow:auto; scrollbar-color:var(--wash-11) transparent; }
+    .qa-results-table { width:100%; border-collapse:collapse; font-size:11px; font-variant-numeric:tabular-nums; }
+    .qa-results-table th { background:var(--wash-2); color:var(--d300); font-weight:600; text-align:left; }
+    .qa-results-table th,.qa-results-table td { padding:11px 13px; border-bottom:1px solid var(--wash-5); white-space:nowrap; }
+    .qa-results-table td { color:var(--d200); }
+    .qa-results-table tr:last-child td { border-bottom:0; }
+    .qa-results-table .qa-strong { color:var(--d50); font-weight:600; }
+    .qa-results-pill { display:inline-block; padding:3px 8px; border-radius:7px; background:var(--wash-5); color:var(--d300); font-size:10px; font-weight:600; }
+    .qa-results-pill.attention { background:var(--err-bg); color:var(--err); }
+    .qa-results-pill.completed { background:var(--ok-bg); color:var(--ok); }
+    .qa-results-table-foot { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:10px; padding:11px 16px; border-top:1px solid var(--wash-5); color:var(--d400); font-size:10px; }
+    .qa-results-export { padding:5px 0; border:0; background:none; color:var(--d200); font:600 11px var(--font-sans); text-decoration:underline; text-underline-offset:3px; cursor:pointer; }
+    .qa-results-export:disabled,.gps-filter-btn:disabled { opacity:.5; cursor:not-allowed; }
+    .qa-results-sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; border:0; }
+    @media (max-width:1050px) { .qa-results-stats { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+    @media (max-width:700px) { .app-sidebar { width:58px; padding-inline:5px; } .sidebar-label { display:none; } .sidebar-link { justify-content:center; padding-inline:6px; font-size:0; } .sidebar-link svg { width:18px; height:18px; } .gps-bar { padding-inline:12px; } .dashboard-scroll { padding:22px 14px 56px; } .qa-results-stats { gap:8px; } .qa-results-stat { padding:13px; } .qa-results-stat-value { font-size:20px; } .qa-results-empty { padding:22px 18px; } }
+    @media (prefers-reduced-motion:reduce) { *,*::before,*::after { scroll-behavior:auto!important; } }
+  </style>
+  <script>
+    (function () {
+      document.documentElement.setAttribute('data-qa-results-scope', 'mine');
+      try {
+        if (localStorage.getItem('aimy-ds-theme') === 'light') document.documentElement.setAttribute('data-theme', 'light');
+        var scope = localStorage.getItem('aimy-qa-scope'), values = [];
+        if (scope) { if (scope.charAt(0) === '[') { try { values = JSON.parse(scope) || []; } catch (e) {} } else values = [scope]; }
+        values = values.filter(function (v) { return ['upland','asteris','secondstreet'].indexOf(v) !== -1; });
+        document.documentElement.setAttribute('data-scope', !values.length ? 'all' : values.length === 1 ? values[0] : 'multi');
+      } catch (e) {}
+    })();
+  </script>
+  <link rel="stylesheet" href="assets/aimy-results.css?v=2">
+</head>
+<body>
+  <div class="app-topnav">
+    <a class="brand" href="index.html" aria-label="AiMY QA dashboard">
+      <span class="brand-mark" aria-hidden="true"><svg class="lucide lucide-sparkles" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"/><path d="M20 2v4"/><path d="M22 4h-4"/><circle cx="4" cy="20" r="2"/></svg></span>
+      AiMY QA
+    </a>
+    <a class="topnav-link" href="index.html">Dashboard</a>
+    <span class="topnav-spacer"></span>
+    <span class="topnav-state">My QA</span>
+  </div>
+  <div class="app-body">
+    <aside class="app-sidebar" aria-label="Primary navigation">
+      <div class="sidebar-label">Workspace</div>
+      <a class="sidebar-link" href="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="5" rx="2"/><rect x="13" y="10" width="8" height="11" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/></svg>Dashboard</a>
+      <a class="sidebar-link active" href="my-qa.html" aria-current="page"><svg class="lucide lucide-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>M QA</a>
+    </aside>
+    <main class="app-main">
+      <div class="gps-bar" aria-label="My QA filters">
+        <div class="gps-controls" role="toolbar" aria-label="My QA filter context">
+          <div class="gps-filter-btn gps-main-filter" id="filterSummary" aria-label="Current dashboard filters">
+            <svg class="lucide lucide-funnel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 20a1 1 0 0 0 .553.895l2 1A1 1 0 0 0 14 21v-7a2 2 0 0 1 .517-1.341L21.74 4.67A1 1 0 0 0 21 3H3a1 1 0 0 0-.742 1.67l7.225 7.989A2 2 0 0 1 10 14z"/></svg>
+            <span id="filterSummaryText">Current filters</span><span class="toolbar-badge" id="filterSummaryCount" hidden>0</span>
+          </div>
+          <span class="gps-divider" aria-hidden="true"></span>
+          <span class="gps-filter-btn gps-static-filter"><svg class="lucide lucide-list-filter" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M7 12h10"/><path d="M10 18h4"/></svg><span id="interactionFilter">All interactions</span></span>
+          <span class="gps-filter-btn gps-static-filter"><svg class="lucide lucide-building-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4M10 10h4M10 14h4M10 18h4"/></svg><span id="clientFilter">All clients</span></span>
+          <span class="gps-filter-btn gps-static-filter"><svg class="lucide lucide-box" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg><span id="productFilter">All products</span></span>
+          <span class="gps-filter-btn gps-static-filter"><svg class="lucide lucide-calendar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v3"/><path d="M16 2v3"/><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/></svg><span id="dateFilter">Current date range</span></span>
+          <a class="gps-filter-btn gps-back" id="editFiltersLink" href="index.html" aria-label="Return to dashboard filters and edit them">Edit filters</a>
+        </div>
+      </div>
+      <div class="dashboard-scroll">
+        <header class="qa-page-header"><h1>My QA</h1><p>Reviews of your evaluated work, scoped to the filters selected on the dashboard.</p></header>
+        <div class="qa-scope-indicator" id="qaScopeIndicator" role="status" hidden><strong>Only your evaluated work</strong><span id="qaScopeIndicatorDetail"></span><button id="qaResultsExitDemo" class="qa-results-export" type="button" hidden>Exit sample preview</button></div>
+        <section class="qa-results-workspace" id="qaResultsWorkspace" aria-labelledby="qaResultsHeading" aria-busy="false">
+          <h2 class="qa-results-sr-only" id="qaResultsHeading">My QA review workspace</h2>
+          <div class="qa-results-empty" id="qaResultsEmpty" role="status">
+            <h2 id="qaResultsEmptyTitle">Personal QA data not connected</h2>
+            <p id="qaResultsEmptyText">This prototype cannot identify your reviews from the displayed profile. Connect a signed-in user ID and review records, or explore fictional sample data.</p>
+            <div class="qa-results-empty-actions"><button id="qaResultsPreviewDemo" class="qa-results-button" type="button">Preview sample data</button><button id="qaResultsClearFilters" class="qa-results-button secondary" type="button" hidden>Clear other filters</button></div>
+          </div>
+          <div id="qaResultsData" hidden>
+            <div class="qa-results-stats" id="qaResultsStats" aria-label="QA summary metrics"></div>
+            <section class="qa-results-panel" aria-labelledby="qaResultsRecordsHeading">
+              <header class="qa-results-panel-head"><h3 id="qaResultsRecordsHeading">Review records</h3><p id="qaResultsCount"></p></header>
+              <div class="qa-results-table-scroll" tabindex="0" role="region" aria-label="QA review records, scroll horizontally for more columns">
+                <table class="qa-results-table"><caption class="qa-results-sr-only">QA reviews matching My QA and the selected filters, newest first</caption>
+                  <thead><tr><th scope="col">Review</th><th scope="col">Date</th><th scope="col">Product</th><th scope="col">Client</th><th scope="col">Interaction</th><th scope="col">Evaluator</th><th scope="col">Quality score</th><th scope="col">Status</th></tr></thead><tbody id="qaResultsRows"></tbody>
+                </table>
+              </div>
+              <footer class="qa-results-table-foot"><span>Metrics and exports match the displayed reviews.</span><button id="qaResultsExport" class="qa-results-export" type="button" disabled>Export visible reviews</button></footer>
+            </section>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+  <script>
+    (function () {
+      'use strict';
+      var params = new URLSearchParams(location.search);
+      var interaction = params.get('qa_interaction') || 'all';
+      if (interaction !== 'calls' && interaction !== 'tickets') interaction = 'all';
+      function listParam(key) { return params.getAll(key).join(',').split(',').filter(Boolean); }
+      var clients = listParam('qa_client');
+      var products = listParam('qa_product');
+      var from = params.get('qa_from') || '2026-01-01', to = params.get('qa_to') || '2026-09-15';
+      var interLabel = { all: 'All interactions', calls: 'Calls', tickets: 'Tickets' };
+      var productLabel = { upland: 'Upland', asteris: 'Asteris', secondstreet: 'SecondStreet' };
+      function listLabel(v, all, labels) { return v.length ? v.map(function (item) { return labels && labels[item] || item; }).join(', ') : all; }
+      function dateLabel(value) {
+        if (!/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(value)) return 'Current date range';
+        var date = new Date(value + 'T00:00:00Z');
+        return Number.isFinite(date.getTime()) ? new Intl.DateTimeFormat('en-GB', { day:'2-digit', month:'short', year:'numeric', timeZone:'UTC' }).format(date) : 'Current date range';
+      }
+      document.getElementById('interactionFilter').textContent = interLabel[interaction];
+      document.getElementById('clientFilter').textContent = listLabel(clients, 'All clients');
+      document.getElementById('productFilter').textContent = listLabel(products, 'All products', productLabel);
+      document.getElementById('dateFilter').textContent = dateLabel(from) + ' – ' + dateLabel(to);
+      var count = (interaction !== 'all' ? 1 : 0) + (clients.length ? 1 : 0) + (products.length ? 1 : 0) + ((from !== '2026-01-01' || to !== '2026-09-15') ? 1 : 0);
+      document.getElementById('filterSummaryCount').textContent = count;
+      document.getElementById('filterSummaryCount').hidden = count === 0;
+      document.getElementById('filterSummaryText').textContent = count ? 'Filters' : 'Current filters';
+      document.getElementById('qaScopeIndicator').hidden = false;
+      document.getElementById('qaScopeIndicatorDetail').textContent = '· ' + (count ? count + ' dashboard filter' + (count === 1 ? '' : 's') + ' applied' : 'All dashboard results');
+      var filterState = { interaction: interaction, client: clients.slice(), product: products.slice(), from: from, to: to };
+      function makeDashboardUrl(next) {
+        var query = new URLSearchParams();
+        query.set('qa_filters', '1');
+        query.set('qa_interaction', next.interaction);
+        if (next.client.length) query.set('qa_client', next.client.join(','));
+        if (next.product.length) query.set('qa_product', next.product.join(','));
+        query.set('qa_from', next.from); query.set('qa_to', next.to);
+        return 'index.html?' + query.toString();
+      }
+      var edit = document.getElementById('editFiltersLink');
+      edit.href = makeDashboardUrl(filterState);
+      window.AIMY_QA_FILTERS = {
+        get: function () { return { interaction:filterState.interaction, client:filterState.client.slice(), product:filterState.product.slice(), from:filterState.from, to:filterState.to }; },
+        restore: function (next) {
+          filterState = {
+            interaction: next.interaction === 'calls' || next.interaction === 'tickets' ? next.interaction : 'all',
+            client: Array.isArray(next.client) ? next.client.filter(Boolean) : [],
+            product: Array.isArray(next.product) ? next.product.filter(Boolean) : [],
+            from: /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(next.from || '') ? next.from : '2026-01-01',
+            to: /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(next.to || '') ? next.to : '2026-09-15'
+          };
+          document.getElementById('interactionFilter').textContent = interLabel[filterState.interaction];
+          document.getElementById('clientFilter').textContent = listLabel(filterState.client, 'All clients');
+          document.getElementById('productFilter').textContent = listLabel(filterState.product, 'All products', productLabel);
+          document.getElementById('dateFilter').textContent = dateLabel(filterState.from) + ' – ' + dateLabel(filterState.to);
+          edit.href = makeDashboardUrl(filterState);
+          var nextCount = (filterState.interaction !== 'all' ? 1 : 0) + (filterState.client.length ? 1 : 0) + (filterState.product.length ? 1 : 0) + ((filterState.from !== '2026-01-01' || filterState.to !== '2026-09-15') ? 1 : 0);
+          document.getElementById('filterSummaryCount').textContent = nextCount;
+          document.getElementById('filterSummaryCount').hidden = nextCount === 0;
+          document.getElementById('filterSummaryText').textContent = nextCount ? 'Filters' : 'Current filters';
+          document.getElementById('qaScopeIndicatorDetail').textContent = '· ' + (nextCount ? nextCount + ' dashboard filter' + (nextCount === 1 ? '' : 's') + ' applied' : 'All dashboard results');
+          window.dispatchEvent(new CustomEvent('aimy:qa-filters-committed'));
+        },
+        reset: function () { this.restore({ interaction:'all', client:[], product:[], from:'2026-01-01', to:'2026-09-15' }); }
+      };
+    })();
+  </script>
+  <script src="assets/aimy-results.js?v=2"></script>
+</body>
+</html>

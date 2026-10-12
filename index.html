@@ -7183,6 +7183,12 @@
     <link rel="stylesheet" href="assets/aimy-rail.css?v=2" />
     <link rel="stylesheet" href="assets/aimy-typography.css?v=1" />
     <script src="assets/aimy-viewport.js?v=5"></script>
+    <link rel="stylesheet" href="assets/aimy-results.css?v=3" />
+    <script>
+      /* Scope only: account identity and reviews are never hydrated from storage. */
+      document.documentElement.setAttribute('data-qa-results-scope',
+        new URLSearchParams(location.search).get('qa_results_scope') === 'mine' ? 'mine' : 'all');
+    </script>
   </head>
   <body>
     <!-- ── Ellipse glow layer: #171A1C bg → ellipse → components on top ── -->
@@ -7346,9 +7352,9 @@
           </div>
         </div>
         <div class="topnav-user">
-          <div class="topnav-avatar">NW</div>
+          <div class="topnav-avatar">EY</div>
           <div class="topnav-user-info">
-            <span class="topnav-user-name">Nour Wael</span>
+            <span class="topnav-user-name">Engy Yasser</span>
             <span class="topnav-user-role">Product Design</span>
           </div>
           <svg
@@ -7433,6 +7439,11 @@
              never on an option, so the options are not tabbable. -->
         <div class="gps-bar" id="gpsBar">
           <div class="gps-controls" role="toolbar" aria-label="Dashboard filters">
+            <button class="gps-filter-btn qa-scope-button" id="qaScopeMine" type="button" aria-pressed="false" aria-controls="qaResultsWorkspace" title="Show QA reviews of work you performed">
+              <!-- User artwork from installed lucide-react 1.52.0, rendered statically. -->
+              <svg class="lucide lucide-user" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+              My results
+            </button>
             <button class="gps-filter-btn fp-main-btn" id="fpMainBtn" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="fpMain">
               <svg class="fp-ico lucide lucide-funnel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 20a1 1 0 0 0 .553.895l2 1A1 1 0 0 0 14 21v-7a2 2 0 0 1 .517-1.341L21.74 4.67A1 1 0 0 0 21 3H3a1 1 0 0 0-.742 1.67l7.225 7.989A2 2 0 0 1 10 14z"></path></svg>
               Filter
@@ -7488,6 +7499,11 @@
             </div>
           </div>
 
+          <div class="qa-scope-indicator" id="qaScopeIndicator" role="status" aria-live="polite" hidden>
+            <span class="qa-scope-active-dot" aria-hidden="true"></span>
+            <span><strong>Only your evaluated work</strong><span id="qaScopeIndicatorDetail"></span></span>
+          </div>
+
           <!-- Filter popovers. Moved to <body> by the engine so the bar's
                overflow on small screens cannot clip them. -->
           <div class="fp-pop fp-pop-main" id="fpMain" role="dialog" aria-label="Filters" hidden>
@@ -7518,6 +7534,39 @@
         </div>
 
         <div class="dashboard-scroll">
+          <section class="qa-results-workspace" id="qaResultsWorkspace" aria-labelledby="qaResultsHeading" hidden>
+            <header class="qa-results-heading">
+              <h1 id="qaResultsHeading">QA results</h1>
+              <p id="qaResultsDescription">Review-level quality metrics and evaluations for your selected filters.</p>
+            </header>
+            <div class="qa-results-demo" id="qaResultsDemoBanner" hidden>
+              <span><strong>SAMPLE DATA</strong> These fictional evaluations demonstrate the filter. They are not real account results.</span>
+              <button id="qaResultsExitDemo" type="button">Exit sample preview</button>
+            </div>
+            <div class="qa-results-empty" id="qaResultsEmpty" role="status">
+              <h2 id="qaResultsEmptyTitle">Personal QA data not connected</h2>
+              <p id="qaResultsEmptyText">Connect a signed-in user ID and review records, or explore fictional sample data.</p>
+              <div class="qa-results-empty-actions">
+                <button id="qaResultsPreviewDemo" class="qa-results-button" type="button">Preview sample data</button>
+                <button id="qaResultsClearFilters" class="qa-results-button secondary" type="button" hidden>Clear other filters</button>
+              </div>
+            </div>
+            <div id="qaResultsData" hidden>
+              <div class="qa-results-stats" id="qaResultsStats" aria-label="QA summary metrics"></div>
+              <section class="qa-results-panel" aria-labelledby="qaResultsRecordsHeading">
+                <header class="qa-results-panel-head"><div><h2 id="qaResultsRecordsHeading">Evaluation records</h2><p id="qaResultsCount"></p></div></header>
+                <div class="qa-results-table-scroll" tabindex="0" role="region" aria-label="QA review records, scroll horizontally for more columns">
+                  <table class="qa-results-table">
+                    <caption class="qa-results-sr-only">QA reviews matching My results and the selected filters, newest first</caption>
+                    <thead><tr><th scope="col">Review</th><th scope="col">Date</th><th scope="col">Product</th><th scope="col">Client</th><th scope="col">Interaction</th><th scope="col">Evaluator</th><th scope="col">Score</th><th scope="col">Outcome</th></tr></thead>
+                    <tbody id="qaResultsRows"></tbody>
+                  </table>
+                </div>
+                <footer class="qa-results-table-foot"><span id="qaResultsFootnote">Metrics and exports match the displayed reviews.</span><button id="qaResultsExport" class="qa-results-export" type="button" disabled>Export visible reviews</button></footer>
+              </section>
+            </div>
+            <p class="qa-results-context">AiMY chat is not connected to these reviews. Aggregate demo conversations are not personal QA evidence.</p>
+          </section>
           <div class="dash-view" id="viewManager">
         <!-- ════ AIMY DAILY SUMMARY CARD ════════════════════════════════════════
              Headline metric + 3 key signals + primary action for today.
@@ -11046,7 +11095,7 @@
           const wrap = document.createElement("div");
           wrap.className = "chat-msg user";
           wrap.innerHTML =
-            '<div class="msg-avatar user-av">NW</div>' +
+            '<div class="msg-avatar user-av">EY</div>' +
             '<div class="msg-bubble">' +
             escHtml(text) +
             "</div>";
@@ -11925,6 +11974,13 @@
             return;
           }
 
+          if (window.AIMY_QA_RESULTS_SCOPE && window.AIMY_QA_RESULTS_SCOPE.get() === 'mine') {
+            setTimeout(function () {
+              appendAiMsg('My results is active, but AiMY chat is not connected to your review records. I cannot provide a grounded personal QA answer. Use the QA results table and export for this view; switch My results off to explore the aggregate demo.');
+            }, 500);
+            return;
+          }
+
           if (topic && RESPONSE_BY_TOPIC[topic]) {
             window.__aimyLastTopic = topic;
             var entryVal = RESPONSE_BY_TOPIC[topic];
@@ -12140,13 +12196,14 @@
           var APPLYING = false;
 
           window.AIMY_SURFACE = {
-            initials: "NW",
-            SCALAR: ["view", "scenario", "chart", "interaction", "qa_filters", "qa_interaction", "qa_from", "qa_to"].concat(DIMS.map(slug)),
+            initials: "EY",
+            SCALAR: ["view", "scenario", "chart", "interaction", "qa_filters", "qa_interaction", "qa_from", "qa_to", "qa_results_scope"].concat(DIMS.map(slug)),
             MULTI: ["qa_client", "qa_product"],
-            DEFAULTS: { view: "manager", scenario: "critical", interaction: "all", qa_filters: "", qa_interaction: "all", qa_from: "2026-01-01", qa_to: "2026-09-15" },
+            DEFAULTS: { view: "manager", scenario: "critical", interaction: "all", qa_filters: "", qa_interaction: "all", qa_from: "2026-01-01", qa_to: "2026-09-15", qa_results_scope: "all" },
 
             read: function () {
               var out = { scenario: activeScenario };
+              out.qa_results_scope = window.AIMY_QA_RESULTS_SCOPE ? window.AIMY_QA_RESULTS_SCOPE.get() : 'all';
               /* Manager or Director. The tab owns the truth via aria-selected,
                  the same way the chart toggle does — reading the button rather
                  than a variable means the two cannot disagree. */
@@ -12189,6 +12246,7 @@
                 } else if (window.__AIMY_CHAT_RESTORING_SESSION && window.AIMY_QA_FILTERS) {
                   window.AIMY_QA_FILTERS.restore({ interaction: "all", client: [], product: [], from: "2026-01-01", to: "2026-09-15" });
                 }
+                if (window.AIMY_QA_RESULTS_SCOPE) window.AIMY_QA_RESULTS_SCOPE.set(v.qa_results_scope === 'mine' ? 'mine' : 'all', { silent: true });
 
                 /* The detected state. `setScenario` repaints the pill, the
                    confidence signals, the chip row and the alternatives, so
@@ -14178,10 +14236,13 @@
           return n;
         }
         function readApplied() {
-          return { interaction: inter.get(), client: state.client.slice(), product: scope.get(), from: state.from, to: state.to };
+          return { interaction: inter.get(), client: state.client.slice(), product: scope.get(), from: state.from, to: state.to,
+            resultsScope: window.AIMY_QA_RESULTS_SCOPE ? window.AIMY_QA_RESULTS_SCOPE.get() : document.documentElement.getAttribute('data-qa-results-scope') || 'all' };
         }
         function clone(d) {
-          return { interaction: d.interaction, client: d.client.slice(), product: d.product.slice(), from: d.from, to: d.to };
+          var copy = { interaction: d.interaction, client: d.client.slice(), product: d.product.slice(), from: d.from, to: d.to };
+          if (d.resultsScope === 'mine' || d.resultsScope === 'all') copy.resultsScope = d.resultsScope;
+          return copy;
         }
         function count(key, d) {
           if (key === 'interaction') return d.interaction !== 'all' ? 1 : 0;
@@ -14257,7 +14318,7 @@
             pill.appendChild(edit);
             appliedEl.appendChild(pill);
           });
-          appliedEl.hidden = !appliedEl.children.length;
+          appliedEl.hidden = !appliedEl.children.length && a.resultsScope !== 'mine';
           if (!appliedEl.hidden) {
             var reset = el('button', 'fp-applied-reset', 'Reset all');
             reset.type = 'button';
@@ -14299,7 +14360,7 @@
         function saveChatProposals(data) {
           try { localStorage.setItem(CHAT_PROPOSALS_KEY, JSON.stringify(data)); } catch (e) {}
         }
-        function filterSignature(d) { return JSON.stringify({ interaction: d.interaction, client: d.client, product: d.product, from: d.from, to: d.to }); }
+        function filterSignature(d) { return JSON.stringify({ interaction: d.interaction, client: d.client, product: d.product, from: d.from, to: d.to, resultsScope: d.resultsScope }); }
         function createChatProposal(text) {
           var parsed = parseFilterRequest(text), id = 'qaf-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
           var proposal = {
@@ -14373,12 +14434,23 @@
               from: validDate(d.from) ? d.from : DEFAULT_FROM,
               to: validDate(d.to) ? d.to : DEFAULT_TO
             };
+            if (d.resultsScope === 'mine' || d.resultsScope === 'all') safe.resultsScope = d.resultsScope;
             var prior = window.__AIMY_QA_FILTER_RESTORING;
             window.__AIMY_QA_FILTER_RESTORING = true;
             try { commit(ORDER, safe); } finally { window.__AIMY_QA_FILTER_RESTORING = prior; }
           },
           reset: clearAll
         };
+        var incomingFilters = new URLSearchParams(window.location.search);
+        if (incomingFilters.get('qa_filters') === '1') {
+          window.AIMY_QA_FILTERS.restore({
+            interaction: incomingFilters.get('qa_interaction') || 'all',
+            client: (incomingFilters.get('qa_client') || '').split(',').filter(Boolean),
+            product: (incomingFilters.get('qa_product') || '').split(',').filter(Boolean),
+            from: incomingFilters.get('qa_from') || DEFAULT_FROM,
+            to: incomingFilters.get('qa_to') || DEFAULT_TO
+          });
+        }
         toolDialog.addEventListener('close', function () {
           if (toolOpener) toolOpener.setAttribute('aria-expanded', 'false');
           if (toolOpener && document.contains(toolOpener)) toolOpener.focus({ preventScroll: true });
@@ -14459,7 +14531,7 @@
           var clearDate = /\b(clear|remove|reset)\s+(the\s+)?(date range|date|time period)(\s+filters?)?\b|\byear to date\b|\bytd\b/.test(query);
 
           if (allClear) {
-            next = { interaction: 'all', client: [], product: [], from: DEFAULT_FROM, to: DEFAULT_TO };
+            next = { interaction: 'all', client: [], product: [], from: DEFAULT_FROM, to: DEFAULT_TO, resultsScope: 'all' };
             touched = ORDER.slice();
             changes.push('Clear all active filters');
           } else {
@@ -14559,6 +14631,7 @@
             return FIELDS[key].label + ': ' + value;
           });
           var changed = touched.filter(function (key) { return count(key, current) !== count(key, next) || JSON.stringify(current[key]) !== JSON.stringify(next[key]) || (key === 'date' && (current.from !== next.from || current.to !== next.to)); });
+          if (allClear && current.resultsScope === 'mine' && !changed.length) changed = ORDER.slice();
           if (!changed.length) {
             var noChange = allClear ? 'All supported filters are already clear.'
               : touched.length && touched.every(function (key) { return !count(key, current) && !count(key, next); })
@@ -14606,7 +14679,7 @@
             }
             list.innerHTML = views.map(function (view, index) {
               var selected = ORDER.reduce(function (total, key) { return total + count(key, view.filters); }, 0);
-              return '<div class="fp-view-row"><button class="fp-view-load" type="button" data-load-view="' + index + '"><strong>' + escapeHtml(view.name) + '</strong><small>' + selected + ' selected filter' + (selected === 1 ? '' : 's') + '</small></button>' +
+              return '<div class="fp-view-row"><button class="fp-view-load" type="button" data-load-view="' + index + '"><strong>' + escapeHtml(view.name) + '</strong><small>' + selected + ' selected filter' + (selected === 1 ? '' : 's') + (view.filters.resultsScope === 'mine' ? ' · My results' : '') + '</small></button>' +
                 '<button class="fp-view-delete" type="button" data-delete-view="' + index + '" aria-label="Delete ' + escapeHtml(view.name) + '">Delete</button></div>';
             }).join('');
             list.querySelectorAll('[data-load-view]').forEach(function (button) {
@@ -14645,6 +14718,7 @@
         }
         function commit(keys, d) {
           var has = function (k) { return keys.indexOf(k) >= 0; };
+          if (window.AIMY_QA_RESULTS_SCOPE && (d.resultsScope === 'mine' || d.resultsScope === 'all')) window.AIMY_QA_RESULTS_SCOPE.set(d.resultsScope, { silent: true });
           if (has('interaction')) inter.set(d.interaction);
           if (has('product') && !sameList(scope.get(), d.product)) scope.set(d.product);
           if (has('client') && !sameList(state.client, d.client)) {
@@ -14656,6 +14730,7 @@
             window.dispatchEvent(new CustomEvent('aimy:date-range-changed', { detail: { from: state.from, to: state.to } }));
           }
           updateToolbar();
+          window.dispatchEvent(new CustomEvent('aimy:qa-filters-committed'));
         }
 
         /* ── Editors ───────────────────────────────────────────────────── */
@@ -14915,7 +14990,7 @@
           closeCur(true);
         }
         function clearAll() {
-          commit(ORDER, { interaction: 'all', client: [], product: [], from: DEFAULT_FROM, to: DEFAULT_TO });
+          commit(ORDER, { interaction: 'all', client: [], product: [], from: DEFAULT_FROM, to: DEFAULT_TO, resultsScope: 'all' });
           closeCur(true);
         }
 
@@ -14969,10 +15044,12 @@
         window.addEventListener('resize', function () { if (cur) place(cur.pop, cur.trigger); });
         window.addEventListener('aimy:scope-synced', updateToolbar);
         window.addEventListener('aimy:scope-changed', updateToolbar);
+        window.addEventListener('aimy:results-scope-changed', updateToolbar);
         new MutationObserver(updateToolbar).observe(document.body, { attributes: true, attributeFilter: ['data-interaction-type'] });
         updateToolbar();
       })();
     </script>
+    <script src="assets/aimy-results.js?v=3"></script>
     <script src="assets/aimy-canvas.js?v=13"></script>
     <script src="assets/aimy-rail.js?v=3"></script>
     <script>

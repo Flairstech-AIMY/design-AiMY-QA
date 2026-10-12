@@ -64,6 +64,17 @@ The intended executive question is: **How is the organization performing, and is
 
 Evaluation content is grouped under the feedback loop and evaluation client lens. It covers feedback waiting, acknowledgement, coaching, follow-through, and sentiment actions. It should not be presented as audit KPI performance.
 
+### My results
+
+- The dashboard toolbar's **My results** button (`#qaScopeMine`) opens the **QA results** workspace in place of the aggregate dashboard cards; pressing it again returns to the dashboard. The engine lives in [`assets/aimy-results.js`](assets/aimy-results.js). When no signed-in user and review records are connected, turning it on opens the labeled sample preview directly. The standalone [`my-qa.html`](my-qa.html) page shares the same engine.
+- “My” matches a review's `evaluatedUserId` to an explicitly supplied session `id`: work performed by the evaluated user, not reviews they authored. The displayed profile name/initials are never authentication. Production must provide server-authorized records; this browser scope is not access control.
+- `window.AIMY_QA_RESULTS_SCOPE` exposes `get/set`, `getSession/setSession`, `setRecords`, `setLoading`, `getVisibleRecords`, `getPersonalRecords`, `getMetrics`, `previewDemo`, `exitDemo`, and `exportCSV`. Supply session before records. Changing the session ID or signing out clears loaded records; callers must discard obsolete asynchronous responses themselves.
+- Initial data is disconnected. **Preview sample data** loads the six fictional source-prototype reviews, clearly labeled; four evaluate the sample user. Preview never changes existing filters. Exit restores the pre-preview in-memory data; it does not turn off the scope.
+- Interaction, client, product and date filters determine rows, metrics and CSV. Average quality uses valid numeric scores from 0–100; pass rate uses only explicit boolean pass/fail decisions; attention uses explicit `needs-attention` flags. Missing/invalid dates cannot pass bounded ranges. Missing scores are unavailable, not zero. The current prototype's default period remains 1 January–15 September 2026.
+- CSV uses the displayed newest-first order and normalized table values, quotes/escapes cells and guards spreadsheet formulas. No rows or loading disables export; turning My results off restores the original dashboard export state.
+- Filter values travel in the My QA page URL and back to the dashboard's existing filter restoration. User identity and review records are never included in URLs, local-storage view presets, or conversation snapshots.
+- Chat is not connected to these records: My QA discloses this boundary, and new personal-scope questions return an honest unavailable answer instead of canned aggregate metrics.
+
 ## Interaction Rules
 
 - Every metric card should answer “what is this?” without requiring a hover or chat interaction.
@@ -108,6 +119,16 @@ npm.cmd install
 The expected Node version is `v24.20.0`. The package manifest also declares the supported range as `>=24.20.0 <25`.
 
 ## Change Log
+
+### 2026-10-12
+
+- **My results** on the dashboard toolbar now opens the QA results workspace (sample banner, four summary cards, evaluation records table), ported from the Smart Simple My Results prototype. With no connected account data, it opens the labeled sample preview directly.
+
+### 2026-10-08
+
+- Added a dedicated My QA results page linked from the dashboard filter toolbar; the link carries active dashboard filters and the return link restores them for editing.
+- Added functional, labeled sample preview; explicit user matching; filtered metrics and safe CSV; account-change clearing; personal-chat context disclosure.
+- Preserved the aggregate dashboard shell, role/content choices, filter controls, shortcuts, icons and shared responsive assets.
 
 ### 2026-09-08
 
