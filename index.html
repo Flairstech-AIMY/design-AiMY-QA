@@ -7172,7 +7172,7 @@
     <!-- The canvas shell above: full-width geometry and the conversation
          column. Loaded last so it overrides the inline canvas rules, the
          same order sales.css has over aimy-ds.css. -->
-    <link rel="stylesheet" href="assets/aimy-canvas.css?v=11" />
+    <link rel="stylesheet" href="assets/aimy-canvas.css?v=13" />
     <link rel="stylesheet" href="assets/aimy-sessions.css?v=2" />
 
     <!-- The responsive layer above both: one UI scale for large screens,
@@ -7180,15 +7180,11 @@
          composer on screen. Loaded last so it overrides the canvas rules,
          the same order aimy-canvas.css has over this page's inline block. -->
     <link rel="stylesheet" href="assets/aimy-responsive.css?v=7" />
-    <link rel="stylesheet" href="assets/aimy-rail.css?v=2" />
+    <link rel="stylesheet" href="assets/aimy-scroll.css?v=1" />
+    <link rel="stylesheet" href="assets/aimy-rail.css?v=8" />
+    <link rel="stylesheet" href="assets/aimy-user-menu.css?v=2" />
     <link rel="stylesheet" href="assets/aimy-typography.css?v=1" />
-    <script src="assets/aimy-viewport.js?v=5"></script>
-    <link rel="stylesheet" href="assets/aimy-results.css?v=3" />
-    <script>
-      /* Scope only: account identity and reviews are never hydrated from storage. */
-      document.documentElement.setAttribute('data-qa-results-scope',
-        new URLSearchParams(location.search).get('qa_results_scope') === 'mine' ? 'mine' : 'all');
-    </script>
+    <script src="assets/aimy-viewport.js?v=6"></script>
   </head>
   <body>
     <!-- ── Ellipse glow layer: #171A1C bg → ellipse → components on top ── -->
@@ -7439,11 +7435,9 @@
              never on an option, so the options are not tabbable. -->
         <div class="gps-bar" id="gpsBar">
           <div class="gps-controls" role="toolbar" aria-label="Dashboard filters">
-            <button class="gps-filter-btn qa-scope-button" id="qaScopeMine" type="button" aria-pressed="false" aria-controls="qaResultsWorkspace" title="Show QA reviews of work you performed">
-              <!-- User artwork from installed lucide-react 1.52.0, rendered statically. -->
-              <svg class="lucide lucide-user" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-              My results
-            </button>
+            <!-- The "My results" toggle and the QA results workspace it
+                 opened were removed. "View my QA" in the account menu
+                 (assets/aimy-user-menu.js) is a standalone checkbox. -->
             <button class="gps-filter-btn fp-main-btn" id="fpMainBtn" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="fpMain">
               <svg class="fp-ico lucide lucide-funnel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 20a1 1 0 0 0 .553.895l2 1A1 1 0 0 0 14 21v-7a2 2 0 0 1 .517-1.341L21.74 4.67A1 1 0 0 0 21 3H3a1 1 0 0 0-.742 1.67l7.225 7.989A2 2 0 0 1 10 14z"></path></svg>
               Filter
@@ -7499,11 +7493,6 @@
             </div>
           </div>
 
-          <div class="qa-scope-indicator" id="qaScopeIndicator" role="status" aria-live="polite" hidden>
-            <span class="qa-scope-active-dot" aria-hidden="true"></span>
-            <span><strong>Only your evaluated work</strong><span id="qaScopeIndicatorDetail"></span></span>
-          </div>
-
           <!-- Filter popovers. Moved to <body> by the engine so the bar's
                overflow on small screens cannot clip them. -->
           <div class="fp-pop fp-pop-main" id="fpMain" role="dialog" aria-label="Filters" hidden>
@@ -7534,39 +7523,6 @@
         </div>
 
         <div class="dashboard-scroll">
-          <section class="qa-results-workspace" id="qaResultsWorkspace" aria-labelledby="qaResultsHeading" hidden>
-            <header class="qa-results-heading">
-              <h1 id="qaResultsHeading">QA results</h1>
-              <p id="qaResultsDescription">Review-level quality metrics and evaluations for your selected filters.</p>
-            </header>
-            <div class="qa-results-demo" id="qaResultsDemoBanner" hidden>
-              <span><strong>SAMPLE DATA</strong> These fictional evaluations demonstrate the filter. They are not real account results.</span>
-              <button id="qaResultsExitDemo" type="button">Exit sample preview</button>
-            </div>
-            <div class="qa-results-empty" id="qaResultsEmpty" role="status">
-              <h2 id="qaResultsEmptyTitle">Personal QA data not connected</h2>
-              <p id="qaResultsEmptyText">Connect a signed-in user ID and review records, or explore fictional sample data.</p>
-              <div class="qa-results-empty-actions">
-                <button id="qaResultsPreviewDemo" class="qa-results-button" type="button">Preview sample data</button>
-                <button id="qaResultsClearFilters" class="qa-results-button secondary" type="button" hidden>Clear other filters</button>
-              </div>
-            </div>
-            <div id="qaResultsData" hidden>
-              <div class="qa-results-stats" id="qaResultsStats" aria-label="QA summary metrics"></div>
-              <section class="qa-results-panel" aria-labelledby="qaResultsRecordsHeading">
-                <header class="qa-results-panel-head"><div><h2 id="qaResultsRecordsHeading">Evaluation records</h2><p id="qaResultsCount"></p></div></header>
-                <div class="qa-results-table-scroll" tabindex="0" role="region" aria-label="QA review records, scroll horizontally for more columns">
-                  <table class="qa-results-table">
-                    <caption class="qa-results-sr-only">QA reviews matching My results and the selected filters, newest first</caption>
-                    <thead><tr><th scope="col">Review</th><th scope="col">Date</th><th scope="col">Product</th><th scope="col">Client</th><th scope="col">Interaction</th><th scope="col">Evaluator</th><th scope="col">Score</th><th scope="col">Outcome</th></tr></thead>
-                    <tbody id="qaResultsRows"></tbody>
-                  </table>
-                </div>
-                <footer class="qa-results-table-foot"><span id="qaResultsFootnote">Metrics and exports match the displayed reviews.</span><button id="qaResultsExport" class="qa-results-export" type="button" disabled>Export visible reviews</button></footer>
-              </section>
-            </div>
-            <p class="qa-results-context">AiMY chat is not connected to these reviews. Aggregate demo conversations are not personal QA evidence.</p>
-          </section>
           <div class="dash-view" id="viewManager">
         <!-- ════ AIMY DAILY SUMMARY CARD ════════════════════════════════════════
              Headline metric + 3 key signals + primary action for today.
@@ -11976,7 +11932,7 @@
 
           if (window.AIMY_QA_RESULTS_SCOPE && window.AIMY_QA_RESULTS_SCOPE.get() === 'mine') {
             setTimeout(function () {
-              appendAiMsg('My results is active, but AiMY chat is not connected to your review records. I cannot provide a grounded personal QA answer. Use the QA results table and export for this view; switch My results off to explore the aggregate demo.');
+              appendAiMsg('View my QA is on, but AiMY chat is not connected to your review records. I cannot provide a grounded personal QA answer. Use the QA results table and export for this view; untick View my QA in your account menu to explore the aggregate demo.');
             }, 500);
             return;
           }
@@ -14679,7 +14635,7 @@
             }
             list.innerHTML = views.map(function (view, index) {
               var selected = ORDER.reduce(function (total, key) { return total + count(key, view.filters); }, 0);
-              return '<div class="fp-view-row"><button class="fp-view-load" type="button" data-load-view="' + index + '"><strong>' + escapeHtml(view.name) + '</strong><small>' + selected + ' selected filter' + (selected === 1 ? '' : 's') + (view.filters.resultsScope === 'mine' ? ' · My results' : '') + '</small></button>' +
+              return '<div class="fp-view-row"><button class="fp-view-load" type="button" data-load-view="' + index + '"><strong>' + escapeHtml(view.name) + '</strong><small>' + selected + ' selected filter' + (selected === 1 ? '' : 's') + '' + '</small></button>' +
                 '<button class="fp-view-delete" type="button" data-delete-view="' + index + '" aria-label="Delete ' + escapeHtml(view.name) + '">Delete</button></div>';
             }).join('');
             list.querySelectorAll('[data-load-view]').forEach(function (button) {
@@ -15049,9 +15005,10 @@
         updateToolbar();
       })();
     </script>
-    <script src="assets/aimy-results.js?v=3"></script>
-    <script src="assets/aimy-canvas.js?v=13"></script>
-    <script src="assets/aimy-rail.js?v=3"></script>
+    <script src="assets/aimy-scroll.js?v=3"></script>
+    <script src="assets/aimy-canvas.js?v=16"></script>
+    <script src="assets/aimy-rail.js?v=6"></script>
+    <script src="assets/aimy-user-menu.js?v=3"></script>
     <script>
       /* Cards rendered from live data carry no --pct, so read it off the metric each card displays. */
       (function () {

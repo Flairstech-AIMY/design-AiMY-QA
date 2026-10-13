@@ -746,10 +746,21 @@
     }, 300);
   }
 
+  /* ═══ THE THREAD'S SCROLL DOT ═══
+     The shared indicator from assets/aimy-scroll.js (which already puts it
+     on the canvas's far right, since the thread is a centred column), plus
+     a clickable track and the "Latest" pill, which only means something in a
+     conversation. aimy-scroll.js may already have found the thread on its own
+     scan; attach() then just updates the options. */
+  function initThreadScroll(th) {
+    if (window.AimyScroll) window.AimyScroll.attach(th, { track: true, latest: true });
+  }
+
   function boot() {
     var th = $("#overlayThread");
     SUGGESTIONS = $("#overlaySuggestions");
     if (th) th.addEventListener("scroll", function () { markEnd(th); });
+    if (th) initThreadScroll(th);
 
     /* Stored first, then every untouched fixture cleared and the current set
        laid down. Overwriting in place is not enough on its own: a fixture the
