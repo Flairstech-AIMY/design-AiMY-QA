@@ -7109,8 +7109,39 @@
       .fp-opt:hover { background: var(--wash-3); color: var(--d50); }
       .fp-opt:has(input:checked) { background: rgba(97,173,241,0.12); color: #61adf1; }
       .fp-opt:has(input:focus-visible) { outline: 2px solid var(--brand); outline-offset: -2px; }
-      .fp-opt input { width: 14px; height: 14px; margin: 0; accent-color: var(--brand); flex-shrink: 0; }
+      /* Checkboxes and radios in the filter's blue: a translucent blue box
+         at rest, a stronger blue fill with a bright border when on, and a
+         white Lucide check (radios: a dot) for contrast. Native controls
+         cannot take this, so the box is drawn and the mark is a mask. */
+      .fp-opt input {
+        -webkit-appearance: none; appearance: none;
+        display: grid; place-content: center;
+        width: 16px; height: 16px; margin: 0; flex-shrink: 0;
+        border: 1.5px solid rgba(97,173,241,0.45); border-radius: 4px;
+        background: rgba(51,105,255,0.08);
+        cursor: pointer;
+        transition: background var(--transition-fast), border-color var(--transition-fast);
+      }
+      .fp-opt input[type="radio"] { border-radius: 50%; }
+      .fp-opt:hover input { border-color: rgba(97,173,241,0.7); }
+      .fp-opt input:checked { background: rgba(51,105,255,0.45); border-color: #61adf1; }
+      .fp-opt input[type="checkbox"]::before {
+        content: ""; width: 10px; height: 10px; background: #fff;
+        -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E") center / contain no-repeat;
+                mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E") center / contain no-repeat;
+        transform: scale(0); transition: transform var(--transition-fast) cubic-bezier(0.22,1,0.36,1);
+      }
+      .fp-opt input[type="radio"]::before {
+        content: ""; width: 6px; height: 6px; border-radius: 50%; background: #fff;
+        transform: scale(0); transition: transform var(--transition-fast) cubic-bezier(0.22,1,0.36,1);
+      }
+      .fp-opt input:checked::before { transform: scale(1); }
       .fp-opt input:focus-visible { outline: none; }
+      :root[data-theme="light"] .fp-opt input { border-color: rgba(31,95,208,0.4); background: rgba(51,105,255,0.06); }
+      :root[data-theme="light"] .fp-opt input:checked { background: var(--brand); border-color: var(--brand); }
+      @media (prefers-reduced-motion: reduce) {
+        .fp-opt input::before { transition: none; }
+      }
       .fp-none { padding: 10px 8px; text-align: center; font-size: 11.5px; font-weight: 500; color: var(--d500); }
       .fp-none[hidden] { display: none; }
 
@@ -7128,22 +7159,112 @@
       .fp-error { margin: 0; font-size: 11px; font-weight: 600; color: var(--err); }
       .fp-error[hidden] { display: none; }
 
+      /* ── Date picker ──
+         The native picker cannot be themed, so its button is hidden and the
+         calendar icon in each field opens a small floating range calendar
+         instead. The <input type="date"> pair stays the value, so typing a
+         date and the From/To validation work as before. */
+      .fp-date-row { position: relative; display: block; }
+      .fp-date-row .fp-input { width: 100%; padding-right: 34px; box-sizing: border-box; }
+      .fp-input::-webkit-calendar-picker-indicator { display: none; }
+      .fp-cal-btn {
+        position: absolute; top: 50%; right: 4px; transform: translateY(-50%);
+        width: 24px; height: 24px; display: grid; place-content: center;
+        border: 0; border-radius: 6px; background: transparent; color: var(--d400); cursor: pointer;
+        transition: background var(--transition-fast), color var(--transition-fast);
+      }
+      .fp-cal-btn svg { width: 18px; height: 18px; }
+      .fp-cal-btn:hover, .fp-cal-btn[aria-expanded="true"] { background: rgba(51,105,255,0.14); color: #61adf1; }
+      .fp-cal-btn:focus-visible { outline: 2px solid var(--brand); outline-offset: 1px; }
+
+      .fp-cal {
+        position: fixed; z-index: 240; top: 0; left: 0;
+        width: 212px; padding: 8px;
+        background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 10px;
+        box-shadow: 0 12px 32px rgba(0,0,0,0.45), 0 0 0 1px rgba(0,0,0,0.2);
+        animation: fpIn 140ms cubic-bezier(0.22,1,0.36,1);
+      }
+      .fp-cal[hidden] { display: none; }
+      .fp-cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+      .fp-cal-title { font-size: 12px; font-weight: 700; color: var(--d50); }
+      .fp-cal-nav {
+        width: 22px; height: 22px; display: grid; place-content: center;
+        border: 0; border-radius: 6px; background: transparent; color: var(--d300); cursor: pointer;
+        transition: background var(--transition-fast), color var(--transition-fast);
+      }
+      .fp-cal-nav svg { width: 14px; height: 14px; }
+      .fp-cal-nav:hover { background: var(--wash-3); color: #61adf1; }
+      .fp-cal-nav:focus-visible { outline: 2px solid var(--brand); outline-offset: 1px; }
+      /* No column gap, so the range band between start and end runs
+         unbroken along a week. */
+      .fp-cal-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); row-gap: 2px; }
+      .fp-cal-dow { padding: 2px 0 4px; text-align: center; font-size: 10px; font-weight: 600; color: #61adf1; }
+      .fp-cal-day {
+        position: relative; z-index: 0;
+        height: 26px; display: grid; place-content: center;
+        border: 0; border-radius: 6px; background: transparent;
+        color: var(--d100); font-family: inherit; font-size: 11px; font-weight: 600; font-variant-numeric: tabular-nums;
+        cursor: pointer;
+        transition: background var(--transition-fast), color var(--transition-fast);
+      }
+      .fp-cal-day:hover { background: var(--wash-3); color: var(--d50); }
+      .fp-cal-day:focus-visible { outline: 2px solid #61adf1; outline-offset: -2px; }
+      .fp-cal-day:disabled { opacity: 0.35; cursor: default; }
+      /* At rest: the current start date on a soft tile. */
+      .fp-cal-day.is-anchor { background: rgba(51,105,255,0.22); }
+      /* Picking: the band between the ends, and the ends as solid tiles that
+         the band runs into (the tile is ::after, under the number). */
+      .fp-cal-day.is-between { background: rgba(51,105,255,0.22); border-radius: 0; color: var(--d50); }
+      .fp-cal-day.is-start, .fp-cal-day.is-end { color: #fff; font-weight: 700; border-radius: 0; background: transparent; }
+      .fp-cal-day.is-start:not(.is-end) { background: linear-gradient(to right, transparent 50%, rgba(51,105,255,0.22) 50%); }
+      .fp-cal-day.is-end:not(.is-start) { background: linear-gradient(to left, transparent 50%, rgba(51,105,255,0.22) 50%); }
+      .fp-cal-day.is-start::after, .fp-cal-day.is-end::after {
+        content: ""; position: absolute; inset: 0; z-index: -1;
+        border-radius: 6px; background: color-mix(in srgb, var(--brand) 82%, #fff);
+      }
+      :root[data-theme="light"] .fp-cal-dow { color: #1f5fd0; }
+      :root[data-theme="light"] .fp-cal-day.is-anchor,
+      :root[data-theme="light"] .fp-cal-day.is-between { background: rgba(51,105,255,0.12); color: #1f5fd0; }
+      :root[data-theme="light"] .fp-cal-day.is-start:not(.is-end) { background: linear-gradient(to right, transparent 50%, rgba(51,105,255,0.12) 50%); }
+      :root[data-theme="light"] .fp-cal-day.is-end:not(.is-start) { background: linear-gradient(to left, transparent 50%, rgba(51,105,255,0.12) 50%); }
+      :root[data-theme="light"] .fp-cal-day.is-start::after,
+      :root[data-theme="light"] .fp-cal-day.is-end::after { background: var(--brand); }
+      :root[data-theme="light"] .fp-cal-btn:hover,
+      :root[data-theme="light"] .fp-cal-btn[aria-expanded="true"],
+      :root[data-theme="light"] .fp-cal-nav:hover { color: #1f5fd0; }
+      @media (prefers-reduced-motion: reduce) {
+        .fp-cal { animation: none; }
+      }
+
       .fp-foot {
         display: flex; align-items: center; justify-content: space-between; gap: 8px;
         padding: 6px 8px; border-top: 1px solid var(--wash-6);
       }
       .fp-foot-actions { display: flex; gap: 4px; margin-left: auto; }
+      /* Footer actions at the popover's own scale: 24px rows, 11px labels,
+         the 6px radius of the dropdown options above them. Apply is the
+         brand blue as a tint rather than a solid fill, so it is clearly the
+         primary choice without being the loudest thing in the popover. */
       .fp-btn {
-        min-height: 28px; padding: 0 12px; border: 0; border-radius: 8px;
+        min-height: 24px; padding: 0 10px; border: 0; border-radius: 6px;
         background: transparent; color: var(--d300);
-        font-family: inherit; font-size: 12px; font-weight: 600; cursor: pointer;
+        font-family: inherit; font-size: 11px; font-weight: 600; cursor: pointer;
         transition: background var(--transition-fast), color var(--transition-fast);
       }
       .fp-btn:hover { background: var(--wash-3); color: var(--d50); }
-      .fp-btn-primary { background: var(--brand); color: #fff; }
-      .fp-btn-primary:hover { background: var(--brand); color: #fff; filter: brightness(1.12); }
+      .fp-btn-primary {
+        background: color-mix(in srgb, var(--brand) 18%, transparent);
+        color: color-mix(in srgb, var(--brand) 45%, #fff);
+      }
+      .fp-btn-primary:hover {
+        background: color-mix(in srgb, var(--brand) 28%, transparent);
+        color: #fff;
+      }
+      :root[data-theme="light"] .fp-btn-primary { background: color-mix(in srgb, var(--brand) 12%, transparent); color: #1f5fd0; }
+      :root[data-theme="light"] .fp-btn-primary:hover { background: color-mix(in srgb, var(--brand) 20%, transparent); color: #1f5fd0; }
+      .fp-btn:focus-visible { outline: 2px solid var(--brand); outline-offset: 1px; }
       .fp-link {
-        min-height: 28px; padding: 0 6px; border: 0; border-radius: 6px; background: none;
+        min-height: 24px; padding: 0 6px; border: 0; border-radius: 6px; background: none;
         color: var(--d400); font-family: inherit; font-size: 11px; font-weight: 600; cursor: pointer;
       }
       .fp-link:hover { color: var(--d50); }
@@ -14700,8 +14821,10 @@
             err.setAttribute('role', 'alert');
             err.hidden = true;
             var inputs = {};
+            var calBtns = {};
             var makeField = function (label, prop) {
               var lab = el('label', 'fp-label', label);
+              var row = el('span', 'fp-date-row');
               var input = el('input', 'fp-input');
               input.type = 'date';
               input.min = '2000-01-01';
@@ -14712,13 +14835,189 @@
                 if (!err.hidden) check();
                 onChange();
               });
-              lab.appendChild(input);
+              row.appendChild(input);
+              lab.appendChild(row);
               box.appendChild(lab);
               inputs[prop] = input;
+              calBtns[prop] = { btn: makeCalButton(label, row), row: row };
+            };
+
+            /* The calendar button inside each date field. */
+            var makeCalButton = function (label, row) {
+              var b = el('button', 'fp-cal-btn');
+              b.type = 'button';
+              b.innerHTML = '<svg class="lucide lucide-calendar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v3" /><path d="M16 2v3" /><rect x="3" y="3" width="18" height="18" rx="2" /><path d="M3 9h18" /></svg>';
+              b.setAttribute('aria-label', 'Choose date range');
+              b.setAttribute('aria-haspopup', 'dialog');
+              b.setAttribute('aria-expanded', 'false');
+              row.appendChild(b);
+              return b;
             };
             makeField('From', 'from');
             makeField('To', 'to');
             box.appendChild(err);
+
+            /* ── The range calendar ──
+               One small floating calendar for both fields, opened from either
+               field's calendar icon and anchored under that field. At rest it
+               is plain numbers, with the opened field's date on a soft tile.
+               Picking: the first click sets the start, the second the end
+               (earlier than the start swaps them); both get a solid blue tile
+               and the days between a continuous band. Picking writes both
+               inputs and fires 'input', so validation, the badge and Apply
+               see an ordinary edit; the calendar then closes. Position is
+               fixed, so the main Filter popover's scrolling column cannot clip
+               it, but it stays inside the popover's DOM, so the popover's
+               outside-click and Escape handling still treat it as inside. */
+            var calIcon = {
+              prev: '<svg class="lucide lucide-chevron-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6" /></svg>',
+              next: '<svg class="lucide lucide-chevron-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg>'
+            };
+            var MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            var DOW = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            var pad2 = function (n) { return (n < 10 ? '0' : '') + n; };
+            var isoOf = function (y, m, day) { return y + '-' + pad2(m + 1) + '-' + pad2(day); };
+
+            var cal = el('div', 'fp-cal');
+            cal.hidden = true;
+            cal.setAttribute('role', 'dialog');
+            cal.setAttribute('aria-label', 'Choose date range');
+            box.appendChild(cal);
+
+            var view = { y: 0, m: 0 };
+            var pick = { start: '', end: '', hover: '' };
+            var anchorBtn = null;
+
+            var renderCal = function () {
+              var first = new Date(view.y, view.m, 1).getDay();
+              var days = new Date(view.y, view.m + 1, 0).getDate();
+              var html = '<div class="fp-cal-head">' +
+                '<button class="fp-cal-nav" type="button" data-step="-1" aria-label="Previous month">' + calIcon.prev + '</button>' +
+                '<span class="fp-cal-title" aria-live="polite">' + MONTHS[view.m] + ', ' + view.y + '</span>' +
+                '<button class="fp-cal-nav" type="button" data-step="1" aria-label="Next month">' + calIcon.next + '</button>' +
+                '</div><div class="fp-cal-grid">';
+              DOW.forEach(function (w) { html += '<span class="fp-cal-dow" aria-hidden="true">' + w + '</span>'; });
+              for (var b = 0; b < first; b++) html += '<span aria-hidden="true"></span>';
+              for (var day = 1; day <= days; day++) {
+                var key = isoOf(view.y, view.m, day);
+                var off = key < inputs.from.min || key > inputs.from.max;
+                html += '<button class="fp-cal-day" type="button" data-date="' + key + '"' +
+                  ' aria-label="' + MONTHS[view.m] + ' ' + day + ', ' + view.y + '"' + (off ? ' disabled' : '') + '>' + day + '</button>';
+              }
+              cal.innerHTML = html + '</div>';
+              paintRange();
+            };
+
+            /* Range state as classes on the existing day buttons, so hovering
+               never rebuilds the grid under the pointer. */
+            var paintRange = function () {
+              var lo = pick.start, hi = pick.end || (pick.start && pick.hover) || '';
+              if (lo && hi && hi < lo) { var t = lo; lo = hi; hi = t; }
+              Array.prototype.forEach.call(cal.querySelectorAll('.fp-cal-day'), function (btn) {
+                var key = btn.getAttribute('data-date');
+                btn.classList.toggle('is-anchor', !pick.start && !!anchorBtn && key === inputs[anchorBtn.prop].value);
+                btn.classList.toggle('is-start', !!lo && key === lo);
+                btn.classList.toggle('is-end', !!hi && key === hi);
+                btn.classList.toggle('is-between', !!(lo && hi) && key > lo && key < hi);
+                btn.setAttribute('aria-pressed', String(key === lo || key === hi));
+              });
+            };
+
+            var placeCal = function () {
+              if (!anchorBtn) return;
+              var r = calBtns[anchorBtn.prop].row.getBoundingClientRect();
+              var w = cal.offsetWidth, h = cal.offsetHeight;
+              var left = Math.min(Math.max(8, r.right - w), window.innerWidth - w - 8);
+              var top = r.bottom + 6;
+              if (top + h > window.innerHeight - 8) top = Math.max(8, r.top - h - 6);
+              cal.style.left = left + 'px';
+              cal.style.top = top + 'px';
+            };
+
+            var onAway = function (e) {
+              if (cal.contains(e.target) || e.target.closest('.fp-cal-btn')) return;
+              setCal(false);
+            };
+
+            var setCal = function (open, prop) {
+              Object.keys(calBtns).forEach(function (k) { calBtns[k].btn.setAttribute('aria-expanded', String(open && k === prop)); });
+              if (!open) {
+                cal.hidden = true;
+                anchorBtn = null;
+                document.removeEventListener('pointerdown', onAway, true);
+                window.removeEventListener('resize', placeCal);
+                document.removeEventListener('scroll', closeOnScroll, true);
+                return;
+              }
+              anchorBtn = { prop: prop };
+              pick = { start: '', end: '', hover: '' };
+              var base = validDate(inputs[prop].value) ? inputs[prop].value
+                : validDate(inputs.from.value) ? inputs.from.value
+                : isoOf(new Date().getFullYear(), new Date().getMonth(), 1);
+              view.y = +base.slice(0, 4); view.m = +base.slice(5, 7) - 1;
+              renderCal();
+              cal.hidden = false;
+              placeCal();
+              document.addEventListener('pointerdown', onAway, true);
+              window.addEventListener('resize', placeCal);
+              document.addEventListener('scroll', closeOnScroll, true);
+            };
+            var closeOnScroll = function (e) { if (!cal.contains(e.target)) setCal(false); };
+
+            Object.keys(calBtns).forEach(function (prop) {
+              calBtns[prop].btn.addEventListener('click', function (e) {
+                e.preventDefault();
+                var same = !cal.hidden && anchorBtn && anchorBtn.prop === prop;
+                setCal(!same, prop);
+              });
+            });
+
+            cal.addEventListener('click', function (e) {
+              var nav = e.target.closest('.fp-cal-nav');
+              if (nav) {
+                view.m += +nav.getAttribute('data-step');
+                if (view.m < 0) { view.m = 11; view.y--; }
+                if (view.m > 11) { view.m = 0; view.y++; }
+                renderCal();
+                cal.querySelector('[data-step="' + nav.getAttribute('data-step') + '"]').focus();
+                return;
+              }
+              var dayBtn = e.target.closest('.fp-cal-day');
+              if (!dayBtn || dayBtn.disabled) return;
+              var key = dayBtn.getAttribute('data-date');
+              if (!pick.start || pick.end) {
+                pick = { start: key, end: '', hover: '' };
+                paintRange();
+                return;
+              }
+              var a = pick.start, b2 = key;
+              if (b2 < a) { var t2 = a; a = b2; b2 = t2; }
+              pick = { start: a, end: b2, hover: '' };
+              paintRange();
+              inputs.from.value = a;
+              inputs.from.dispatchEvent(new Event('input', { bubbles: true }));
+              inputs.to.value = b2;
+              inputs.to.dispatchEvent(new Event('input', { bubbles: true }));
+              var back = calBtns[anchorBtn.prop].btn;
+              /* A beat to see the range land, then close. */
+              setTimeout(function () { if (!cal.hidden) { setCal(false); back.focus(); } }, 280);
+            });
+            cal.addEventListener('mouseover', function (e) {
+              if (!pick.start || pick.end) return;
+              var dayBtn = e.target.closest('.fp-cal-day');
+              var key = dayBtn && !dayBtn.disabled ? dayBtn.getAttribute('data-date') : '';
+              if (key === pick.hover) return;
+              pick.hover = key;
+              paintRange();
+            });
+            /* Escape closes the calendar only, not the whole filter popover:
+               the popover's capture-phase Escape handler sends this. */
+            cal.addEventListener('fp-cal-close', function () {
+              var back = anchorBtn ? calBtns[anchorBtn.prop].btn : null;
+              setCal(false);
+              if (back) back.focus();
+            });
+
             var check = function () {
               var msg = dateMessage(d);
               var fromOk = validDate(d.from) && !(validDate(d.to) && d.from > d.to);
@@ -14984,6 +15283,10 @@
           if (e.key === 'Escape') {
             e.preventDefault();
             e.stopPropagation();
+            /* An open date calendar is the innermost layer: Escape closes it
+               first, and only the next Escape closes the popover. */
+            var openCal = cur.pop.querySelector('.fp-cal:not([hidden])');
+            if (openCal) { openCal.dispatchEvent(new CustomEvent('fp-cal-close')); return; }
             closeCur(true);
             return;
           }
