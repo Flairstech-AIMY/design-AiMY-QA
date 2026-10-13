@@ -75,7 +75,10 @@
       myQa.setAttribute("aria-checked", String(myQaOn()));
     }
 
+    var closeTimer = 0;
+
     function setOpen(next, focusFirst) {
+      clearTimeout(closeTimer);
       if (open === next) return;
       open = next;
       if (open) syncChecks();
@@ -119,11 +122,20 @@
       }
     });
 
+    /* The tick lands at once; the menu stays up for 2 seconds so the change
+       is seen before it closes, in both directions. Clicking again restarts
+       the wait, and Escape, a click outside or the pill still close it at
+       once (setOpen clears the timer). */
+    var CLOSE_AFTER_MS = 2000;
     myQa.addEventListener("click", function () {
       setMyQa(!myQaOn());
       syncChecks();
-      setOpen(false);
-      pill.focus({ preventScroll: true });
+      clearTimeout(closeTimer);
+      closeTimer = setTimeout(function () {
+        var keepFocus = panel.contains(document.activeElement);
+        setOpen(false);
+        if (keepFocus) pill.focus({ preventScroll: true });
+      }, CLOSE_AFTER_MS);
     });
   }
 
