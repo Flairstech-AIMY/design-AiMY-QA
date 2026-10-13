@@ -127,6 +127,17 @@
 
   sync(); /* pre-paint */
 
+  /* THE RAIL'S STATE, PRE-PAINT, so a reader who collapsed it never sees it
+     flash open on the next page. Below 1100px it is always collapsed (open is
+     a temporary overlay); above, it is the remembered choice, open by default.
+     assets/aimy-rail.js owns it from here on. */
+  (function () {
+    var pref = null;
+    try { pref = localStorage.getItem("aimy-qa-rail"); } catch (e) {}
+    var narrow = window.matchMedia && matchMedia("(max-width: 1099.98px)").matches;
+    root.setAttribute("data-rail", narrow ? "collapsed" : pref === "collapsed" ? "collapsed" : "open");
+  })();
+
   addEventListener("resize", schedule, { passive: true });
   addEventListener("orientationchange", schedule, { passive: true });
   if (window.visualViewport) {
@@ -187,9 +198,18 @@
 
     var railQ = matchMedia("(max-width: 1099.98px)");
 
+    /* Icons only show while the rail is collapsed and not opened as a drawer.
+       aimy-rail.js sets data-tip-text to "Page — finding"; the bare label is
+       the fallback on any page that rail script has not reached. */
+    function collapsed() {
+      var state = root.getAttribute("data-rail");
+      if (state) return state === "collapsed" && !sidebar.classList.contains("is-open");
+      return railQ.matches;
+    }
+
     function show(a) {
-      if (!railQ.matches) return;
-      var label = a.getAttribute("data-label");
+      if (!collapsed()) return;
+      var label = a.getAttribute("data-tip-text") || a.getAttribute("data-label");
       if (!label) return;
       /* getBoundingClientRect is in VISUAL px; a custom property carrying a
          `px` length is read in LAYOUT px inside the zoom. currentCSSZoom is the

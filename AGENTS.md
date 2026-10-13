@@ -12,7 +12,7 @@
 - Use `lucide-react` for all interface icons. Choose the closest semantic Lucide icon automatically and import its named component when working in React.
 - Default icons to 18px and inherit the surrounding text color (`currentColor`). Preserve an established local size only when that UI already has a deliberate icon-size convention.
 - Do not use emoji or create/use custom SVG icons for interface controls unless explicitly requested. Supplied brand artwork is not a UI icon and may remain an asset.
-- The product pages are static HTML and do not currently have a React page runtime or app bundler. Do not assume a JSX `lucide-react` component can be placed directly in an HTML file. Use a project-compatible rendering/build path sourced from `lucide-react`; do not silently substitute a hand-drawn icon, emoji, or unrelated icon set. If the required integration is unclear or would expand scope, explain the static-HTML constraint before choosing an alternative.
+- The product pages are static HTML and do not currently have a React page runtime or app bundler. Do not assume a JSX `lucide-react` component can be placed directly in an HTML file. For static pages, take the icon from the installed `lucide-static` package (same version as `lucide-react`): copy the SVG from `node_modules/lucide-static/icons/<icon-name>.svg` inline, keep its `class="lucide lucide-<icon-name>"`, drop the license comment and fixed `width`/`height` in favour of the 18px default, and add `aria-hidden="true"` when the icon is decorative. Do not silently substitute a hand-drawn icon, emoji, or unrelated icon set.
 
 ## Product and design contracts
 

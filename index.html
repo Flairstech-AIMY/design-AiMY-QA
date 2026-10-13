@@ -7172,7 +7172,7 @@
     <!-- The canvas shell above: full-width geometry and the conversation
          column. Loaded last so it overrides the inline canvas rules, the
          same order sales.css has over aimy-ds.css. -->
-    <link rel="stylesheet" href="assets/aimy-canvas.css?v=11" />
+    <link rel="stylesheet" href="assets/aimy-canvas.css?v=13" />
     <link rel="stylesheet" href="assets/aimy-sessions.css?v=2" />
 
     <!-- The responsive layer above both: one UI scale for large screens,
@@ -7180,9 +7180,11 @@
          composer on screen. Loaded last so it overrides the canvas rules,
          the same order aimy-canvas.css has over this page's inline block. -->
     <link rel="stylesheet" href="assets/aimy-responsive.css?v=7" />
-    <link rel="stylesheet" href="assets/aimy-rail.css?v=2" />
+    <link rel="stylesheet" href="assets/aimy-scroll.css?v=1" />
+    <link rel="stylesheet" href="assets/aimy-rail.css?v=8" />
+    <link rel="stylesheet" href="assets/aimy-user-menu.css?v=2" />
     <link rel="stylesheet" href="assets/aimy-typography.css?v=1" />
-    <script src="assets/aimy-viewport.js?v=5"></script>
+    <script src="assets/aimy-viewport.js?v=6"></script>
   </head>
   <body>
     <!-- ── Ellipse glow layer: #171A1C bg → ellipse → components on top ── -->
@@ -7346,9 +7348,9 @@
           </div>
         </div>
         <div class="topnav-user">
-          <div class="topnav-avatar">NW</div>
+          <div class="topnav-avatar">EY</div>
           <div class="topnav-user-info">
-            <span class="topnav-user-name">Nour Wael</span>
+            <span class="topnav-user-name">Engy Yasser</span>
             <span class="topnav-user-role">Product Design</span>
           </div>
           <svg
@@ -7433,6 +7435,9 @@
              never on an option, so the options are not tabbable. -->
         <div class="gps-bar" id="gpsBar">
           <div class="gps-controls" role="toolbar" aria-label="Dashboard filters">
+            <!-- The "My results" toggle and the QA results workspace it
+                 opened were removed. "View my QA" in the account menu
+                 (assets/aimy-user-menu.js) is a standalone checkbox. -->
             <button class="gps-filter-btn fp-main-btn" id="fpMainBtn" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="fpMain">
               <svg class="fp-ico lucide lucide-funnel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 20a1 1 0 0 0 .553.895l2 1A1 1 0 0 0 14 21v-7a2 2 0 0 1 .517-1.341L21.74 4.67A1 1 0 0 0 21 3H3a1 1 0 0 0-.742 1.67l7.225 7.989A2 2 0 0 1 10 14z"></path></svg>
               Filter
@@ -11046,7 +11051,7 @@
           const wrap = document.createElement("div");
           wrap.className = "chat-msg user";
           wrap.innerHTML =
-            '<div class="msg-avatar user-av">NW</div>' +
+            '<div class="msg-avatar user-av">EY</div>' +
             '<div class="msg-bubble">' +
             escHtml(text) +
             "</div>";
@@ -11925,6 +11930,13 @@
             return;
           }
 
+          if (window.AIMY_QA_RESULTS_SCOPE && window.AIMY_QA_RESULTS_SCOPE.get() === 'mine') {
+            setTimeout(function () {
+              appendAiMsg('View my QA is on, but AiMY chat is not connected to your review records. I cannot provide a grounded personal QA answer. Use the QA results table and export for this view; untick View my QA in your account menu to explore the aggregate demo.');
+            }, 500);
+            return;
+          }
+
           if (topic && RESPONSE_BY_TOPIC[topic]) {
             window.__aimyLastTopic = topic;
             var entryVal = RESPONSE_BY_TOPIC[topic];
@@ -12140,13 +12152,14 @@
           var APPLYING = false;
 
           window.AIMY_SURFACE = {
-            initials: "NW",
-            SCALAR: ["view", "scenario", "chart", "interaction", "qa_filters", "qa_interaction", "qa_from", "qa_to"].concat(DIMS.map(slug)),
+            initials: "EY",
+            SCALAR: ["view", "scenario", "chart", "interaction", "qa_filters", "qa_interaction", "qa_from", "qa_to", "qa_results_scope"].concat(DIMS.map(slug)),
             MULTI: ["qa_client", "qa_product"],
-            DEFAULTS: { view: "manager", scenario: "critical", interaction: "all", qa_filters: "", qa_interaction: "all", qa_from: "2026-01-01", qa_to: "2026-09-15" },
+            DEFAULTS: { view: "manager", scenario: "critical", interaction: "all", qa_filters: "", qa_interaction: "all", qa_from: "2026-01-01", qa_to: "2026-09-15", qa_results_scope: "all" },
 
             read: function () {
               var out = { scenario: activeScenario };
+              out.qa_results_scope = window.AIMY_QA_RESULTS_SCOPE ? window.AIMY_QA_RESULTS_SCOPE.get() : 'all';
               /* Manager or Director. The tab owns the truth via aria-selected,
                  the same way the chart toggle does — reading the button rather
                  than a variable means the two cannot disagree. */
@@ -12189,6 +12202,7 @@
                 } else if (window.__AIMY_CHAT_RESTORING_SESSION && window.AIMY_QA_FILTERS) {
                   window.AIMY_QA_FILTERS.restore({ interaction: "all", client: [], product: [], from: "2026-01-01", to: "2026-09-15" });
                 }
+                if (window.AIMY_QA_RESULTS_SCOPE) window.AIMY_QA_RESULTS_SCOPE.set(v.qa_results_scope === 'mine' ? 'mine' : 'all', { silent: true });
 
                 /* The detected state. `setScenario` repaints the pill, the
                    confidence signals, the chip row and the alternatives, so
@@ -14178,10 +14192,13 @@
           return n;
         }
         function readApplied() {
-          return { interaction: inter.get(), client: state.client.slice(), product: scope.get(), from: state.from, to: state.to };
+          return { interaction: inter.get(), client: state.client.slice(), product: scope.get(), from: state.from, to: state.to,
+            resultsScope: window.AIMY_QA_RESULTS_SCOPE ? window.AIMY_QA_RESULTS_SCOPE.get() : document.documentElement.getAttribute('data-qa-results-scope') || 'all' };
         }
         function clone(d) {
-          return { interaction: d.interaction, client: d.client.slice(), product: d.product.slice(), from: d.from, to: d.to };
+          var copy = { interaction: d.interaction, client: d.client.slice(), product: d.product.slice(), from: d.from, to: d.to };
+          if (d.resultsScope === 'mine' || d.resultsScope === 'all') copy.resultsScope = d.resultsScope;
+          return copy;
         }
         function count(key, d) {
           if (key === 'interaction') return d.interaction !== 'all' ? 1 : 0;
@@ -14257,7 +14274,7 @@
             pill.appendChild(edit);
             appliedEl.appendChild(pill);
           });
-          appliedEl.hidden = !appliedEl.children.length;
+          appliedEl.hidden = !appliedEl.children.length && a.resultsScope !== 'mine';
           if (!appliedEl.hidden) {
             var reset = el('button', 'fp-applied-reset', 'Reset all');
             reset.type = 'button';
@@ -14299,7 +14316,7 @@
         function saveChatProposals(data) {
           try { localStorage.setItem(CHAT_PROPOSALS_KEY, JSON.stringify(data)); } catch (e) {}
         }
-        function filterSignature(d) { return JSON.stringify({ interaction: d.interaction, client: d.client, product: d.product, from: d.from, to: d.to }); }
+        function filterSignature(d) { return JSON.stringify({ interaction: d.interaction, client: d.client, product: d.product, from: d.from, to: d.to, resultsScope: d.resultsScope }); }
         function createChatProposal(text) {
           var parsed = parseFilterRequest(text), id = 'qaf-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
           var proposal = {
@@ -14373,12 +14390,23 @@
               from: validDate(d.from) ? d.from : DEFAULT_FROM,
               to: validDate(d.to) ? d.to : DEFAULT_TO
             };
+            if (d.resultsScope === 'mine' || d.resultsScope === 'all') safe.resultsScope = d.resultsScope;
             var prior = window.__AIMY_QA_FILTER_RESTORING;
             window.__AIMY_QA_FILTER_RESTORING = true;
             try { commit(ORDER, safe); } finally { window.__AIMY_QA_FILTER_RESTORING = prior; }
           },
           reset: clearAll
         };
+        var incomingFilters = new URLSearchParams(window.location.search);
+        if (incomingFilters.get('qa_filters') === '1') {
+          window.AIMY_QA_FILTERS.restore({
+            interaction: incomingFilters.get('qa_interaction') || 'all',
+            client: (incomingFilters.get('qa_client') || '').split(',').filter(Boolean),
+            product: (incomingFilters.get('qa_product') || '').split(',').filter(Boolean),
+            from: incomingFilters.get('qa_from') || DEFAULT_FROM,
+            to: incomingFilters.get('qa_to') || DEFAULT_TO
+          });
+        }
         toolDialog.addEventListener('close', function () {
           if (toolOpener) toolOpener.setAttribute('aria-expanded', 'false');
           if (toolOpener && document.contains(toolOpener)) toolOpener.focus({ preventScroll: true });
@@ -14459,7 +14487,7 @@
           var clearDate = /\b(clear|remove|reset)\s+(the\s+)?(date range|date|time period)(\s+filters?)?\b|\byear to date\b|\bytd\b/.test(query);
 
           if (allClear) {
-            next = { interaction: 'all', client: [], product: [], from: DEFAULT_FROM, to: DEFAULT_TO };
+            next = { interaction: 'all', client: [], product: [], from: DEFAULT_FROM, to: DEFAULT_TO, resultsScope: 'all' };
             touched = ORDER.slice();
             changes.push('Clear all active filters');
           } else {
@@ -14559,6 +14587,7 @@
             return FIELDS[key].label + ': ' + value;
           });
           var changed = touched.filter(function (key) { return count(key, current) !== count(key, next) || JSON.stringify(current[key]) !== JSON.stringify(next[key]) || (key === 'date' && (current.from !== next.from || current.to !== next.to)); });
+          if (allClear && current.resultsScope === 'mine' && !changed.length) changed = ORDER.slice();
           if (!changed.length) {
             var noChange = allClear ? 'All supported filters are already clear.'
               : touched.length && touched.every(function (key) { return !count(key, current) && !count(key, next); })
@@ -14606,7 +14635,7 @@
             }
             list.innerHTML = views.map(function (view, index) {
               var selected = ORDER.reduce(function (total, key) { return total + count(key, view.filters); }, 0);
-              return '<div class="fp-view-row"><button class="fp-view-load" type="button" data-load-view="' + index + '"><strong>' + escapeHtml(view.name) + '</strong><small>' + selected + ' selected filter' + (selected === 1 ? '' : 's') + '</small></button>' +
+              return '<div class="fp-view-row"><button class="fp-view-load" type="button" data-load-view="' + index + '"><strong>' + escapeHtml(view.name) + '</strong><small>' + selected + ' selected filter' + (selected === 1 ? '' : 's') + '' + '</small></button>' +
                 '<button class="fp-view-delete" type="button" data-delete-view="' + index + '" aria-label="Delete ' + escapeHtml(view.name) + '">Delete</button></div>';
             }).join('');
             list.querySelectorAll('[data-load-view]').forEach(function (button) {
@@ -14645,6 +14674,7 @@
         }
         function commit(keys, d) {
           var has = function (k) { return keys.indexOf(k) >= 0; };
+          if (window.AIMY_QA_RESULTS_SCOPE && (d.resultsScope === 'mine' || d.resultsScope === 'all')) window.AIMY_QA_RESULTS_SCOPE.set(d.resultsScope, { silent: true });
           if (has('interaction')) inter.set(d.interaction);
           if (has('product') && !sameList(scope.get(), d.product)) scope.set(d.product);
           if (has('client') && !sameList(state.client, d.client)) {
@@ -14656,6 +14686,7 @@
             window.dispatchEvent(new CustomEvent('aimy:date-range-changed', { detail: { from: state.from, to: state.to } }));
           }
           updateToolbar();
+          window.dispatchEvent(new CustomEvent('aimy:qa-filters-committed'));
         }
 
         /* ── Editors ───────────────────────────────────────────────────── */
@@ -14915,7 +14946,7 @@
           closeCur(true);
         }
         function clearAll() {
-          commit(ORDER, { interaction: 'all', client: [], product: [], from: DEFAULT_FROM, to: DEFAULT_TO });
+          commit(ORDER, { interaction: 'all', client: [], product: [], from: DEFAULT_FROM, to: DEFAULT_TO, resultsScope: 'all' });
           closeCur(true);
         }
 
@@ -14969,12 +15000,15 @@
         window.addEventListener('resize', function () { if (cur) place(cur.pop, cur.trigger); });
         window.addEventListener('aimy:scope-synced', updateToolbar);
         window.addEventListener('aimy:scope-changed', updateToolbar);
+        window.addEventListener('aimy:results-scope-changed', updateToolbar);
         new MutationObserver(updateToolbar).observe(document.body, { attributes: true, attributeFilter: ['data-interaction-type'] });
         updateToolbar();
       })();
     </script>
-    <script src="assets/aimy-canvas.js?v=13"></script>
-    <script src="assets/aimy-rail.js?v=3"></script>
+    <script src="assets/aimy-scroll.js?v=3"></script>
+    <script src="assets/aimy-canvas.js?v=16"></script>
+    <script src="assets/aimy-rail.js?v=6"></script>
+    <script src="assets/aimy-user-menu.js?v=4"></script>
     <script>
       /* Cards rendered from live data carry no --pct, so read it off the metric each card displays. */
       (function () {

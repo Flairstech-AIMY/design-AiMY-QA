@@ -1,0 +1,142 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   THE USER MENU — what the profile pill in the top bar opens
+   (behaviour in assets/aimy-user-menu.js)
+
+   Card background, border and two-layer shadow of the notifications panel
+   beside it (.ntf-panel in each page); the compact geometry of the design
+   system's dropdown (.v2-dropdown-panel: 10px radius, 4px inset; rows as
+   .v2-dropdown-option), so it reads as a small menu, not a second panel.
+
+   Opens with the design system's dropdown motion (design-system-new.md,
+   Dropdown): translateY(-4px) scale(0.98) → none at 150ms, from the top-right
+   corner it hangs off. Reduced motion keeps the fade and drops the movement.
+
+   Tokens are the ones every shell page declares in both themes; :root prefix
+   so a page's own inline <style> cannot outrank them (see aimy-rail.css).
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:root .um-anchor {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* The pill is now a real control. */
+:root .um-anchor .topnav-user:focus-visible {
+  outline: 2px solid var(--qa-accent);
+  outline-offset: 2px;
+}
+:root .um-anchor .topnav-user > svg {
+  transition: transform var(--transition-fast, 150ms) var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1));
+}
+:root .um-anchor .topnav-user[aria-expanded="true"] {
+  border-color: var(--wash-10, rgba(255,255,255,0.2));
+  background: var(--wash-6, rgba(255,255,255,0.09));
+}
+:root .um-anchor .topnav-user[aria-expanded="true"] > svg {
+  transform: rotate(180deg);
+}
+
+:root .um-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 300;
+  min-width: 160px;
+  padding: 4px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(0, 0, 0, 0.2);
+  font-family: "Urbanist", sans-serif;
+  text-align: left;
+  transform-origin: top right;
+  opacity: 0;
+  transform: translateY(-4px) scale(0.98);
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity var(--transition-fast, 150ms) var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1)),
+    transform var(--transition-fast, 150ms) var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1)),
+    visibility 0s linear var(--transition-fast, 150ms);
+}
+:root .um-panel.is-open {
+  opacity: 1;
+  transform: none;
+  visibility: visible;
+  pointer-events: auto;
+  transition-delay: 0s;
+}
+
+:root .um-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* Row geometry is the design system's dropdown option (.v2-dropdown-option):
+   6px 10px, 6px radius, 11px semibold Urbanist. The tick sits at the far end
+   and is drawn only when the item is on; 14px rather than the 18px icon
+   default, so it sits inside the 11px row instead of outweighing its label. */
+:root .um-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--d200, #e8edf2);
+  font-family: "Urbanist", sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.4;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background var(--transition-fast, 150ms), color var(--transition-fast, 150ms);
+}
+:root .um-item .um-check {
+  width: 14px;
+  height: 14px;
+  margin-left: auto;
+  flex-shrink: 0;
+  color: var(--qa-accent);
+  opacity: 0;
+  transform: scale(0.85);
+  transition:
+    opacity var(--transition-fast, 150ms) var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1)),
+    transform var(--transition-fast, 150ms) var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1));
+}
+:root .um-item[aria-checked="true"] {
+  color: var(--d50);
+}
+:root .um-item[aria-checked="true"] .um-check {
+  opacity: 1;
+  transform: none;
+}
+:root .um-item:hover,
+:root .um-item:focus-visible {
+  background: var(--wash-3);
+  color: var(--d50);
+  outline: none;
+}
+:root .um-item:focus-visible {
+  box-shadow: inset 0 0 0 2px rgba(var(--qa-accent-rgb), 0.6);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root .um-panel,
+  :root .um-panel.is-open,
+  :root .um-item .um-check {
+    transform: none;
+  }
+  :root .um-anchor .topnav-user > svg {
+    transition: none;
+  }
+}

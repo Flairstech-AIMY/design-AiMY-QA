@@ -339,6 +339,11 @@
    existing rather than by being remembered. Components that want something
    different still override it: this is the floor, not a ceiling.
 
+   Since aimy-scroll.js, vertical-only scrollers hide this bar and show the
+   animated scroll dot instead (assets/aimy-scroll.css). What remains here
+   is for surfaces that scroll both ways, horizontal strips, and pages
+   before the script has run.
+
    COLOURED WITH TOKENS, so it follows the theme without a light-mode twin —
    --wash-6 and --card-border are both defined in each page's :root and again
    under :root[data-theme="light"].
