@@ -26,6 +26,12 @@
           });
           document.documentElement.setAttribute('data-scope',
             scopeList.length === 0 ? 'all' : scopeList.length === 1 ? scopeList[0] : 'multi');
+
+          /* View my QA (account menu), pre-paint so a ticked box never
+             flashes the team dashboard first. The scope module at the end
+             of <body> swaps the copy; this class alone decides which blocks
+             show (html.is-my-qa [data-my-qa]). */
+          if (localStorage.getItem('aimy-qa-view-my-qa') === 'on') document.documentElement.classList.add('is-my-qa');
         } catch (e) {}
       })();
     </script>
@@ -7289,6 +7295,120 @@
       }
       :root[data-theme="light"] .fp-opt:has(input:checked) { color: #1f5fd0; }
       /* ══ end global product scope ════════════════════════════════════ */
+
+      /* ══ VIEW MY QA, the dashboard scoped to the signed-in person ═══════════
+         The account-menu checkbox (assets/aimy-user-menu.js) sets
+         html.is-my-qa. Blocks marked data-my-qa="only" show only then;
+         blocks marked data-my-qa="hide" are the team versions they replace.
+         Copy swaps (data-my-qa-html) live in the scope script at the end of
+         <body>. Prototype data: no backend behaviour is implied. */
+      html:not(.is-my-qa) [data-my-qa="only"],
+      html.is-my-qa [data-my-qa="hide"] { display: none !important; }
+      .sr-only {
+        position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+        overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+      }
+
+      /* Locked Agents chip: an applied filter that names the person. */
+      .gps-myqa-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+      .gps-myqa-chip {
+        gap: 6px; min-height: 28px; padding: 4px 12px; border: 0; cursor: pointer;
+        color: var(--d300); font-family: inherit; font-size: 12px; line-height: 1.4; white-space: nowrap;
+        transition: background var(--transition-fast), color var(--transition-fast);
+      }
+      .gps-myqa-chip:hover { background: rgba(51, 105, 255, 0.18); color: var(--d50); }
+      .gps-myqa-chip:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+      .gps-myqa-chip svg.lucide-lock { width: 12px; height: 12px; flex-shrink: 0; color: var(--ai-text); }
+      .gps-myqa-chip b { color: var(--ai-text); font-weight: 700; }
+      .gps-myqa-lock { color: var(--d400); }
+
+      .slv-score-trend .trend-negative { color: var(--err); font-weight: 700; }
+      html.is-my-qa .slv-score-val { color: var(--err); text-shadow: 0 0 22px rgba(240, 68, 56, 0.16); }
+      .eval-bar-count .hl-err, .eval-bar-count .hl-ok { font-weight: 700; }
+      .hl-ok { color: var(--ok); }
+
+      /* Improvement opportunities, one person in scope: KPIs ranked by
+         points under the 85% goal. Same slot as the team pattern cards. */
+      .io-kpi, .ev-panel {
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: 16px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+        overflow-x: auto;
+      }
+      :root[data-theme="light"] .io-kpi,
+      :root[data-theme="light"] .ev-panel { box-shadow: 0 4px 24px rgba(16, 24, 40, 0.06); }
+      .io-kpi { padding-bottom: 12px; }
+      .io-kpi-table, .ev-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-variant-numeric: tabular-nums;
+      }
+      .io-kpi-table thead th, .ev-table thead th {
+        padding: 12px 10px 9px;
+        font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+        color: var(--d400); text-align: left; white-space: nowrap;
+        border-bottom: 1px solid var(--wash-5);
+      }
+      .io-kpi-table tbody > tr > *, .ev-table tbody > tr > * {
+        padding: 12px 10px;
+        text-align: left; vertical-align: middle;
+        border-bottom: 1px solid var(--wash-3);
+      }
+      .io-kpi-table tbody > tr:last-child > *, .ev-table tbody > tr:last-child > * { border-bottom: 0; }
+      .io-kpi-table tr > :first-child, .ev-table tr > :first-child { padding-left: 16px; }
+      .io-kpi-table tr > :last-child, .ev-table tr > :last-child { padding-right: 16px; }
+      .io-kpi-table .num, .ev-table .num { text-align: right; }
+
+      .io-kpi-row.is-worst { background: color-mix(in srgb, var(--err) 7%, transparent); }
+      .io-kpi-name { display: block; font-size: 13px; font-weight: 700; line-height: 1.3; color: var(--d50); }
+      .io-kpi-note { display: block; margin-top: 2px; font-size: 11px; font-weight: 500; line-height: 1.4; color: var(--d400); }
+      .io-kpi-rate { font-size: 14px; font-weight: 800; color: var(--d50); white-space: nowrap; }
+      .io-kpi-row[data-tone="err"] .io-kpi-rate { color: var(--err); }
+      .io-kpi-row[data-tone="warn"] .io-kpi-rate { color: var(--warn); }
+      .io-kpi-delta { font-size: 12px; font-weight: 700; color: var(--d400); white-space: nowrap; }
+      .io-kpi-delta.is-down { color: var(--err); }
+      .io-kpi-delta.is-up { color: var(--ok); }
+      .io-kpi-table th[scope="row"] { width: 100%; min-width: 150px; }
+      .io-kpi-bar {
+        position: relative; display: block; width: 64px; height: 4px; margin: 6px 0 0 auto;
+        border-radius: 2px; background: var(--wash-5);
+      }
+      .io-kpi-bar i {
+        position: absolute; inset: 0 auto 0 0; width: calc(var(--pct, 0) * 1%);
+        border-radius: inherit; background: var(--ok);
+      }
+      .io-kpi-row[data-tone="err"] .io-kpi-bar i { background: var(--err); }
+      .io-kpi-row[data-tone="warn"] .io-kpi-bar i { background: var(--warn); }
+      .io-kpi-bar em {
+        position: absolute; left: 85%; top: -3px; bottom: -3px; width: 2px; margin-left: -1px;
+        border-radius: 1px; background: var(--d200);
+      }
+      .io-kpi-act { text-align: right; }
+      .io-kpi-foot { margin: 10px 16px 0; font-size: 11px; color: var(--d400); }
+
+      /* Recent evaluations (component 7): team list by agent, or the
+         person's own list by product while View my QA is ticked. */
+      .ev-records { margin-top: 8px; }
+      .ev-records .dashboard-section-head { align-items: center; }
+      .ev-export { margin-left: auto; }
+      .ev-table tbody th { font-weight: 400; }
+      .ev-table td { font-size: 12.5px; font-weight: 600; color: var(--d200); white-space: nowrap; }
+      .ev-id {
+        padding: 0; border: 0; background: none; cursor: pointer;
+        font-family: inherit; font-size: 12.5px; font-weight: 700; color: var(--d50);
+        border-radius: 4px;
+        transition: color var(--transition-fast);
+      }
+      .ev-id:hover { color: rgb(var(--qa-accent-rgb)); text-decoration: underline; text-underline-offset: 3px; }
+      .ev-id:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+      .ev-score { font-weight: 800; color: var(--d50); }
+      .ev-score[data-tone="err"] { color: var(--err); }
+      .ev-score[data-tone="ok"] { color: var(--ok); }
+      .ev-table tbody tr { transition: background var(--transition-fast); }
+      @media (hover: hover) and (pointer: fine) {
+        .ev-table tbody tr:hover { background: var(--wash-2); }
+      }
 </style>
     <!-- The canvas shell above: full-width geometry and the conversation
          column. Loaded last so it overrides the inline canvas rules, the
@@ -7614,6 +7734,20 @@
             </div>
           </div>
 
+          <!-- View my QA: the Agents filter as an applied-filter tag, locked
+               to the signed-in person while the account-menu box is ticked.
+               It sits under the toolbar, where applied filters show, so the
+               toolbar keeps its width. It opens the account menu, the one
+               place to untick it. -->
+          <div class="gps-myqa-row" data-my-qa="only">
+            <button class="fp-applied-pill gps-myqa-chip" id="myQaChip" type="button"
+                    aria-haspopup="menu" aria-controls="aimyUserMenu">
+              <svg class="lucide lucide-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+              <span>Agents: <b data-my-qa-name>you</b></span>
+              <span class="gps-myqa-lock">· locked</span>
+            </button>
+          </div>
+
           <!-- Filter popovers. Moved to <body> by the engine so the bar's
                overflow on small screens cannot clip them. -->
           <div class="fp-pop fp-pop-main" id="fpMain" role="dialog" aria-label="Filters" hidden>
@@ -7672,17 +7806,38 @@
         <div class="slv" id="briefingOpener" role="region" aria-label="Since your last visit">
           <div class="slv-head">
             <svg viewBox="0 0 18 20"><use href="#aimy-logo-small"/></svg>
-            <b>Since your last visit</b>
+            <b data-my-qa-html="Your results &middot; since your last visit">Since your last visit</b>
             <span class="slv-time">last seen yesterday, 5:40pm</span>
           </div>
           <div class="slv-body">
             <div class="slv-main">
-              <p class="slv-line" id="briefingOpenerText">
+              <p class="slv-line" id="briefingOpenerText"
+                 data-my-qa-html="You are &lt;b&gt;4 points under the 85% goal&lt;/b&gt;, and &lt;b&gt;First Response Time&lt;/b&gt; explains most of it: 4 of its 5 fails landed in the last two weeks. &lt;b&gt;3&lt;/b&gt; new evaluations arrived, &lt;b&gt;1&lt;/b&gt; needs your attention, and &lt;b&gt;1&lt;/b&gt; dispute has a drafted reply waiting for you.">
                 I ran <b>2,847</b> audited interactions overnight. <strong>Three things need you</strong>: a response-time fix for
                 <b>8 agents</b> is staged, <b>6</b> coaching plans are drafted, and <b>2</b> dispute replies are waiting to send.
                 Quality slipped <b>4 points</b>, all of it in Objectif Lune.
               </p>
-          <div class="slv-signals" id="briefingOpenerSignals">
+          <div class="slv-signals" data-my-qa="only">
+            <button class="entry-action em-review ea-sm"
+                    data-entry-mode="review"
+                    data-aimy-topic="goal-frt"
+                    data-aimy-ask="First Response Time is my weakest KPI at 62%, 9 points down. Show my 5 fails, the 4 from the last two weeks, and what to do differently on High priority tickets.">
+              <svg class="em-ico"><use href="#em-ico-review"/></svg>Review First Response Time
+            </button>
+            <button class="entry-action em-investigate ea-sm"
+                    data-entry-mode="investigate"
+                    data-aimy-topic="disputes"
+                    data-aimy-ask="Show the reply AiMY drafted for my open dispute on EV-0512 and the evaluation behind it.">
+              <svg class="em-ico"><use href="#em-ico-investigate"/></svg>Reply to the open dispute
+            </button>
+            <button class="entry-action em-prompt ea-sm"
+                    data-entry-mode="prompt"
+                    data-aimy-topic="my-results"
+                    data-aimy-ask="What changed in my results since my last visit?">
+              <svg class="em-ico"><use href="#em-ico-prompt"/></svg>Ask AiMY what changed
+            </button>
+          </div>
+          <div class="slv-signals" id="briefingOpenerSignals" data-my-qa="hide">
             <button class="entry-action em-review ea-sm"
                     data-entry-mode="review"
                     data-aimy-topic="sla"
@@ -7707,9 +7862,9 @@
         </div>
         <div class="slv-score" aria-label="Quality score summary">
           <span class="slv-score-cap">Quality score</span>
-          <span class="slv-score-val">87.3%</span>
-          <span class="slv-score-sub"><strong>2.7</strong> under the <strong>90%</strong> goal</span>
-          <span class="slv-score-trend"><span class="trend-positive">&#8593; 5.2%</span> vs last period</span>
+          <span class="slv-score-val" data-my-qa-html="81%">87.3%</span>
+          <span class="slv-score-sub" data-my-qa-html="&lt;strong&gt;4.0&lt;/strong&gt; under the &lt;strong&gt;85%&lt;/strong&gt; goal"><strong>2.7</strong> under the <strong>90%</strong> goal</span>
+          <span class="slv-score-trend" data-my-qa-html="&lt;span class=&quot;trend-negative&quot;&gt;&amp;#8595; 3.0&lt;/span&gt; vs prior 30 days &amp;middot; 41 evaluations"><span class="trend-positive">&#8593; 5.2%</span> vs last period</span>
           <button class="slv-score-toggle" id="qsChartToggle" type="button"
                   aria-expanded="false" aria-controls="qsChartPanel"
                   aria-label="Open Quality Score trend" title="Open trend"
@@ -8857,11 +9012,89 @@
         </section>
 
         <div class="dashboard-section-head audit-only">
-          <h2>Audit health</h2>
-          <span>What the audited interactions say about KPI performance</span>
+          <h2 data-my-qa-html="Your audit health">Audit health</h2>
+          <span data-my-qa-html="What your evaluations say about your KPIs">What the audited interactions say about KPI performance</span>
         </div>
         <div class="tier-1-grid">
-          <div class="bcard p3 audit-only" role="region" tabindex="0">
+          <!-- View my QA: the same four slots, about the signed-in person.
+               The team cards after them are hidden while the box is ticked. -->
+          <div class="bcard p2 audit-only" role="region" tabindex="0" aria-label="Your pass rate" data-my-qa="only">
+              <div class="bcard-accent"></div>
+              <div class="bcard-body">
+                <div class="bcard-meta">
+                  <span class="type-label">Pass rate</span>
+                  <span class="priority-badge">P2 · Watch</span>
+                </div>
+                <div class="bcard-stat-line"><span class="bcard-stat warn">78%</span><span class="bcard-stat-cap">goal <b>85%</b> · <b>32</b> of 41 decisions</span></div>
+                <div class="bcard-status ok">&#8593; 2.0 vs prior period</div>
+                <div class="aimy-done">
+                  <svg class="aimy-done-mark" viewBox="0 0 18 20"><use href="#aimy-logo-small"/></svg>
+                  <span class="work-state ws-recommended" data-work-state="recommended"><span class="ws-dot"></span>Recommended</span><span class="aimy-done-text"><b>First Response Time</b> is behind most fails</span>
+                  <span class="aimy-done-actions">
+                    <button data-entry-mode="investigate" class="aimy-done-link primary" data-aimy-review="My pass rate is 78%, 32 of 41 decisions, against the 85% goal. Show which KPIs failed and which evaluations they came from." data-aimy-topic="my-results">Review failed KPIs</button>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+          <div class="bcard p1 audit-only" role="region" tabindex="0" aria-label="Your evaluations that need attention" data-my-qa="only">
+              <div class="bcard-accent"></div>
+              <div class="bcard-body">
+                <div class="bcard-meta">
+                  <span class="type-label">Needs attention</span>
+                  <span class="priority-badge">P1 · New</span>
+                </div>
+                <div class="bcard-stat-line"><span class="bcard-stat err">1</span><span class="bcard-stat-cap">evaluation · flagged by reviewers</span></div>
+                <div class="bcard-status err">&#8593; 1 vs prior period</div>
+                <div class="aimy-done">
+                  <svg class="aimy-done-mark" viewBox="0 0 18 20"><use href="#aimy-logo-small"/></svg>
+                  <span class="work-state ws-detected" data-work-state="detected"><span class="ws-dot"></span>Detected</span><span class="aimy-done-text"><b>EV-0541</b> · 71% · 13 Oct</span>
+                  <span class="aimy-done-actions">
+                    <button data-entry-mode="investigate" class="aimy-done-link primary" data-aimy-review="Open EV-0541, my ticket evaluation from 13 Oct scored 71%. Show which KPIs failed, the lines behind each, and what to change next time." data-aimy-topic="my-results">Open EV-0541</button>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+          <div class="bcard p2 audit-only" role="region" tabindex="0" aria-label="Your open disputes" data-my-qa="only">
+              <div class="bcard-accent"></div>
+              <div class="bcard-body">
+                <div class="bcard-meta">
+                  <span class="type-label">Disputes</span>
+                  <span class="priority-badge">P2 · Drafted</span>
+                </div>
+                <div class="bcard-stat-line"><span class="bcard-stat">1</span><span class="bcard-stat-cap">open dispute</span></div>
+                <div class="bcard-status plain">Reply drafted by AiMY, waiting for you</div>
+                <div class="aimy-done">
+                  <svg class="aimy-done-mark" viewBox="0 0 18 20"><use href="#aimy-logo-small"/></svg>
+                  <span class="work-state ws-drafted" data-work-state="drafted"><span class="ws-dot"></span>Drafted</span><span class="aimy-done-text">Reply on <b>EV-0512</b> ready to review</span>
+                  <span class="aimy-done-actions">
+                    <button data-entry-mode="review" class="aimy-done-link primary" data-aimy-review="Show the reply AiMY drafted for my open dispute on EV-0512, the evaluation it answers, and what changes if I send it." data-aimy-topic="disputes">Read the drafted reply</button>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+          <div class="bcard p3 audit-only" role="region" tabindex="0" aria-label="Your evaluations" data-my-qa="only">
+              <div class="bcard-accent"></div>
+              <div class="bcard-body">
+                <div class="bcard-meta">
+                  <span class="type-label">Evaluations</span>
+                  <span class="priority-badge">P3 · Complete</span>
+                </div>
+                <div class="bcard-stat-line"><span class="bcard-stat">41</span><span class="bcard-stat-cap">of <b>41</b> analyzed</span></div>
+                <div class="bcard-status plain">28 tickets · 13 calls</div>
+                <div class="aimy-done">
+                  <svg class="aimy-done-mark" viewBox="0 0 18 20"><use href="#aimy-logo-small"/></svg>
+                  <span class="work-state ws-completed" data-work-state="completed"><span class="ws-dot"></span>Completed</span><span class="aimy-done-text"><b>100% coverage</b> of your interactions</span>
+                  <span class="aimy-done-actions">
+                    <button class="aimy-done-link primary" type="button" data-scroll-to="myEvaluations">Review your evaluations</button>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+          <div class="bcard p3 audit-only" role="region" tabindex="0" data-my-qa="hide">
               <div class="bcard-accent"></div>
               <div class="bcard-body">
                 <div class="bcard-meta">
@@ -8880,7 +9113,7 @@
               </div>
             </div>
 
-          <div class="bcard p3 fail-rate-card audit-only" role="region" tabindex="0">
+          <div class="bcard p3 fail-rate-card audit-only" role="region" tabindex="0" data-my-qa="hide">
               <div class="bcard-accent"></div>
               <div class="bcard-body">
                 <div class="bcard-meta">
@@ -8899,7 +9132,7 @@
               </div>
             </div>
 
-            <div class="bcard p3 sentiment-card audit-only" role="region" tabindex="0">
+            <div class="bcard p3 sentiment-card audit-only" role="region" tabindex="0" data-my-qa="hide">
               <div class="bcard-accent"></div>
               <div class="bcard-body">
                 <div class="bcard-meta">
@@ -8918,7 +9151,7 @@
               </div>
             </div>
 
-            <div class="bcard csat-card" role="region" tabindex="0">
+            <div class="bcard csat-card" role="region" tabindex="0" data-my-qa="hide">
               <div class="bcard-body">
                 <div class="bcard-meta">
                   <span class="type-label">CSAT</span>
@@ -8946,7 +9179,7 @@
               </svg>
               <span class="ads-label">AiMY</span>
               <span class="work-state ws-detected" data-work-state="detected"><span class="ws-dot"></span>Detected</span>
-              <span class="ads-state" id="adsStateText">Watching 3 audit KPIs below target · Nov dip open</span>
+              <span class="ads-state" id="adsStateText" data-my-qa-html="3 of your KPIs sit under the 85% goal · First Response Time dipped in the last 2 weeks">Watching 3 audit KPIs below target · Nov dip open</span>
               <span class="ads-confidence" id="adsConfidence">high confidence</span>
             </div>
             <!-- "Explore in canvas" named our architecture and left the user to
@@ -8954,8 +9187,9 @@
             <button class="ads-cta"
                     data-entry-mode="investigate"
                     data-aimy-topic="goals-off-track"
-                      data-aimy-ask="Show me all 3 audit KPIs below target and what I should do about each.">
-                    Show me all 3 audit KPIs
+                      data-aimy-ask="Show me all 3 audit KPIs below target and what I should do about each."
+                      data-my-qa-ask="Show me my 3 KPIs under the 85% goal and what I should do about each, starting with First Response Time.">
+                    <span data-my-qa-html="Show me my 3 KPIs">Show me all 3 audit KPIs</span>
               <svg viewBox="0 0 13 13" fill="none" width="11" height="11">
                 <path d="M2 6.5H11M7 2.5L11 6.5L7 10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
@@ -8966,9 +9200,53 @@
             <div class="layout-column">
               <div class="dashboard-section-head">
                 <h2>Improvement opportunities</h2>
-                <span>Patterns, risks, and recommended actions from your audited interactions</span>
+                <span data-my-qa-html="Your KPIs, ranked by points under the 85% goal">Patterns, risks, and recommended actions from your audited interactions</span>
               </div>
-              <div class="ai-insights">
+              <!-- View my QA: one person in scope, so the same slot ranks
+                   their KPIs by points under the 85% goal instead of showing
+                   team patterns. Decided by the scope, not a second widget. -->
+              <div class="io-kpi" data-my-qa="only">
+                <table class="io-kpi-table">
+                  <caption class="sr-only">Your KPIs, ranked by points under the 85% goal</caption>
+                  <thead>
+                    <tr><th scope="col">KPI</th><th scope="col" class="num">Pass rate</th><th scope="col" class="num">Change</th><th scope="col"><span class="sr-only">Action</span></th></tr>
+                  </thead>
+                  <tbody>
+                    <tr class="io-kpi-row is-worst" data-tone="err">
+                      <th scope="row"><span class="io-kpi-name">First Response Time</span><span class="io-kpi-note">High priority tickets answered after the 4-hour SLA · 8 of 13 passed, 4 of 5 fails in the last two weeks</span></th>
+                      <td class="num io-kpi-rate">62%<span class="io-kpi-bar" style="--pct:62"><i></i><em></em></span></td>
+                      <td class="num"><span class="io-kpi-delta is-down">&#8595; 9</span></td>
+                      <td class="io-kpi-act"><button class="aimy-done-link primary" type="button" data-entry-mode="investigate" data-aimy-topic="goal-frt" data-aimy-review="Tell me more about First Response Time for my results: 8 of 13 passed (62%), 9 points down, 4 of the 5 fails in the last two weeks.">Ask AiMY</button></td>
+                    </tr>
+                    <tr class="io-kpi-row" data-tone="warn">
+                      <th scope="row"><span class="io-kpi-name">Resolution summary quality</span><span class="io-kpi-note">Closing notes name the fix, not the cause · 19 of 23 passed</span></th>
+                      <td class="num io-kpi-rate">83%<span class="io-kpi-bar" style="--pct:83"><i></i><em></em></span></td>
+                      <td class="num"><span class="io-kpi-delta is-down">&#8595; 3</span></td>
+                      <td class="io-kpi-act"><button class="aimy-done-link" type="button" data-entry-mode="investigate" data-aimy-topic="my-results" data-aimy-review="Tell me more about Resolution summary quality for my results: 19 of 23 passed (83%), 3 points down.">Ask AiMY</button></td>
+                    </tr>
+                    <tr class="io-kpi-row" data-tone="warn">
+                      <th scope="row"><span class="io-kpi-name">Time between updates</span><span class="io-kpi-note">Tickets left over a weekend without a holding note · 26 of 31 passed</span></th>
+                      <td class="num io-kpi-rate">84%<span class="io-kpi-bar" style="--pct:84"><i></i><em></em></span></td>
+                      <td class="num"><span class="io-kpi-delta">0</span></td>
+                      <td class="io-kpi-act"><button class="aimy-done-link" type="button" data-entry-mode="investigate" data-aimy-topic="my-results" data-aimy-review="Tell me more about Time between updates for my results: 26 of 31 passed (84%), unchanged.">Ask AiMY</button></td>
+                    </tr>
+                    <tr class="io-kpi-row" data-tone="ok">
+                      <th scope="row"><span class="io-kpi-name">Customer name formatting</span><span class="io-kpi-note">39 of 41 passed</span></th>
+                      <td class="num io-kpi-rate">95%<span class="io-kpi-bar" style="--pct:95"><i></i><em></em></span></td>
+                      <td class="num"><span class="io-kpi-delta is-up">&#8593; 4</span></td>
+                      <td class="io-kpi-act"><button class="aimy-done-link" type="button" data-entry-mode="investigate" data-aimy-topic="my-results" data-aimy-review="Tell me more about Customer name formatting for my results: 39 of 41 passed (95%), up 4.">Ask AiMY</button></td>
+                    </tr>
+                    <tr class="io-kpi-row" data-tone="ok">
+                      <th scope="row"><span class="io-kpi-name">Grammar and sentence structure</span><span class="io-kpi-note">41 of 41 passed</span></th>
+                      <td class="num io-kpi-rate">100%<span class="io-kpi-bar" style="--pct:100"><i></i><em></em></span></td>
+                      <td class="num"><span class="io-kpi-delta">0</span></td>
+                      <td class="io-kpi-act"></td>
+                    </tr>
+                  </tbody>
+                </table>
+                <p class="io-kpi-foot">Ranked by points under the 85% goal. The mark on each bar is the goal.</p>
+              </div>
+              <div class="ai-insights" data-my-qa="hide">
                 <article class="ai-insight" data-classification="highest-impact" data-severity="critical" data-rank="1" tabindex="0" style="--pct:71" aria-labelledby="ai-insight-status-name">
                   <div class="ai-insight__row">
                     <h3 class="ai-insight__name" id="ai-insight-status-name">Ticket status accuracy</h3>
@@ -9080,7 +9358,7 @@
                 <div class="eval-header">
                   <div class="eval-header-left">
                     <span class="eval-title">Audit performance by product</span>
-                    <span class="eval-header-sub">audited interactions · trend</span>
+                    <span class="eval-header-sub" data-my-qa-html="your audited interactions · trend">audited interactions · trend</span>
                   </div>
                 </div>
 
@@ -9088,7 +9366,24 @@
                 <div class="eval-products-section" style="position:relative">
                   <div class="eval-bars-section-label"><span>Audited interactions by product</span><span class="eval-bars-column-label">Quality score</span></div>
                   <div class="eval-bars">
-                    <div class="eval-bar-row" data-segment="objectif-lune"
+                    <!-- View my QA: the two products this person works on. -->
+                    <div class="eval-bar-row" data-my-qa="only"
+                      onclick="window.openOverlay && window.openOverlay('My Upland · KCM tickets: 28 evaluated at 79% quality, down 3 on the prior period. Show the KPIs behind the drop and the tickets that failed.')">
+                      <div class="eval-bar-top">
+                        <span class="eval-bar-label"><span class="eval-dot" style="background:var(--warn)"></span>Upland · KCM</span>
+                        <div class="eval-bar-right"><span class="eval-bar-count">28 tickets · <span class="hl-err">&#8595; 3</span></span><span class="eval-bar-avg warn">79%</span></div>
+                      </div>
+                      <div class="eval-bar-track"><div class="eval-bar-fill" style="width:68%;background:var(--warn)"></div></div>
+                    </div>
+                    <div class="eval-bar-row" data-my-qa="only"
+                      onclick="window.openOverlay && window.openOverlay('My Upland · AccuRoute calls: 13 evaluated at 85% quality, up 2 on the prior period. Show what is working so I can repeat it on KCM.')">
+                      <div class="eval-bar-top">
+                        <span class="eval-bar-label"><span class="eval-dot" style="background:var(--ok)"></span>Upland · AccuRoute</span>
+                        <div class="eval-bar-right"><span class="eval-bar-count">13 calls · <span class="hl-ok">&#8593; 2</span></span><span class="eval-bar-avg ok">85%</span></div>
+                      </div>
+                      <div class="eval-bar-track"><div class="eval-bar-fill" style="width:32%;background:linear-gradient(90deg,var(--ok),#22c55e)"></div></div>
+                    </div>
+                    <div class="eval-bar-row" data-segment="objectif-lune" data-my-qa="hide"
                       onmouseenter="evalHover('objectif-lune')" onmouseleave="scheduleEvalOut()"
                       onclick="window.openOverlay && window.openOverlay('Objectif Lune has the highest review volume at 411 with a 79.2% avg quality, worst in portfolio. Show top failing goals, agent attribution, and the fastest intervention.')">
                       <div class="eval-bar-top">
@@ -9097,7 +9392,7 @@
                       </div>
                       <div class="eval-bar-track"><div class="eval-bar-fill" style="width:91%;background:var(--warn)"></div></div>
                     </div>
-                    <div class="eval-bar-row" data-segment="adestra"
+                    <div class="eval-bar-row" data-segment="adestra" data-my-qa="hide"
                       onmouseenter="evalHover('adestra')" onmouseleave="scheduleEvalOut()"
                       onclick="window.openOverlay && window.openOverlay('Adestra has 398 reviews at 93.7% avg quality, best performer in the portfolio. Show what agents are driving this and what behaviors we can replicate elsewhere.')">
                       <div class="eval-bar-top">
@@ -9106,7 +9401,7 @@
                       </div>
                       <div class="eval-bar-track"><div class="eval-bar-fill" style="width:88%;background:linear-gradient(90deg,var(--ok),#22c55e)"></div></div>
                     </div>
-                    <div class="eval-bar-row" data-segment="interfax"
+                    <div class="eval-bar-row" data-segment="interfax" data-my-qa="hide"
                       onmouseenter="evalHover('interfax')" onmouseleave="scheduleEvalOut()"
                       onclick="window.openOverlay && window.openOverlay('InterFax has 334 reviews at 88.4% avg quality, 1.6pts below the 90% target. Show which goals are dragging it under and what coaching action would close the gap.')">
                       <div class="eval-bar-top">
@@ -9115,7 +9410,7 @@
                       </div>
                       <div class="eval-bar-track"><div class="eval-bar-fill" style="width:74%;background:linear-gradient(90deg,var(--ok),#22c55e)"></div></div>
                     </div>
-                    <div class="eval-bar-row" data-segment="rightanswers"
+                    <div class="eval-bar-row" data-segment="rightanswers" data-my-qa="hide"
                       onmouseenter="evalHover('rightanswers')" onmouseleave="scheduleEvalOut()"
                       onclick="window.openOverlay && window.openOverlay('RightAnswers has 274 reviews at 91.3% avg quality, above target. Show quality trend and whether it is stable or improving.')">
                       <div class="eval-bar-top">
@@ -9124,7 +9419,7 @@
                       </div>
                       <div class="eval-bar-track"><div class="eval-bar-fill" style="width:61%;background:linear-gradient(90deg,var(--ok),#22c55e)"></div></div>
                     </div>
-                    <div class="eval-bar-row" data-segment="qvidian"
+                    <div class="eval-bar-row" data-segment="qvidian" data-my-qa="hide"
                       onmouseenter="evalHover('qvidian')" onmouseleave="scheduleEvalOut()"
                       onclick="window.openOverlay && window.openOverlay('Qvidian has 221 reviews at 80.1% avg quality, second worst in portfolio. Show top failure goals, agent attribution, and the fastest intervention to bring it above target.')">
                       <div class="eval-bar-top">
@@ -9145,7 +9440,8 @@
                 <div class="eval-insight">
                   <svg class="eval-insight-mark" width="16" height="18" viewBox="0 0 18 20"><use href="#aimy-logo-small"/></svg>
                   <p class="eval-insight-text">
-                    <strong>5 agents</strong> under goal · team <span class="hl-err">&#8722;15%</span> · <span class="hl-warn">billing wait times</span> the driver
+                    <span data-my-qa="hide"><strong>5 agents</strong> under goal · team <span class="hl-err">&#8722;15%</span> · <span class="hl-warn">billing wait times</span> the driver</span>
+                    <span data-my-qa="only"><strong>Your two products</strong> · KCM <span class="hl-err">&#8595; 3</span> · <span class="hl-warn">First Response Time</span> the driver</span>
                   </p>
                 </div>
 
@@ -9156,7 +9452,16 @@
                      for it. Moving 26 tickets across teams is multi-entity
                      and cross-team, so it is a rung-3 reviewed action (§3.1)
                      and the honest state before the decision is staged. -->
-                <div class="eval-action-row">
+                <div class="eval-action-row" data-my-qa="only">
+                  <div class="aimy-done" style="width:100%;border-top:none;padding-top:0;margin-top:0">
+                    <span class="work-state ws-recommended" data-work-state="recommended"><span class="ws-dot"></span>Recommended</span><span class="aimy-done-text"><b>4 High priority KCM tickets</b> missed the 4-hour SLA</span>
+                    <span class="aimy-done-actions">
+                      <button data-entry-mode="investigate" class="aimy-done-link primary" data-aimy-review="Show my 4 High priority Upland · KCM tickets that missed the 4-hour first-response SLA in the last two weeks, and what held each one up." data-aimy-topic="goal-frt">Review the 4 tickets</button>
+                    </span>
+                  </div>
+                </div>
+
+                <div class="eval-action-row" data-my-qa="hide">
                   <div class="aimy-done" style="width:100%;border-top:none;padding-top:0;margin-top:0">
 
                     <span class="work-state ws-staged" data-work-state="staged"><span class="ws-dot"></span>Staged</span><span class="aimy-done-text"><b>26</b> tickets ready to reassign · protocol reviewed</span>
@@ -9177,7 +9482,7 @@
                      \u00a75.5 ask for. These were numbers wearing office clothes. -->
 
                 <!-- Friction signals \u2192 canvas CTA -->
-                <div class="eval-action-row">
+                <div class="eval-action-row" data-my-qa="hide">
                   <div class="aimy-done" style="width:100%;border-top:none;padding-top:0;margin-top:0">
                     <span class="work-state ws-recommended" data-work-state="recommended"><span class="ws-dot"></span>Recommended</span><span class="aimy-done-text"><b>Friction signals</b> ready to review across the product set</span>
                     <span class="aimy-done-actions">
@@ -9192,6 +9497,70 @@
             <!-- /layout-column right -->
           </div>
           <!-- /tier-2-grid -->
+
+          <!-- ════ RECENT EVALUATIONS (component 7) ═══════════════════════════
+               The evaluation records and their CSV, inside the dashboard.
+               Team scope lists everyone's newest evaluations by agent; with
+               View my QA ticked it is the person's own list, by product.
+               Export downloads the rows on screen, nothing else. -->
+          <section class="ev-records audit-only" id="myEvaluations" aria-labelledby="evRecordsTitle">
+            <div class="dashboard-section-head">
+              <h2 id="evRecordsTitle" data-my-qa-html="Your evaluations">Recent evaluations</h2>
+              <span>Newest first</span>
+              <button class="gps-export-btn ev-export" type="button" id="evExportBtn">
+                <svg class="lucide lucide-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3"></path><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><path d="m7 10 5 5 5-5"></path></svg>
+                Export CSV
+              </button>
+            </div>
+            <div class="ev-panel">
+              <table class="ev-table" id="evTable">
+                <thead>
+                  <tr>
+                    <th scope="col">Review</th>
+                    <th scope="col" class="num">Date</th>
+                    <th scope="col" data-my-qa-html="Product">Agent</th>
+                    <th scope="col">Type</th>
+                    <th scope="col" class="num">Score</th>
+                    <th scope="col">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row"><button class="ev-id" type="button" data-entry-mode="investigate" data-aimy-topic="evaluation" data-aimy-review="Open EV-0541, the ticket evaluation from 2026-10-13 scored 71%. Show the KPIs, the lines behind each decision, and what to change next time.">EV-0541</button></th>
+                    <td class="num">2026-10-13</td>
+                    <td><span data-my-qa-html="Upland · KCM">Omar Abdallah</span></td>
+                    <td>Ticket</td>
+                    <td class="num ev-score" data-tone="err">71%</td>
+                    <td><span class="work-state ws-failed"><span class="ws-dot"></span>Needs attention</span></td>
+                  </tr>
+                  <tr>
+                    <th scope="row"><button class="ev-id" type="button" data-entry-mode="investigate" data-aimy-topic="evaluation" data-aimy-review="Open EV-0538, the ticket evaluation from 2026-10-12 scored 88%. Show the KPIs, the lines behind each decision, and what to change next time.">EV-0538</button></th>
+                    <td class="num">2026-10-12</td>
+                    <td><span data-my-qa-html="Upland · KCM">Lina Haddad</span></td>
+                    <td>Ticket</td>
+                    <td class="num ev-score" data-tone="ok">88%</td>
+                    <td><span class="work-state ws-completed"><span class="ws-dot"></span>Completed</span></td>
+                  </tr>
+                  <tr>
+                    <th scope="row"><button class="ev-id" type="button" data-entry-mode="investigate" data-aimy-topic="evaluation" data-aimy-review="Open EV-0533, the call evaluation from 2026-10-10 scored 93%. Show the KPIs, the lines behind each decision, and what to change next time.">EV-0533</button></th>
+                    <td class="num">2026-10-10</td>
+                    <td><span data-my-qa-html="Upland · KCM">Sara Hany</span></td>
+                    <td>Call</td>
+                    <td class="num ev-score" data-tone="ok">93%</td>
+                    <td><span class="work-state ws-completed"><span class="ws-dot"></span>Completed</span></td>
+                  </tr>
+                  <tr>
+                    <th scope="row"><button class="ev-id" type="button" data-entry-mode="investigate" data-aimy-topic="evaluation" data-aimy-review="Open EV-0529, the ticket evaluation from 2026-10-09 scored 84%. Show the KPIs, the lines behind each decision, and what to change next time.">EV-0529</button></th>
+                    <td class="num">2026-10-09</td>
+                    <td><span data-my-qa-html="Upland · KCM">Omar Abdallah</span></td>
+                    <td>Ticket</td>
+                    <td class="num ev-score" data-tone="ok">84%</td>
+                    <td><span class="work-state ws-completed"><span class="ws-dot"></span>Completed</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
                   </div><!-- /viewManager -->
           <div class="dash-view" id="viewDirector" hidden>
             <!-- Director opener, the same component, re-prioritised by role.
@@ -9705,7 +10074,24 @@
         return d;
       }
 
+      /* View my QA: the signed-in person's quality score per range, against
+         their 85% goal. Sample values for the prototype. */
+      const MY_QA_TREND = {
+        short: [83.4, 83.9, 83.7, 84.7, 84.5, 84.2, 82.9, 82.3, 81.5, 80.7, 81],
+        long:  [85, 85.3, 84.7, 85, 84.5, 84.7, 84.2, 83.7, 82.6, 81.5, 81]
+      };
+      let qsMiniRange = 'YTD';
+      window.aimyRedrawQsMini = function () {
+        if (typeof RANGE_DATA !== 'undefined' && RANGE_DATA[qsMiniRange]) renderQualityMiniTrend(RANGE_DATA[qsMiniRange], qsMiniRange);
+      };
+
       function renderQualityMiniTrend(data, range) {
+        qsMiniRange = range;
+        const myQa = document.documentElement.classList.contains('is-my-qa');
+        if (myQa) {
+          data = { scores: MY_QA_TREND[range === '7D' || range === '30D' ? 'short' : 'long'], goal: 85 };
+        }
+        const goal = data.goal || 90;
         const path = document.getElementById('qsMiniTrendPath');
         const fill = document.getElementById('qsMiniTrendFill');
         const end = document.getElementById('qsMiniTrendEnd');
@@ -9718,8 +10104,8 @@
         const height = box.height;
         const padX = 4;
         const padY = 5;
-        const rawMin = Math.min(...data.scores, 90);
-        const rawMax = Math.max(...data.scores, 90);
+        const rawMin = Math.min(...data.scores, goal);
+        const rawMax = Math.max(...data.scores, goal);
         const min = Math.max(0, rawMin - 3);
         const max = Math.min(100, rawMax + 3);
         const span = Math.max(1, max - min);
@@ -9740,10 +10126,10 @@
         fill.setAttribute('d', `${d} L${last[0]},${height - padY} L${points[0][0]},${height - padY} Z`);
         end.setAttribute('cx', last[0]);
         end.setAttribute('cy', last[1]);
-        const targetY = yFor(90);
+        const targetY = yFor(goal);
         target.setAttribute('y1', targetY);
         target.setAttribute('y2', targetY);
-        if (source) source.textContent = `Real audit data · ${range}`;
+        if (source) source.textContent = `${myQa ? 'Your evaluations' : 'Real audit data'} · ${range}`;
       }
 
       function applyRangeToChart(range) {
@@ -15310,8 +15696,122 @@
     </script>
     <script src="assets/aimy-scroll.js?v=3"></script>
     <script src="assets/aimy-canvas.js?v=16"></script>
-    <script src="assets/aimy-rail.js?v=6"></script>
-    <script src="assets/aimy-user-menu.js?v=4"></script>
+    <script src="assets/aimy-rail.js?v=8"></script>
+    <script src="assets/aimy-user-menu.js?v=5"></script>
+    <script>
+      /* VIEW MY QA, the dashboard scope.
+         The account-menu checkbox (assets/aimy-user-menu.js) announces
+         "aimy:view-my-qa"; this swaps the Manager view between the team
+         dashboard and the signed-in person's own results. Which blocks show
+         is pure CSS off html.is-my-qa (set pre-paint in <head>); this script
+         swaps the copy marked data-my-qa-html, the AiMY questions marked
+         data-my-qa-ask, the person's name in the locked Agents chip, and the
+         quality-score line. Unticking restores the team copy exactly.
+         Prototype only: the tick is a local preference, not a permission. */
+      (function () {
+        "use strict";
+        var root = document.documentElement;
+        var teamHtml = new WeakMap();
+        var EASE = "cubic-bezier(0.22, 1, 0.36, 1)";
+
+        function personName() {
+          var n = document.querySelector(".app-topnav .topnav-user-name");
+          return n ? n.textContent.trim() : "you";
+        }
+
+        function nameChip() {
+          var name = personName();
+          document.querySelectorAll("[data-my-qa-name]").forEach(function (el) { el.textContent = name; });
+          var chip = document.getElementById("myQaChip");
+          if (chip) {
+            chip.setAttribute("aria-label", "Agents: " + name + ", locked by View my QA. Opens the account menu");
+            chip.title = "Locked while View my QA is ticked. Untick it in the account menu to see the team.";
+          }
+        }
+
+        function apply(on) {
+          root.classList.toggle("is-my-qa", on);
+          document.querySelectorAll("[data-my-qa-html]").forEach(function (el) {
+            if (!teamHtml.has(el)) teamHtml.set(el, el.innerHTML);
+            el.innerHTML = on ? el.getAttribute("data-my-qa-html") : teamHtml.get(el);
+          });
+          document.querySelectorAll("[data-my-qa-ask]").forEach(function (el) {
+            if (!el.hasAttribute("data-team-ask")) el.setAttribute("data-team-ask", el.getAttribute("data-aimy-ask") || "");
+            el.setAttribute("data-aimy-ask", el.getAttribute(on ? "data-my-qa-ask" : "data-team-ask"));
+          });
+          if (typeof window.aimyRedrawQsMini === "function") window.aimyRedrawQsMini();
+          if (window.AimyScroll && typeof window.AimyScroll.refresh === "function") window.AimyScroll.refresh();
+        }
+
+        /* A short opacity dip bridges the swap so the numbers do not jump in
+           place. Opacity only, so it also runs under reduced motion. The
+           latest tick wins if the box is clicked twice in a row. */
+        var wanted = root.classList.contains("is-my-qa");
+        var swapping = false;
+        function swap(on) {
+          wanted = on;
+          if (swapping) return;
+          var targets = [document.getElementById("viewManager"), document.getElementById("gpsBar")].filter(Boolean);
+          if (!targets.length || typeof targets[0].animate !== "function") { apply(wanted); return; }
+          swapping = true;
+          var outs = targets.map(function (t) {
+            return t.animate([{ opacity: 1 }, { opacity: 0.35 }], { duration: 120, easing: EASE, fill: "forwards" });
+          });
+          outs[0].finished.then(function () {
+            apply(wanted);
+            targets.forEach(function (t, i) {
+              outs[i].cancel();
+              t.animate([{ opacity: 0.35 }, { opacity: 1 }], { duration: 180, easing: EASE });
+            });
+            swapping = false;
+          });
+        }
+
+        document.addEventListener("aimy:view-my-qa", function (e) { swap(!!(e.detail && e.detail.on)); });
+        window.addEventListener("storage", function (e) {
+          if (e.key === "aimy-qa-view-my-qa") swap(e.newValue === "on");
+        });
+
+        var chip = document.getElementById("myQaChip");
+        if (chip) chip.addEventListener("click", function (e) {
+          e.stopPropagation();
+          if (window.AimyUserMenu && typeof window.AimyUserMenu.open === "function") window.AimyUserMenu.open(true);
+        });
+
+        document.addEventListener("click", function (e) {
+          var link = e.target.closest("[data-scroll-to]");
+          if (!link) return;
+          var target = document.getElementById(link.getAttribute("data-scroll-to"));
+          if (!target) return;
+          var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+          target.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+        });
+
+        /* Export CSV: the rows on screen, in the scope on screen. */
+        var exportBtn = document.getElementById("evExportBtn");
+        if (exportBtn) exportBtn.addEventListener("click", function () {
+          var table = document.getElementById("evTable");
+          if (!table) return;
+          var lines = Array.prototype.map.call(table.rows, function (row) {
+            return Array.prototype.map.call(row.cells, function (cell) {
+              return '"' + cell.textContent.trim().replace(/\s+/g, " ").replace(/"/g, '""') + '"';
+            }).join(",");
+          });
+          var url = URL.createObjectURL(new Blob([lines.join("\r\n")], { type: "text/csv;charset=utf-8" }));
+          var a = document.createElement("a");
+          a.href = url;
+          a.download = (root.classList.contains("is-my-qa") ? "my-evaluations" : "recent-evaluations") + ".csv";
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          setTimeout(function () { URL.revokeObjectURL(url); }, 0);
+        });
+
+        nameChip();
+        if (wanted) apply(true);
+      })();
+    </script>
+
     <script>
       /* Cards rendered from live data carry no --pct, so read it off the metric each card displays. */
       (function () {

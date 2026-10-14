@@ -7,12 +7,16 @@
    the pill is wrapped in an anchor, given button semantics, and a menu panel
    is placed beside it, the same way the notifications bell sits in .ntf-anchor.
 
-   ONE ITEM, "View my QA", a checkbox item (menuitemcheckbox) and nothing
-   more: picking it ticks or unticks it and closes the menu. It opens no
-   view and changes no filter — the QA results workspace it used to switch
-   on was removed by decision. The tick is remembered per browser
-   (localStorage) so it reads the same on every page; it is a preference
-   flag only, holding no identity or records.
+   ONE ITEM, "View my QA", a checkbox item (menuitemcheckbox): picking it
+   ticks or unticks it and closes the menu 2 seconds later. Each change is
+   announced as the document event "aimy:view-my-qa" ({ detail: { on } });
+   the Dashboard listens and scopes itself to the signed-in person (its
+   scope script in index.html). Pages that do not listen are unchanged. The
+   tick is remembered per browser (localStorage) so it reads the same on
+   every page; it is a preference flag only, holding no identity or records.
+
+   window.AimyUserMenu.open(focusFirst) opens the menu from elsewhere, such
+   as the Dashboard's locked Agents chip.
 
    Keyboard: Enter, Space or ArrowDown on the pill opens it and focuses the
    first item; Escape closes and returns focus; Tab out or a click elsewhere
@@ -32,6 +36,7 @@
       if (on) localStorage.setItem(MY_QA_KEY, "on");
       else localStorage.removeItem(MY_QA_KEY);
     } catch (e) {}
+    document.dispatchEvent(new CustomEvent("aimy:view-my-qa", { detail: { on: on } }));
   }
 
   function boot() {
@@ -126,6 +131,10 @@
        is seen before it closes, in both directions. Clicking again restarts
        the wait, and Escape, a click outside or the pill still close it at
        once (setOpen clears the timer). */
+    window.AimyUserMenu = {
+      open: function (focusFirst) { setOpen(true, !!focusFirst); }
+    };
+
     var CLOSE_AFTER_MS = 2000;
     myQa.addEventListener("click", function () {
       setMyQa(!myQaOn());

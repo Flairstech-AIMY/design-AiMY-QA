@@ -67,7 +67,15 @@ Evaluation content is grouped under the feedback loop and evaluation client lens
 ### My results
 
 - The dashboard no longer has a QA results workspace or a **My results** toggle. Both were removed by decision.
-- **View my QA** in the account menu (the profile pill in the top bar, [`assets/aimy-user-menu.js`](assets/aimy-user-menu.js)) is a checkbox only. Picking it ticks or unticks it and closes the menu. It opens no view and changes no filter. The tick is remembered per browser in `localStorage['aimy-qa-view-my-qa']`, a preference flag that holds no identity or records.
+- **View my QA** in the account menu (the profile pill in the top bar, [`assets/aimy-user-menu.js`](assets/aimy-user-menu.js)) is a checkbox. Picking it ticks or unticks it, closes the menu after 2 seconds, and announces the document event `aimy:view-my-qa` (`detail.on`). The tick is remembered per browser in `localStorage['aimy-qa-view-my-qa']`, a preference flag that holds no identity or records. Pages that do not listen for the event are unchanged.
+- Ticked, the Dashboard's Manager view shows only the signed-in person, in the same components:
+  - A locked tag, **Agents: _name_ · locked**, sits under the filter toolbar where applied filters show. The name is read from the profile pill. Clicking the tag opens the account menu, the one place to untick it.
+  - The briefing, quality score (81%, 4.0 under the person's 85% goal, ↓ 3.0, with its own mini trend), the four Audit health cards (Pass rate, Needs attention, Disputes, Evaluations), the AiMY detection strip and Audit performance by product (the person's two products) switch to the person's numbers.
+  - **Improvement opportunities** changes shape: instead of team pattern cards it ranks the person's KPIs by points under the 85% goal, with pass rate, a bar with the goal mark, the change against the prior period, the sample and an **Ask AiMY** action.
+  - **Recent evaluations** (new, under the two-column row) lists the newest evaluations with an **Export CSV** of the rows on screen. Team scope shows the agent column; ticked, it reads **Your evaluations** and shows the product column instead.
+  - Unticking restores the team dashboard exactly. The swap is a 300ms opacity dip; the class `html.is-my-qa` is set before paint, so a ticked box never flashes the team view on load.
+- Markup contract: `data-my-qa="only"` blocks show only while ticked, `data-my-qa="hide"` blocks are the team versions they replace, `data-my-qa-html` holds the personal copy for an element, and `data-my-qa-ask` the personal AiMY question for a button. The personal numbers are prototype sample data (from the agent-view tour); no backend behaviour is implied, and the tick is not access control.
+- Not scoped yet: the expanded Quality score trend panel (Open trend) still shows the team chart, and the AiMY rail keeps its team findings and its My Profile entry.
 - The results engine ([`assets/aimy-results.js`](assets/aimy-results.js)) now runs only on the standalone [`my-qa.html`](my-qa.html) page. The rules below describe that page.
 - “My” matches a review's `evaluatedUserId` to an explicitly supplied session `id`: work performed by the evaluated user, not reviews they authored. The displayed profile name/initials are never authentication. Production must provide server-authorized records; this browser scope is not access control.
 - `window.AIMY_QA_RESULTS_SCOPE` exposes `get/set`, `getSession/setSession`, `setRecords`, `setLoading`, `getVisibleRecords`, `getPersonalRecords`, `getMetrics`, `previewDemo`, `exitDemo`, and `exportCSV`. Supply session before records. Changing the session ID or signing out clears loaded records; callers must discard obsolete asynchronous responses themselves.
@@ -129,6 +137,10 @@ npm.cmd install
 The expected Node version is `v24.20.0`. The package manifest also declares the supported range as `>=24.20.0 <25`.
 
 ## Change Log
+
+### 2026-10-14
+
+- **View my QA** now scopes the Dashboard to the signed-in person. Ticked, the briefing, quality score, Audit health cards, detection strip and product panel show the person's results, a locked **Agents** tag appears under the filter toolbar, and Improvement opportunities ranks the person's KPIs by points under the 85% goal. A new **Recent evaluations** table with CSV export sits under the two-column row and becomes **Your evaluations** when ticked. Unticking restores the team dashboard.
 
 ### 2026-10-12
 
