@@ -19,9 +19,8 @@ wrangler.jsonc
 README.md
 
 # Vendored tools and local agent material (AGENTS.md: "not examples of the
-# product app"). The three skill repos are git submodules: Workers Builds
-# clones them, so without these lines they would be published with the site.
-.gitmodules
+# product app"). Some are committed, some exist only in a local working copy;
+# either way they are tooling, not the site, and must not be published.
 agent-skills
 ui-ux-pro-max-skill
 custom-icons-skill

@@ -10,3 +10,10 @@
 # Storybook / Node build output
 node_modules/
 storybook-static/
+
+# Vendored skill repos (AGENTS.md: reference tools, not part of the site).
+# Kept as local clones only: committed as submodules they broke the
+# Cloudflare deploy, which must stay a plain static checkout.
+agent-skills/
+ui-ux-pro-max-skill/
+custom-icons-skill/
