@@ -17,3 +17,18 @@ package.json
 package-lock.json
 wrangler.jsonc
 README.md
+
+# Vendored tools and local agent material (AGENTS.md: "not examples of the
+# product app"). The three skill repos are git submodules: Workers Builds
+# clones them, so without these lines they would be published with the site.
+.gitmodules
+agent-skills
+ui-ux-pro-max-skill
+custom-icons-skill
+.agents
+.aider-desk
+.impeccable
+AGENTS.md
+findings.txt
+skills-lock.json
+storybook-static

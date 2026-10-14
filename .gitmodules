@@ -1,0 +1,9 @@
+[submodule "agent-skills"]
+	path = agent-skills
+	url = https://github.com/vercel-labs/agent-skills.git
+[submodule "ui-ux-pro-max-skill"]
+	path = ui-ux-pro-max-skill
+	url = https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git
+[submodule "custom-icons-skill"]
+	path = custom-icons-skill
+	url = https://github.com/JKc66/custom-icons-skill.git
