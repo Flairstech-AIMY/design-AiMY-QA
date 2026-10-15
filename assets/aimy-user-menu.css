@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════════════════════════════════════
-   THE USER MENU — what the profile pill in the top bar opens
-   (behaviour in assets/aimy-user-menu.js)
+   THE USER MENU — what the profile pill in the top bar opens — and the
+   View my QA switch beside it (behaviour in assets/aimy-user-menu.js)
 
    Card background, border and two-layer shadow of the notifications panel
    beside it (.ntf-panel in each page); the compact geometry of the design
@@ -43,7 +43,7 @@
   top: calc(100% + 8px);
   right: 0;
   z-index: 300;
-  min-width: 160px;
+  width: 280px;
   padding: 4px;
   background: var(--card-bg);
   border: 1px solid var(--card-border);
@@ -69,72 +69,270 @@
   transition-delay: 0s;
 }
 
-:root .um-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+/* ── Demo controls ──────────────────────────────────────────────────────
+   The prototype's own switches, grouped under one label so nobody reads
+   them as product features. A flask marks the group; "Prototype only" says
+   it in words. Each control is the page's own element, restyled here as a
+   compact segmented control (the panel's controls, not the top bar's). */
+:root .um-demo {
+  padding: 8px 8px 10px;
 }
-
-/* Row geometry is the design system's dropdown option (.v2-dropdown-option):
-   6px 10px, 6px radius, 11px semibold Urbanist. The tick sits at the far end
-   and is drawn only when the item is on; 14px rather than the 18px icon
-   default, so it sits inside the 11px row instead of outweighing its label. */
-:root .um-item {
+:root .um-demo-head {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 6px;
+}
+:root .um-demo-ico {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  color: var(--warn);
+}
+:root .um-demo-title {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--d200);
+}
+:root .um-demo-tag {
+  margin-left: auto;
+  padding: 2px 7px;
+  border-radius: 9999px;
+  background: var(--warn-bg);
+  border: 1px solid rgba(247, 144, 9, 0.24);
+  color: var(--warn);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+:root .um-demo-note {
+  margin: 6px 0 10px;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.45;
+  color: var(--d400);
+}
+:root .um-demo-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+:root .um-demo-row {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+:root .um-demo-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--d300);
+}
+:root .um-demo-empty {
+  margin: 0;
+  font-size: 11px;
+  color: var(--d400);
+}
+
+/* The moved controls: reset the top-bar placement each page gives them
+   (absolute, hidden below 1100px) and draw them as a full-width segmented
+   control. */
+:root .um-demo .nav-role-switch,
+:root .um-demo .content-view-toggle {
+  position: static;
+  transform: none;
+  display: flex;
+  order: 0;
   width: 100%;
-  padding: 6px 10px;
+  margin: 0;
+  padding: 2px;
+  gap: 2px;
+  border-radius: 8px;
+  border: 1px solid var(--wash-6);
+  background: var(--wash-2);
+  pointer-events: auto;
+}
+:root .um-demo .nav-role-switch > button,
+:root .um-demo .content-view-toggle > button {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 5px 8px;
   border: 0;
   border-radius: 6px;
   background: transparent;
-  color: var(--d200, #e8edf2);
+  color: var(--d400);
   font-family: "Urbanist", sans-serif;
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 700;
+  letter-spacing: 0;
   line-height: 1.4;
-  text-align: left;
   white-space: nowrap;
+  text-align: center;
   cursor: pointer;
   transition: background var(--transition-fast, 150ms), color var(--transition-fast, 150ms);
 }
-:root .um-item .um-check {
+:root .um-demo .nav-role-switch > button:hover,
+:root .um-demo .content-view-toggle > button:hover {
+  color: var(--d100);
+}
+:root .um-demo .nav-role-switch > button.active,
+:root .um-demo .nav-role-switch > button.is-active,
+:root .um-demo .content-view-toggle > button.active {
+  background: var(--wash-6);
+  color: var(--d50);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+:root .um-demo .nav-role-switch > button:focus-visible,
+:root .um-demo .content-view-toggle > button:focus-visible {
+  outline: 2px solid var(--qa-accent);
+  outline-offset: 1px;
+}
+
+/* ── View my QA, the top-bar switch ─────────────────────────────────────
+   The design system's toggle switch (design-system-new.md, Toggle;
+   .toggle-wrap in design-system-new.html): a 12px/600 label beside a
+   36×20 track with a 14px white thumb. No pill,
+   no icon: it is a setting, and reads as one. The whole row is the button,
+   so the label is part of the hit area. */
+:root .myqa-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  padding: 4px 6px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--d300);
+  font-family: "Urbanist", sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color var(--transition-fast, 150ms);
+}
+:root .myqa-switch:hover,
+:root .myqa-switch[aria-checked="true"] {
+  color: var(--d100);
+}
+:root .myqa-switch:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+/* The track is dark glass: a recessed inner shadow and a hairline rim.
+   Switched on, the AiMY gradient (#3369ff → #9b5cff, the Describe a filter
+   mark) fades in on a layer underneath, with a soft halo, and the thumb
+   lights up. A gradient cannot transition, so the fill is its own layer
+   (::before) and only its opacity moves. */
+:root .myqa-track {
+  position: relative;
+  width: 36px;
+  height: 20px;
+  flex-shrink: 0;
+  border-radius: 9999px;
+  background: var(--wash-4);
+  box-shadow:
+    inset 0 0 0 1px var(--wash-9),
+    inset 0 1px 3px rgba(0, 0, 0, 0.35);
+  transition: box-shadow 200ms var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1));
+}
+:root .myqa-track::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0) 55%),
+    linear-gradient(90deg, #3369ff 0%, #9b5cff 100%);
+  opacity: 0;
+  transition: opacity 200ms var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1));
+}
+:root .myqa-thumb {
+  position: absolute;
+  z-index: 1;
+  top: 3px;
+  left: 3px;
   width: 14px;
   height: 14px;
-  margin-left: auto;
-  flex-shrink: 0;
-  color: var(--qa-accent);
-  opacity: 0;
-  transform: scale(0.85);
+  border-radius: 9999px;
+  background: radial-gradient(circle at 35% 30%, #fff 0%, #dfe5ee 100%);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  transform-origin: left center;
   transition:
-    opacity var(--transition-fast, 150ms) var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1)),
-    transform var(--transition-fast, 150ms) var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1));
+    transform 200ms var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1)),
+    box-shadow 200ms var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1));
 }
-:root .um-item[aria-checked="true"] {
-  color: var(--d50);
+:root .myqa-switch[aria-checked="true"] .myqa-track {
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.18),
+    0 0 12px rgba(91, 108, 255, 0.45);
 }
-:root .um-item[aria-checked="true"] .um-check {
+:root .myqa-switch[aria-checked="true"] .myqa-track::before {
   opacity: 1;
-  transform: none;
 }
-:root .um-item:hover,
-:root .um-item:focus-visible {
-  background: var(--wash-3);
-  color: var(--d50);
-  outline: none;
+:root .myqa-switch[aria-checked="true"] .myqa-thumb {
+  transform: translateX(16px);
+  transform-origin: right center;
+  background: #fff;
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.3),
+    0 0 8px rgba(255, 255, 255, 0.75);
 }
-:root .um-item:focus-visible {
-  box-shadow: inset 0 0 0 2px rgba(var(--qa-accent-rgb), 0.6);
+/* Press feedback: the thumb stretches toward where it is about to go. */
+:root .myqa-switch:active .myqa-thumb {
+  transform: scaleX(1.25);
+}
+:root .myqa-switch[aria-checked="true"]:active .myqa-thumb {
+  transform: translateX(16px) scaleX(1.25);
+}
+@media (hover: hover) and (pointer: fine) {
+  :root .myqa-switch:hover .myqa-track {
+    box-shadow:
+      inset 0 0 0 1px var(--wash-12),
+      inset 0 1px 3px rgba(0, 0, 0, 0.35);
+  }
+  :root .myqa-switch[aria-checked="true"]:hover .myqa-track {
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 255, 255, 0.24),
+      0 0 16px rgba(91, 108, 255, 0.55);
+  }
+}
+:root[data-theme="light"] .myqa-switch[aria-checked="true"] .myqa-track {
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.3),
+    0 0 10px rgba(91, 108, 255, 0.3);
+}
+/* The top bar is short of room below the shell's compact line; the track
+   still says it, and the button keeps its label for assistive tech through
+   the visually hidden text (and its title on hover). */
+@media (max-width: 1099.98px) {
+  :root .myqa-switch .myqa-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   :root .um-panel,
-  :root .um-panel.is-open,
-  :root .um-item .um-check {
+  :root .um-panel.is-open {
     transform: none;
+  }
+  /* The thumb jumps instead of sliding and does not stretch; the gradient
+     and glow still fade, since they carry the state. */
+  :root .myqa-switch .myqa-thumb {
+    transition: box-shadow 200ms ease;
+  }
+  :root .myqa-switch:active .myqa-thumb {
+    transform: none;
+  }
+  :root .myqa-switch[aria-checked="true"]:active .myqa-thumb {
+    transform: translateX(16px);
   }
   :root .um-anchor .topnav-user > svg {
     transition: none;

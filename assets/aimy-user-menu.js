@@ -1,32 +1,45 @@
 /* ═══════════════════════════════════════════════════════════════════════════
-   THE USER MENU — the profile pill in the top bar opens a menu
+   THE USER MENU AND THE VIEW MY QA SWITCH
    (styles in assets/aimy-user-menu.css)
 
-   The pill was an inert <div> with a chevron that promised a menu. This makes
-   it a real menu button on every shell page without touching their markup:
-   the pill is wrapped in an anchor, given button semantics, and a menu panel
-   is placed beside it, the same way the notifications bell sits in .ntf-anchor.
+   VIEW MY QA lives in the top bar as the design system's toggle switch
+   (role="switch", label then track),
+   placed first in .topnav-right on every shell page. It takes effect at
+   once, so it is a switch rather than a menu item. Each change is announced
+   as the document event "aimy:view-my-qa" ({ detail: { on } }); the
+   Dashboard listens and scopes itself to the signed-in person (its scope
+   script in index.html). Pages that do not listen are unchanged. The state
+   is remembered per browser (localStorage) so it reads the same on every
+   page; it is a preference flag only, holding no identity or records.
 
-   ONE ITEM, "View my QA", a checkbox item (menuitemcheckbox): picking it
-   ticks or unticks it and closes the menu 2 seconds later. Each change is
-   announced as the document event "aimy:view-my-qa" ({ detail: { on } });
-   the Dashboard listens and scopes itself to the signed-in person (its
-   scope script in index.html). Pages that do not listen are unchanged. The
-   tick is remembered per browser (localStorage) so it reads the same on
-   every page; it is a preference flag only, holding no identity or records.
+   THE PROFILE PILL opens a small panel holding the page's DEMO CONTROLS:
+   the prototype's own switches (Manager/Director, Audit/Evaluation view,
+   the Reviews persona). They are not product features, so they leave the
+   top bar and sit together under a "Demo controls" label. The page's own
+   elements are moved, not copied, so the scripts already bound to them keep
+   working. A page without demo controls says so in the panel.
 
-   window.AimyUserMenu.open(focusFirst) opens the menu from elsewhere, such
-   as the Dashboard's locked Agents chip.
+   Keyboard: Enter, Space or ArrowDown on the pill opens the panel and
+   focuses its first control; Escape closes it and returns focus; Tab out or
+   a click elsewhere closes it.
 
-   Keyboard: Enter, Space or ArrowDown on the pill opens it and focuses the
-   first item; Escape closes and returns focus; Tab out or a click elsewhere
-   closes it.
+   window.AimyUserMenu.open(focusFirst) opens the panel from elsewhere;
+   window.AimyUserMenu.focusMyQa() moves focus to the View my QA switch, as
+   the Dashboard's locked Agents tag does.
    ═══════════════════════════════════════════════════════════════════════════ */
 (function () {
   "use strict";
 
   var MY_QA_KEY = "aimy-qa-view-my-qa";
-  var ICON_CHECK = '<svg class="lucide lucide-check um-check" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>';
+  var ICON_FLASK = '<svg class="lucide lucide-flask-conical um-demo-ico" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2v6a2 2 0 0 0 .245.96l5.51 10.08A2 2 0 0 1 18 22H6a2 2 0 0 1-1.755-2.96l5.51-10.08A2 2 0 0 0 10 8V2" /><path d="M6.453 15h11.094" /><path d="M8.5 2h7" /></svg>';
+
+  /* The demo controls a page may carry, in the order they are listed. */
+  var DEMO_CONTROLS = [
+    { selector: ".nav-role-switch", label: function (el) {
+        return el.querySelector(".persona-btn") ? "Reviews persona" : "Dashboard role";
+      } },
+    { selector: ".content-view-toggle", label: function () { return "Dashboard content"; } }
+  ];
 
   function myQaOn() {
     try { return localStorage.getItem(MY_QA_KEY) === "on"; } catch (e) { return false; }
@@ -39,7 +52,31 @@
     document.dispatchEvent(new CustomEvent("aimy:view-my-qa", { detail: { on: on } }));
   }
 
+  /* ── View my QA, the top-bar switch ─────────────────────────────────── */
+  function buildMyQaSwitch() {
+    var right = document.querySelector(".app-topnav .topnav-right");
+    if (!right || right.querySelector(".myqa-switch")) return null;
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "myqa-switch";
+    btn.id = "myQaSwitch";
+    btn.setAttribute("role", "switch");
+    btn.title = "Show only your own QA results on the Dashboard";
+    btn.innerHTML = '<span class="myqa-label">View my QA</span>' +
+      '<span class="myqa-track" aria-hidden="true"><span class="myqa-thumb"></span></span>';
+    function sync() { btn.setAttribute("aria-checked", String(myQaOn())); }
+    sync();
+    btn.addEventListener("click", function () { setMyQa(!myQaOn()); sync(); });
+    /* Another tab changed it. */
+    window.addEventListener("storage", function (e) { if (e.key === MY_QA_KEY) sync(); });
+    right.insertBefore(btn, right.firstChild);
+    return btn;
+  }
+
+  /* ── The profile pill and its demo-controls panel ───────────────────── */
   function boot() {
+    var myQaSwitch = buildMyQaSwitch();
+
     var pill = document.querySelector(".app-topnav .topnav-user");
     if (!pill || pill.closest(".um-anchor")) return;
 
@@ -51,47 +88,67 @@
     var name = pill.querySelector(".topnav-user-name");
     pill.setAttribute("role", "button");
     pill.setAttribute("tabindex", "0");
-    pill.setAttribute("aria-haspopup", "menu");
+    pill.setAttribute("aria-haspopup", "dialog");
     pill.setAttribute("aria-expanded", "false");
     pill.setAttribute("aria-controls", "aimyUserMenu");
-    pill.setAttribute("aria-label", (name ? name.textContent.trim() + ", " : "") + "account menu");
+    pill.setAttribute("aria-label", (name ? name.textContent.trim() + ", " : "") + "account and demo controls");
     var chevron = pill.querySelector(":scope > svg");
     if (chevron) chevron.setAttribute("aria-hidden", "true");
 
     var panel = document.createElement("div");
     panel.className = "um-panel";
     panel.id = "aimyUserMenu";
-    panel.setAttribute("role", "menu");
-    panel.setAttribute("aria-label", "Account");
+    panel.setAttribute("role", "dialog");
+    panel.setAttribute("aria-labelledby", "umDemoTitle");
     panel.innerHTML =
-      '<ul class="um-list" role="none">' +
-        '<li role="none"><button class="um-item" type="button" role="menuitemcheckbox" aria-checked="false" tabindex="-1">' +
-          "<span>View my QA</span>" + ICON_CHECK + "</button></li>" +
-      "</ul>";
+      '<div class="um-demo">' +
+        '<div class="um-demo-head">' +
+          ICON_FLASK +
+          '<span class="um-demo-title" id="umDemoTitle">Demo controls</span>' +
+          '<span class="um-demo-tag">Prototype only</span>' +
+        "</div>" +
+        '<p class="um-demo-note">Switch what this prototype shows. These are not part of the product.</p>' +
+        '<div class="um-demo-rows"></div>' +
+      "</div>";
     anchor.appendChild(panel);
 
-    var items = Array.prototype.slice.call(panel.querySelectorAll('[role^="menuitem"]'));
-    var myQa = items[0];
-    var open = false;
-
-    /* Read from storage each time it opens, so a tick set on another page or
-       tab shows here too. */
-    function syncChecks() {
-      myQa.setAttribute("aria-checked", String(myQaOn()));
+    var rows = panel.querySelector(".um-demo-rows");
+    DEMO_CONTROLS.forEach(function (c) {
+      var el = document.querySelector(".app-topnav " + c.selector);
+      if (!el) return;
+      var row = document.createElement("div");
+      row.className = "um-demo-row";
+      var label = document.createElement("span");
+      label.className = "um-demo-label";
+      label.textContent = c.label(el);
+      label.id = "umDemoLabel" + rows.children.length;
+      el.setAttribute("aria-labelledby", label.id);
+      el.removeAttribute("aria-label");
+      row.appendChild(label);
+      row.appendChild(el);
+      rows.appendChild(row);
+    });
+    if (!rows.children.length) {
+      var none = document.createElement("p");
+      none.className = "um-demo-empty";
+      none.textContent = "This page has no demo controls.";
+      rows.appendChild(none);
     }
 
-    var closeTimer = 0;
+    var open = false;
+    function focusables() {
+      return Array.prototype.slice.call(panel.querySelectorAll("button:not([disabled])"));
+    }
 
     function setOpen(next, focusFirst) {
-      clearTimeout(closeTimer);
       if (open === next) return;
       open = next;
-      if (open) syncChecks();
       panel.classList.toggle("is-open", open);
       pill.setAttribute("aria-expanded", String(open));
       if (open) {
         document.addEventListener("pointerdown", onOutside, true);
-        if (focusFirst && items[0]) items[0].focus({ preventScroll: true });
+        var first = focusables()[0];
+        if (focusFirst && first) first.focus({ preventScroll: true });
       } else {
         document.removeEventListener("pointerdown", onOutside, true);
       }
@@ -113,39 +170,23 @@
     });
 
     panel.addEventListener("keydown", function (e) {
-      var i = items.indexOf(document.activeElement);
       if (e.key === "Escape") {
         e.preventDefault();
         setOpen(false);
         pill.focus();
-      } else if (e.key === "ArrowDown" || e.key === "ArrowUp") {
-        e.preventDefault();
-        var step = e.key === "ArrowDown" ? 1 : -1;
-        items[(i + step + items.length) % items.length].focus();
-      } else if (e.key === "Tab") {
-        setOpen(false);
       }
     });
-
-    /* The tick lands at once; the menu stays up for 2 seconds so the change
-       is seen before it closes, in both directions. Clicking again restarts
-       the wait, and Escape, a click outside or the pill still close it at
-       once (setOpen clears the timer). */
-    window.AimyUserMenu = {
-      open: function (focusFirst) { setOpen(true, !!focusFirst); }
-    };
-
-    var CLOSE_AFTER_MS = 2000;
-    myQa.addEventListener("click", function () {
-      setMyQa(!myQaOn());
-      syncChecks();
-      clearTimeout(closeTimer);
-      closeTimer = setTimeout(function () {
-        var keepFocus = panel.contains(document.activeElement);
-        setOpen(false);
-        if (keepFocus) pill.focus({ preventScroll: true });
-      }, CLOSE_AFTER_MS);
+    panel.addEventListener("focusout", function (e) {
+      if (open && e.relatedTarget && !anchor.contains(e.relatedTarget)) setOpen(false);
     });
+
+    window.AimyUserMenu = {
+      open: function (focusFirst) { setOpen(true, !!focusFirst); },
+      focusMyQa: function () {
+        if (!myQaSwitch) return;
+        myQaSwitch.focus({ preventScroll: true, focusVisible: true });
+      }
+    };
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
