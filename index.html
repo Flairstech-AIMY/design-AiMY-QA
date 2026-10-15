@@ -27,7 +27,7 @@
           document.documentElement.setAttribute('data-scope',
             scopeList.length === 0 ? 'all' : scopeList.length === 1 ? scopeList[0] : 'multi');
 
-          /* View my QA (top-bar switch), pre-paint so a switched-on view never
+          /* My QA scope (All QA | My QA in the top bar), pre-paint so a My QA view never
              flashes the team dashboard first. The scope module at the end
              of <body> swaps the copy; this class alone decides which blocks
              show (html.is-my-qa [data-my-qa]). */
@@ -7297,7 +7297,7 @@
       /* ══ end global product scope ════════════════════════════════════ */
 
       /* ══ VIEW MY QA, the dashboard scoped to the signed-in person ═══════════
-         The View my QA switch in the top bar (assets/aimy-user-menu.js) sets
+         The All QA | My QA scope control in the top bar (assets/aimy-user-menu.js) sets
          html.is-my-qa. Blocks marked data-my-qa="only" show only then;
          blocks marked data-my-qa="hide" are the team versions they replace.
          Copy swaps (data-my-qa-html) live in the scope script at the end of
@@ -7423,7 +7423,7 @@
     <link rel="stylesheet" href="assets/aimy-responsive.css?v=7" />
     <link rel="stylesheet" href="assets/aimy-scroll.css?v=1" />
     <link rel="stylesheet" href="assets/aimy-rail.css?v=8" />
-    <link rel="stylesheet" href="assets/aimy-user-menu.css?v=5" />
+    <link rel="stylesheet" href="assets/aimy-user-menu.css?v=9" />
     <link rel="stylesheet" href="assets/aimy-typography.css?v=1" />
     <script src="assets/aimy-viewport.js?v=6"></script>
   </head>
@@ -7677,8 +7677,8 @@
         <div class="gps-bar" id="gpsBar">
           <div class="gps-controls" role="toolbar" aria-label="Dashboard filters">
             <!-- The "My results" toggle and the QA results workspace it
-                 opened were removed. "View my QA" is a switch in the top bar
-                 (assets/aimy-user-menu.js) that scopes this dashboard. -->
+                 opened were removed. The All QA | My QA control in the top bar
+                 (assets/aimy-user-menu.js) scopes this dashboard. -->
             <button class="gps-filter-btn fp-main-btn" id="fpMainBtn" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="fpMain">
               <svg class="fp-ico lucide lucide-funnel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 20a1 1 0 0 0 .553.895l2 1A1 1 0 0 0 14 21v-7a2 2 0 0 1 .517-1.341L21.74 4.67A1 1 0 0 0 21 3H3a1 1 0 0 0-.742 1.67l7.225 7.989A2 2 0 0 1 10 14z"></path></svg>
               Filter
@@ -7734,15 +7734,15 @@
             </div>
           </div>
 
-          <!-- View my QA: the Agents filter as an applied-filter tag, locked
-               to the signed-in person while the View my QA switch is on.
+          <!-- View my QA: the User filter as an applied-filter tag, locked
+               to the signed-in person while the scope is My QA.
                It sits under the toolbar, where applied filters show, so the
-               toolbar keeps its width. It moves focus to the View my QA
-               switch in the top bar, the one place to turn it off. -->
+               toolbar keeps its width. It moves focus to the All QA | My QA
+               scope control in the top bar, the one place to change it. -->
           <div class="gps-myqa-row" data-my-qa="only">
             <button class="fp-applied-pill gps-myqa-chip" id="myQaChip" type="button" aria-controls="myQaSwitch">
               <svg class="lucide lucide-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-              <span>Agents: <b data-my-qa-name>you</b></span>
+              <span>User: <b data-my-qa-name>you</b></span>
               <span class="gps-myqa-lock">· locked</span>
             </button>
           </div>
@@ -15696,10 +15696,10 @@
     <script src="assets/aimy-scroll.js?v=3"></script>
     <script src="assets/aimy-canvas.js?v=16"></script>
     <script src="assets/aimy-rail.js?v=8"></script>
-    <script src="assets/aimy-user-menu.js?v=7"></script>
+    <script src="assets/aimy-user-menu.js?v=10"></script>
     <script>
       /* VIEW MY QA, the dashboard scope.
-         The View my QA switch in the top bar (assets/aimy-user-menu.js) announces
+         The All QA | My QA scope control in the top bar (assets/aimy-user-menu.js) announces
          "aimy:view-my-qa"; this swaps the Manager view between the team
          dashboard and the signed-in person's own results. Which blocks show
          is pure CSS off html.is-my-qa (set pre-paint in <head>); this script
@@ -15723,8 +15723,8 @@
           document.querySelectorAll("[data-my-qa-name]").forEach(function (el) { el.textContent = name; });
           var chip = document.getElementById("myQaChip");
           if (chip) {
-            chip.setAttribute("aria-label", "Agents: " + name + ", locked by View my QA. Moves to the View my QA switch");
-            chip.title = "Locked while View my QA is on. Turn it off in the top bar to see the team.";
+            chip.setAttribute("aria-label", "User: " + name + ", locked while the scope is My QA. Moves to the scope control");
+            chip.title = "Locked while the scope is My QA. Choose All QA in the top bar to see everything.";
           }
         }
 

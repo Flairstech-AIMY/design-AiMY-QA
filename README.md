@@ -67,9 +67,9 @@ Evaluation content is grouped under the feedback loop and evaluation client lens
 ### My results
 
 - The dashboard no longer has a QA results workspace or a **My results** toggle. Both were removed by decision.
-- **View my QA** is a labelled switch in the top bar, first in the right-hand cluster on all six pages ([`assets/aimy-user-menu.js`](assets/aimy-user-menu.js)). It is the design system's toggle switch (label, then a 36×20 track that fills `--brand` blue when on) built as a `role="switch"` button, with no pill or icon around it. Each change announces the document event `aimy:view-my-qa` (`detail.on`) and is remembered per browser in `localStorage['aimy-qa-view-my-qa']`, a preference flag that holds no identity or records. Pages that do not listen for the event are unchanged. Below 1100px the label is visually hidden and the track remains.
-- Switched on, the Dashboard's Manager view shows only the signed-in person, in the same components:
-  - A locked tag, **Agents: _name_ · locked**, sits under the filter toolbar where applied filters show. The name is read from the profile pill. Clicking the tag moves focus to the View my QA switch, the one place to turn it off.
+- **The scope control, All QA | My QA**, is a two-option segmented control (`role="radiogroup"`) first in the right-hand cluster of the top bar on all six pages ([`assets/aimy-user-menu.js`](assets/aimy-user-menu.js)). The scope follows the person across the whole product, so the selected segment is the scope indicator on every page. All QA is everything the person is allowed to see; there is no team scope. Each change announces the document event `aimy:view-my-qa` (`detail.on`) and is remembered per browser in `localStorage['aimy-qa-view-my-qa']`, a preference flag that holds no identity or records. Pages that do not listen for the event are unchanged. A person the system limits to their own data gets the same component locked: one "My QA" segment with a lock and no All QA (the prototype simulates this with `data-my-qa-locked` on `<body>`). It uses the shell's segmented-control style (`.content-view-toggle`).
+- With the scope on My QA, the Dashboard's Manager view shows only the signed-in person, in the same components:
+  - A locked tag, **User: _name_ · locked**, sits under the filter toolbar where applied filters show. The name is read from the profile pill. Clicking the tag moves focus to the scope control in the top bar, the one place to change it.
   - The briefing, quality score (81%, 4.0 under the person's 85% goal, ↓ 3.0, with its own mini trend), the four Audit health cards (Pass rate, Needs attention, Disputes, Evaluations), the AiMY detection strip and Audit performance by product (the person's two products) switch to the person's numbers.
   - **Improvement opportunities** changes shape: instead of team pattern cards it ranks the person's KPIs by points under the 85% goal, with pass rate, a bar with the goal mark, the change against the prior period, the sample and an **Ask AiMY** action.
   - **Your evaluations** (new, under the two-column row) lists the person's newest evaluations by product, with an **Export CSV** of the rows on screen. It shows only while the box is ticked; the team dashboard has no records table.
@@ -141,7 +141,7 @@ The expected Node version is `v24.20.0`. The package manifest also declares the 
 
 ### 2026-10-15
 
-- **View my QA** moved out of the account menu into the top bar as the design system's toggle switch, where the Audit/Evaluation toggle was. The profile pill now opens **Demo controls**: the Manager/Director and Audit/Evaluation switches on the Dashboard and the persona switch on Reviews, marked **Prototype only**. The Dashboard's locked Agents tag now points to the switch.
+- **View my QA** became the **All QA | My QA** scope control: a segmented control in the right-hand cluster of the top bar, replacing the account-menu checkbox. Both scopes are named, the selected one is visible on every page, and people limited to their own data see a single locked My QA segment. The profile pill now opens **Demo controls**: the Manager/Director and Audit/Evaluation switches on the Dashboard and the persona switch on Reviews, marked **Prototype only**. The Dashboard's locked Agents tag now points to the switch.
 
 ### 2026-10-14
 
