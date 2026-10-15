@@ -67,12 +67,12 @@ Evaluation content is grouped under the feedback loop and evaluation client lens
 ### My results
 
 - The dashboard no longer has a QA results workspace or a **My results** toggle. Both were removed by decision.
-- **View my QA** in the account menu (the profile pill in the top bar, [`assets/aimy-user-menu.js`](assets/aimy-user-menu.js)) is a checkbox. Picking it ticks or unticks it, closes the menu after 2 seconds, and announces the document event `aimy:view-my-qa` (`detail.on`). The tick is remembered per browser in `localStorage['aimy-qa-view-my-qa']`, a preference flag that holds no identity or records. Pages that do not listen for the event are unchanged.
-- Ticked, the Dashboard's Manager view shows only the signed-in person, in the same components:
-  - A locked tag, **Agents: _name_ · locked**, sits under the filter toolbar where applied filters show. The name is read from the profile pill. Clicking the tag opens the account menu, the one place to untick it.
+- **View my QA** is a labelled switch in the top bar, first in the right-hand cluster on all six pages ([`assets/aimy-user-menu.js`](assets/aimy-user-menu.js)). It is the design system's toggle switch (label, then a 36×20 track that fills `--brand` blue when on) built as a `role="switch"` button, with no pill or icon around it. Each change announces the document event `aimy:view-my-qa` (`detail.on`) and is remembered per browser in `localStorage['aimy-qa-view-my-qa']`, a preference flag that holds no identity or records. Pages that do not listen for the event are unchanged. Below 1100px the label is visually hidden and the track remains.
+- Switched on, the Dashboard's Manager view shows only the signed-in person, in the same components:
+  - A locked tag, **Agents: _name_ · locked**, sits under the filter toolbar where applied filters show. The name is read from the profile pill. Clicking the tag moves focus to the View my QA switch, the one place to turn it off.
   - The briefing, quality score (81%, 4.0 under the person's 85% goal, ↓ 3.0, with its own mini trend), the four Audit health cards (Pass rate, Needs attention, Disputes, Evaluations), the AiMY detection strip and Audit performance by product (the person's two products) switch to the person's numbers.
   - **Improvement opportunities** changes shape: instead of team pattern cards it ranks the person's KPIs by points under the 85% goal, with pass rate, a bar with the goal mark, the change against the prior period, the sample and an **Ask AiMY** action.
-  - **Recent evaluations** (new, under the two-column row) lists the newest evaluations with an **Export CSV** of the rows on screen. Team scope shows the agent column; ticked, it reads **Your evaluations** and shows the product column instead.
+  - **Your evaluations** (new, under the two-column row) lists the person's newest evaluations by product, with an **Export CSV** of the rows on screen. It shows only while the box is ticked; the team dashboard has no records table.
   - Unticking restores the team dashboard exactly. The swap is a 300ms opacity dip; the class `html.is-my-qa` is set before paint, so a ticked box never flashes the team view on load.
 - Markup contract: `data-my-qa="only"` blocks show only while ticked, `data-my-qa="hide"` blocks are the team versions they replace, `data-my-qa-html` holds the personal copy for an element, and `data-my-qa-ask` the personal AiMY question for a button. The personal numbers are prototype sample data (from the agent-view tour); no backend behaviour is implied, and the tick is not access control.
 - Not scoped yet: the expanded Quality score trend panel (Open trend) still shows the team chart, and the AiMY rail keeps its team findings and its My Profile entry.
@@ -98,6 +98,7 @@ Evaluation content is grouped under the feedback loop and evaluation client lens
 - Every metric card should answer “what is this?” without requiring a hover or chat interaction.
 - Actions should name the decision or next step, for example `Review the fail-rate trend` or `Approve the response-time fix`.
 - AiMY can provide deeper charts and drill-downs, but the dashboard should show the key trend or comparison directly when that trend is central to the user’s decision.
+- **Demo controls.** The prototype's own switches (Manager/Director and Audit/Evaluation view on the Dashboard, Supervisor/Feedback Manager on Reviews) live in the panel the profile pill opens, under a **Demo controls** label with a **Prototype only** tag. They are not product features. The page's own elements are moved there at load, so their scripts keep working; a page without demo controls says so in the panel.
 - Manager and Director views share information. Their difference is emphasis and available actions, not hidden data.
 
 ## Storybook
@@ -138,9 +139,13 @@ The expected Node version is `v24.20.0`. The package manifest also declares the 
 
 ## Change Log
 
+### 2026-10-15
+
+- **View my QA** moved out of the account menu into the top bar as the design system's toggle switch, where the Audit/Evaluation toggle was. The profile pill now opens **Demo controls**: the Manager/Director and Audit/Evaluation switches on the Dashboard and the persona switch on Reviews, marked **Prototype only**. The Dashboard's locked Agents tag now points to the switch.
+
 ### 2026-10-14
 
-- **View my QA** now scopes the Dashboard to the signed-in person. Ticked, the briefing, quality score, Audit health cards, detection strip and product panel show the person's results, a locked **Agents** tag appears under the filter toolbar, and Improvement opportunities ranks the person's KPIs by points under the 85% goal. A new **Recent evaluations** table with CSV export sits under the two-column row and becomes **Your evaluations** when ticked. Unticking restores the team dashboard.
+- **View my QA** now scopes the Dashboard to the signed-in person. Ticked, the briefing, quality score, Audit health cards, detection strip and product panel show the person's results, a locked **Agents** tag appears under the filter toolbar, and Improvement opportunities ranks the person's KPIs by points under the 85% goal. A new **Your evaluations** table with CSV export sits under the two-column row, shown only while the box is ticked. Unticking restores the team dashboard.
 
 ### 2026-10-12
 
