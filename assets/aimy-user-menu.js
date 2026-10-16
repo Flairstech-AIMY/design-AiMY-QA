@@ -5,8 +5,9 @@
    "ONLY MY RESULTS" is a filter chip that leads the filter row of each page
    that can narrow its results to the signed-in person (Dashboard, Reviews).
    A page opts in with a [data-my-results-slot] first in its filter row,
-   filled from here. Off, the chip is a dashed outline; on, it fills violet
-   with the person's avatar and an ×, so the control is its own indicator.
+   filled from here. Off, the chip is a dashed outline reading "Show only
+   mine"; on, it fills violet with the person's avatar, "Only my results"
+   and an ×, so the control is its own indicator.
    One click either way.
    Pages without a slot have nothing to narrow and show no chip, so no page
    claims a scope it does not apply. Each change shows a toast with Undo and
@@ -84,12 +85,15 @@
       return '<span class="myr-chip is-on is-locked" role="status" title="Your account shows only your own results">' +
         avatar() + "<span>Only your results</span>" + ICON_LOCK + "</span>";
     }
+    /* Off, the label is an action ("Show only mine") so it cannot be read as
+       a statement about the page; on, it states the fact ("Only my results")
+       and the × is the way back. The accessible name carries both. */
     if (on) {
-      return '<button class="myr-chip is-on" type="button" data-myr-toggle aria-pressed="true" title="Show everyone’s results">' +
+      return '<button class="myr-chip is-on" type="button" data-myr-toggle aria-label="Only my results. Show everyone’s results" title="Show everyone’s results">' +
         avatar() + "<span>Only my results</span>" + '<span class="myr-x">' + ICON_X + "</span></button>";
     }
-    return '<button class="myr-chip" type="button" data-myr-toggle aria-pressed="false" title="Limit these results to your own work">' +
-      ICON_USER + "<span>Only my results</span></button>";
+    return '<button class="myr-chip" type="button" data-myr-toggle title="Limit these results to your own work">' +
+      ICON_USER + "<span>Show only mine</span></button>";
   }
 
   function paint() {
