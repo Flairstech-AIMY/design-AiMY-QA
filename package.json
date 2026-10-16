@@ -4,6 +4,7 @@
   "description": "AiMY QA dashboard and documented UI system",
   "main": "index.js",
   "scripts": {
+    "build": "node scripts/build-site.mjs",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "test": "echo \"No automated tests configured\""

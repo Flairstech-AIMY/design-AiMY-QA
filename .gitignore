@@ -10,3 +10,6 @@
 # Storybook / Node build output
 node_modules/
 storybook-static/
+
+# Built site (scripts/build-site.mjs), what wrangler deploys
+dist

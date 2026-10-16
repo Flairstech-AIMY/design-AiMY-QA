@@ -5,8 +5,15 @@
   "observability": {
     "enabled": true
   },
+  /* The site is built into dist/ (scripts/build-site.mjs copies the pages,
+     assets/ and design-strategy/), so tooling at the repo root, node_modules
+     included, is never uploaded. Wrangler runs the build before every
+     deploy, from Cloudflare's builder or from a manual `npx wrangler deploy`. */
+  "build": {
+    "command": "node scripts/build-site.mjs"
+  },
   "assets": {
-    "directory": "."
+    "directory": "./dist"
   },
   "compatibility_flags": [
     "nodejs_compat"
