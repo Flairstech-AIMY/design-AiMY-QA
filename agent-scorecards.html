@@ -24056,6 +24056,40 @@
           }
         });
 
+        /* ── Only my results ────────────────────────────────────────────
+           With the "Only my results" chip on (it leads the filter row,
+           assets/aimy-user-menu.js), every tab lists the signed-in person's
+           own evaluated work instead of the team's. That person is not one
+           of the fixture agents, so their evaluations are sample rows of
+           their own (MINE), kept out of the team set so the team figures,
+           the rail and the quarterly evaluations read exactly as before.
+           Prototype only: the chip is a preference, not access control. */
+        var ME = (function () {
+          var n = document.querySelector(".app-topnav .topnav-user-name");
+          return n ? n.textContent.trim() : "You";
+        })();
+        var ME_AGENT = {
+          initials: ME.split(/\s+/).map(function (p) { return p.charAt(0); }).join("").slice(0, 2).toUpperCase(),
+          grad: "linear-gradient(135deg,#2a1a4a,#8b4ff4)", tenure: "1 year", score: 81, pass: 78
+        };
+        var MINE = [
+          { id: "ev-2001", fails: ["g-followup", "g-resolution"], agent: ME, d: "2026-05-08", ch: "voice",  score: 64, st: "fail",   conf: "high", sent: "neg", verdict: "confirmed",  detail: "eval-detail-human", sum: "First response came after the customer had asked twice." },
+          { id: "ev-2002", fails: [], agent: ME, d: "2026-05-11", ch: "ticket", score: 91, st: "pass",   conf: "high", sent: "pos", verdict: "confirmed",  detail: "eval-detail-human", sum: "Categorised correctly and closed with the customer's agreement." },
+          { id: "ev-2003", fails: ["g-survey"], agent: ME, d: "2026-05-13", ch: "chat",   score: 82, st: "pass",   conf: "med",  sent: "neu", verdict: "confirmed",  detail: "eval-detail-human", sum: "Correct answer, survey not offered at close." },
+          { id: "ev-2004", fails: ["g-resolution"], agent: ME, d: "2026-05-15", ch: "voice",  score: 73, st: "border", conf: "med",  sent: "neu", verdict: "overturned", detail: "eval-detail-human", sum: "Resolution confirmed late; re-scored up on review." },
+          { id: "ev-2005", fails: [], agent: ME, d: "2026-05-17", ch: "email",  score: 94, st: "pass",   conf: "high", sent: "pos", verdict: "confirmed",  detail: "eval-detail-human", sum: "Thorough written reply with next steps and a timeline." },
+          { id: "ev-2006", fails: ["g-followup"], agent: ME, d: "2026-05-19", ch: "ticket", score: 76, st: "border", conf: "high", sent: "neu", verdict: "awaiting",   detail: "eval-detail-human", sum: "Holding reply sent, but the follow-up date was missed." },
+          { id: "ev-2007", fails: ["g-identity", "g-followup"], agent: ME, d: "2026-05-21", ch: "voice",  score: 61, st: "fail",   conf: "high", sent: "neg", verdict: "awaiting",   detail: "eval-detail-human", sum: "Identity not verified before the account was discussed." },
+          { id: "ev-2008", fails: [], agent: ME, d: "2026-05-22", ch: "chat",   score: 88, st: "pass",   conf: "high", sent: "pos", verdict: "confirmed",  detail: "eval-detail-human", sum: "Calm de-escalation of a refund question in four turns." }
+        ];
+        function myOn() { return !!(window.AimyMyResults && window.AimyMyResults.isOn()); }
+        /* The rows the table is drawn from: the team's, or only yours. */
+        function pool() { return myOn() ? MINE : I; }
+        function agentPool() {
+          if (!myOn()) return AGENTS;
+          var only = {}; only[ME] = ME_AGENT; return only;
+        }
+
         var CH_LABEL = { voice: "Voice", chat: "Chat", email: "Email", ticket: "Ticket" };
         var ST_LABEL = { pass: "Pass", fail: "Fail", border: "Borderline" };
         var SENT_LABEL = { pos: "Positive", neg: "Negative", neu: "Neutral" };
@@ -24124,7 +24158,7 @@
         }
 
         function rows() {
-          return I.filter(function (x) {
+          return pool().filter(function (x) {
             if (!inTab(x)) return false;
             if (F.from && x.d < F.from) return false;
             if (F.to && x.d > F.to) return false;
@@ -24154,15 +24188,16 @@
         }
 
         function agentRows() {
-          return Object.keys(AGENTS).filter(function (n) {
+          var A = agentPool();
+          return Object.keys(A).filter(function (n) {
             if (F.q && n.toLowerCase().indexOf(F.q.toLowerCase()) < 0) return false;
             return true;
           }).map(function (n) {
-            var mine = I.filter(function (x) {
+            var mine = pool().filter(function (x) {
               return x.agent === n && (!F.from || x.d >= F.from) && (!F.to || x.d <= F.to);
             });
             return {
-              name: n, a: AGENTS[n], n: mine.length,
+              name: n, a: A[n], n: mine.length,
               awaiting: mine.filter(function (x) { return x.verdict === "awaiting"; }).length
             };
           }).filter(function (r) {
@@ -24234,6 +24269,9 @@
           if (!bar) return;
 
           var out =
+            /* "Only my results" leads the row, filled by
+               assets/aimy-user-menu.js (AimyMyResults.paint below). */
+            '<span data-my-results-slot></span>' +
             /* Search first, as every reference does. It matches the agent
                name too, which is why the agent dropdown could go. */
             '<span class="flt-search">' +
@@ -24253,7 +24291,7 @@
           } else if (TAB === "agents") {
             out += dd("verdict", "All agents", [["all", "All agents"], ["awaiting", "Owe you feedback"]]);
           } else {
-            out += dd("verdict", "All statuses", [["all", "All statuses"], ["awaiting", "Awaiting you"], ["justified", "Disputed — needs a decision"], ["confirmed", "Confirmed"], ["overturned", "Overturned"]]);
+            out += dd("verdict", "All statuses", [["all", "All statuses"], ["awaiting", myOn() ? "With your manager" : "Awaiting you"], ["justified", "Disputed — needs a decision"], ["confirmed", "Confirmed"], ["overturned", "Overturned"]]);
             out += dd("outcome", "All outcomes", [["all", "All outcomes"], ["fail", "Fail"], ["border", "Borderline"], ["pass", "Pass"]]);
             if (TAB === "tickets") {
               out += dd("channel", "All channels", [["all", "All channels"], ["ticket", "Ticket"], ["chat", "Chat"], ["email", "Email"]]);
@@ -24282,6 +24320,7 @@
 
           out += '<button class="flt-clear" type="button" data-flt-clear hidden>Clear</button>';
           bar.innerHTML = out;
+          if (window.AimyMyResults) window.AimyMyResults.paint();
           mountRange();
           paintDirty();
         }
@@ -24353,7 +24392,9 @@
           if (!list) return;
 
           if (TAB === "justifies") {
-            var jsAll = reviewDisputes().filter(function (j) { return j.state === "open"; })
+            /* The rail reads reviewDisputes() too and stays on the team's
+               queue, so "only mine" narrows this table alone. */
+            var jsAll = reviewDisputes().filter(function (j) { return j.state === "open" && (!myOn() || j.agent === ME); })
               .filter(function (j) {
                 if (!F.q) return true;
                 var hay = (j.agent + " " + j.interaction + " " + j.reason + " " + (j.goals || []).join(" ")).toLowerCase();
@@ -24383,8 +24424,11 @@
                 "</div>";
               }).join("")
             ) : ('<div class="empty-state" style="padding:32px 12px;">' +
-                 '<div class="empty-state-title">No open disputes</div>' +
-                 '<div class="empty-state-desc">Nothing you have sent is being disputed right now.</div></div>');
+                 (myOn()
+                   ? '<div class="empty-state-title">No open disputes on your work</div>' +
+                     '<div class="empty-state-desc">You have not disputed any of your evaluations.</div></div>'
+                   : '<div class="empty-state-title">No open disputes</div>' +
+                     '<div class="empty-state-desc">Nothing you have sent is being disputed right now.</div></div>'));
             paintMeta(jsAll.length, JUSTIFIES.filter(function (j) { return j.state === "open"; }).length, "dispute", js.length);
             return;
           }
@@ -24400,7 +24444,9 @@
                 '<span role="columnheader" class="elh-r">Score</span>' +
               "</div>" +
               ar.map(function (r) {
-              return '<div class="eval-row agent-row" role="listitem" tabindex="0" data-open-agent="' + esc(r.name) + '">' +
+              /* Your own row opens nothing: there is no team drill-down of you. */
+              return '<div class="eval-row agent-row" role="listitem"' +
+                (myOn() ? ">" : ' tabindex="0" data-open-agent="' + esc(r.name) + '">') +
                 '<span></span>' +
                 '<div class="ar-name-wrap">' +
                 '<span class="ar-avatar" style="background:' + r.a.grad + '">' + r.a.initials + "</span>" +
@@ -24415,7 +24461,7 @@
                 '<span class="ar-score ' + scoreClass(r.a.score) + '">' + r.a.score + "%</span>" +
                 "</div>";
             }).join("")) : emptyState();
-            paintMeta(arAll.length, Object.keys(AGENTS).length, "agent", ar.length);
+            paintMeta(arAll.length, Object.keys(agentPool()).length, "agent", ar.length);
             return;
           }
 
@@ -24436,8 +24482,11 @@
             rs.map(function (x) {
               var isAi = AGENTS[x.agent] && AGENTS[x.agent].isAi;
               return '<div class="eval-row eval-grid" role="listitem" tabindex="0" data-open-eval="' + x.detail + '" data-eval-id="' + x.id + '">' +
+                /* No bulk select on your own work: you do not send feedback
+                   to yourself. */
+                (myOn() ? "<span></span>" :
                 '<input class="eval-row-check" type="checkbox" aria-label="Select evaluation"' +
-                (SEL[x.id] ? " checked" : "") + ' data-sel="' + x.id + '">' +
+                (SEL[x.id] ? " checked" : "") + ' data-sel="' + x.id + '">') +
 
                 /* INTERACTION — what it was, and which one. */
                 '<span class="er-interaction">' +
@@ -24458,7 +24507,10 @@
                 (x.verdict === "justified"
                   ? '<button class="eval-verdict justified" type="button" data-ju-open="' + x.id +
                     '" title="' + esc((x.justify && x.justify.reason) || "") + '">' + V_LABEL.justified + " · resolve</button>"
-                  : '<span class="eval-verdict ' + x.verdict + '">' + V_LABEL[x.verdict] + "</span>") +
+                  : '<span class="eval-verdict ' + x.verdict + '">' +
+                    /* On your own work an unsent evaluation waits on your
+                       manager, not on you. */
+                    (myOn() && x.verdict === "awaiting" ? "With your manager" : V_LABEL[x.verdict]) + "</span>") +
 
                 '<span class="eval-row-sentiment ' + x.sent + '">' + SENT_LABEL[x.sent] + "</span>" +
 
@@ -24477,13 +24529,13 @@
                 "</div>";
             }).join("")
           ) : emptyState();
-          paintMeta(rsAll.length, I.filter(inTab).length, "evaluation", rs.length);
+          paintMeta(rsAll.length, pool().filter(inTab).length, "evaluation", rs.length);
         }
 
         function emptyState() {
           return '<div class="empty-state" style="padding:32px 12px;">' +
             '<div class="empty-state-title">Nothing matches those filters</div>' +
-            '<div class="empty-state-desc">The tab has ' + I.filter(inTab).length +
+            '<div class="empty-state-desc">The tab has ' + pool().filter(inTab).length +
             ' in it. Widen the date range or clear a filter.</div>' +
             '<button class="btn btn-ghost btn-sm" type="button" data-flt-clear>Clear filters</button></div>';
         }
@@ -24514,7 +24566,14 @@
             paintTabCounts();
             return;
           }
-          if (sub) {
+          if (sub && myOn()) {
+            /* On your own work, "awaiting" means your manager has not sent
+               the feedback yet; nothing here waits on you. */
+            sub.innerHTML = awaiting
+              ? '<strong>' + awaiting + "</strong> not yet sent to you" +
+                (shown !== total ? ' <span class="els-of">· ' + shown + " of " + total + " shown</span>" : "")
+              : '<span class="els-of">' + (shown !== total ? shown + " of " + total + " shown" : "all sent to you") + "</span>";
+          } else if (sub) {
             sub.innerHTML = awaiting
               ? '<strong>' + awaiting + "</strong> awaiting your feedback" +
                 (shown !== total ? ' <span class="els-of">· ' + shown + " of " + total + " shown</span>" : "")
@@ -24534,9 +24593,9 @@
         function paintTabCounts() {
           document.querySelectorAll("[data-tbl]").forEach(function (b) {
             var k = b.dataset.tbl;
-            var n = k === "agents" ? Object.keys(AGENTS).length
-                  : k === "justifies" ? JUSTIFIES.filter(function (j) { return j.state === "open"; }).length
-                  : I.filter(function (x) { return k === "calls" ? x.ch === "voice" : x.ch !== "voice"; }).length;
+            var n = k === "agents" ? Object.keys(agentPool()).length
+                  : k === "justifies" ? JUSTIFIES.filter(function (j) { return j.state === "open" && (!myOn() || j.agent === ME); }).length
+                  : pool().filter(function (x) { return k === "calls" ? x.ch === "voice" : x.ch !== "voice"; }).length;
             var c = b.querySelector(".tbl-n");
             if (!c) { c = document.createElement("span"); c.className = "tbl-n"; b.appendChild(c); }
             c.textContent = n;
@@ -24608,7 +24667,7 @@
           bar.hidden = false;
           bar.innerHTML =
             '<span class="ss-count"><span class="ss-num">' + picked.length + "</span> selected</span>" +
-            '<span class="ss-scope">of <strong>' + I.filter(inTab).length + "</strong> " +
+            '<span class="ss-scope">of <strong>' + pool().filter(inTab).length + "</strong> " +
             (TAB === "calls" ? "calls" : "tickets") +
             (bits.length ? " · filtered to " + bits.join(", ") : " · no filters applied") + "</span>" +
             '<span class="ss-actions">' +
@@ -24701,7 +24760,7 @@
           if (sel) {
             SEL[sel.dataset.sel] = sel.checked;
             e.stopPropagation();
-            paintMeta(rows().length, I.filter(inTab).length, "evaluation");
+            paintMeta(rows().length, pool().filter(inTab).length, "evaluation");
             return;
           }
 
@@ -24743,7 +24802,7 @@
              the interaction; only Agents goes to a list. */
           var er = t.closest("[data-open-eval]");
           if (er) {
-            var rec = I.filter(function (y) { return y.id === er.dataset.evalId; })[0];
+            var rec = pool().filter(function (y) { return y.id === er.dataset.evalId; })[0];
             if (rec && window.hydrateEvalDetail) window.hydrateEvalDetail(er.dataset.openEval, rec);
             if (window.openEvalDetail) window.openEvalDetail(er.dataset.openEval);
             return;
@@ -24751,6 +24810,12 @@
           var ar = t.closest("[data-open-agent]");
           if (ar) { if (window.openAgentTickets) window.openAgentTickets(ar.dataset.openAgent); return; }
         });
+
+        /* The "Only my results" chip changed (here or in another tab):
+           redraw every tab from the other row pool. */
+        function onScope() { SEL = {}; repaint(); }
+        document.addEventListener("aimy:view-my-qa", onScope);
+        window.addEventListener("storage", function (e) { if (e.key === "aimy-qa-view-my-qa") onScope(); });
 
         document.addEventListener("input", function (e) {
           if (e.target.id === "fltSearch") { F.q = e.target.value; PAGE = 1; paintRows(); paintDirty(); return; }
@@ -27036,7 +27101,7 @@
     <script src="assets/aimy-scroll.js?v=3"></script>
     <script src="assets/aimy-canvas.js?v=16"></script>
     <script src="assets/aimy-rail.js?v=8"></script>
-    <script src="assets/aimy-user-menu.js?v=12"></script>
+    <script src="assets/aimy-user-menu.js?v=13"></script>
     <script>
       /* The input docks float over the threads, so each thread needs to know how tall its dock is. */
       (function () {

@@ -141,9 +141,10 @@
       document.activeElement.closest("[data-my-results-slot]");
     setMyQa(on);
     paint();
-    /* Keep focus on the control that was pressed after it re-renders. */
+    /* Keep focus on the chip after it re-renders. A page may have redrawn
+       its whole filter row in the meantime, so look it up again. */
     if (focused) {
-      var again = focused.querySelector("[data-myr-toggle]") || focused.querySelector(".myr-chip");
+      var again = (focused.isConnected ? focused : document).querySelector("[data-my-results-slot] .myr-chip, .myr-chip");
       if (again && typeof again.focus === "function") again.focus({ preventScroll: true });
     }
     if (!opts || opts.toast !== false) toast(on);
