@@ -3916,6 +3916,45 @@
         pointer-events: all;
       }
 
+      /* Close button, top right corner. Restored after the 2026-10-07 chat
+         refinement removed it; it matches the other QA pages, Knowledge and
+         Sales. */
+      .overlay-close {
+        position: absolute;
+        top: 24px;
+        right: 28px;
+        z-index: 10;
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        background: var(--wash-5);
+        border: 1px solid var(--wash-8);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), opacity 200ms 100ms ease;
+        color: var(--d300);
+        opacity: 0;
+      }
+      .overlay-close:hover {
+        background: var(--wash-8);
+        border-color: var(--wash-11);
+        color: var(--d50);
+      }
+      .overlay-close:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+      .overlay-close svg {
+        width: 16px;
+        height: 16px;
+        stroke: currentColor;
+        stroke-width: 2;
+      }
+      .aimy-overlay.open .overlay-close {
+        opacity: 1;
+      }
+      :root[data-theme="light"] .overlay-close { background: rgba(16,24,40,0.05); border-color: rgba(16,24,40,0.12); }
+      :root[data-theme="light"] .overlay-close:hover { background: rgba(16,24,40,0.1); border-color: rgba(16,24,40,0.2); }
+
       /* Context continuity bar. Sits below the badge, shows what AiMY is basing on */
       .overlay-context-bar {
         position: absolute;
@@ -9844,6 +9883,13 @@
                here intact, and they now position against this rather than
                against the overlay, which has become a row. -->
           <div class="overlay-main">
+            <!-- Close button, top right, the same control the other QA pages,
+                 Knowledge and Sales carry. Escape and a click on the empty
+                 canvas close it too. -->
+            <button class="overlay-close" id="overlayClose" type="button" aria-label="Close conversation">
+              <svg class="lucide lucide-x" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+            </button>
+
             <!-- Context continuity bar, driven by active scenario / open context -->
             <div class="overlay-context-bar" id="overlayContextBar" aria-hidden="true">
               <span class="overlay-context-label">Based on</span>
@@ -11525,6 +11571,9 @@
         }
 
         overlay.addEventListener("click", (e) => {
+          // The close button, top right, as on every other QA page and in
+          // Knowledge and Sales.
+          if (e.target.closest && e.target.closest("#overlayClose")) { closeOverlay(); return; }
           // Close when the user clicks the empty canvas space around the conversation.
           if (e.target === overlay || e.target === overlayMain || e.target === thread) closeOverlay();
         });
