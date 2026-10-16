@@ -4337,7 +4337,7 @@
   <link rel="stylesheet" href="assets/aimy-responsive.css?v=7" />
   <link rel="stylesheet" href="assets/aimy-scroll.css?v=1" />
   <link rel="stylesheet" href="assets/aimy-rail.css?v=8" />
-  <link rel="stylesheet" href="assets/aimy-user-menu.css?v=9" />
+  <link rel="stylesheet" href="assets/aimy-user-menu.css?v=11" />
   <link rel="stylesheet" href="assets/aimy-typography.css?v=1" />
   <script src="assets/aimy-viewport.js?v=6"></script>
   </head>
@@ -4485,9 +4485,9 @@
           </div>
         </div>
         <div class="topnav-user">
-          <div class="topnav-avatar">NW</div>
+          <div class="topnav-avatar">EY</div>
           <div class="topnav-user-info">
-            <span class="topnav-user-name">Nour Wael</span>
+            <span class="topnav-user-name">Engy Yasser</span>
             <span class="topnav-user-role">Product Design</span>
           </div>
           <svg
@@ -7318,7 +7318,7 @@
           if (suggestions) suggestions.classList.add('hidden');
           var userWrap = document.createElement('div');
           userWrap.className = 'chat-msg user';
-          userWrap.innerHTML = '<div class="msg-avatar user-av">NW</div><div class="msg-bubble">' + query.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</div>';
+          userWrap.innerHTML = '<div class="msg-avatar user-av">EY</div><div class="msg-bubble">' + query.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</div>';
           if (thread) { thread.appendChild(userWrap); thread.scrollTop = thread.scrollHeight; }
 
           /* Show typing */
@@ -8111,7 +8111,7 @@
           msgCount++;
           var wrap = document.createElement('div');
           wrap.className = 'chat-msg user';
-          wrap.innerHTML = '<div class="msg-avatar user-av">NW</div><div class="msg-bubble">'+escHtml(text)+'</div>';
+          wrap.innerHTML = '<div class="msg-avatar user-av">EY</div><div class="msg-bubble">'+escHtml(text)+'</div>';
           if (thread) { thread.appendChild(wrap); scrollThread(); }
           if (window.AimyChat) window.AimyChat.record("you", text);
         }
@@ -8687,7 +8687,7 @@
         /* This page reports on runs that have already happened. Nothing on
            it narrows or switches, so a conversation here carries itself. */
         window.AIMY_SURFACE = {
-          initials: "NW",
+          initials: "EY",
           SCALAR: [],
           read: function () { return {}; },
           apply: function () {}
@@ -8698,5 +8698,5 @@
     <script src="assets/aimy-scroll.js?v=3"></script>
     <script src="assets/aimy-canvas.js?v=16"></script>
     <script src="assets/aimy-rail.js?v=8"></script>
-    <script src="assets/aimy-user-menu.js?v=10"></script>
+    <script src="assets/aimy-user-menu.js?v=14"></script>
   </body>

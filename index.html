@@ -6954,10 +6954,14 @@
         background: transparent;
         font-family: "Urbanist", sans-serif;
       }
+      /* When the row runs short it wraps onto a second line instead of
+         squeezing: every control keeps its full label (flex-shrink: 0), and
+         the action group stays right-aligned on whichever line it lands. */
       .gps-controls {
-        display: flex; align-items: center; gap: 4px;
+        display: flex; flex-wrap: wrap; align-items: center; gap: 6px 4px;
         width: 100%; min-width: 0; max-width: 100%;
       }
+      .gps-controls > * { flex-shrink: 0; }
       .gps-action-group { display: flex; align-items: center; gap: 4px; margin-left: auto; flex-shrink: 0; }
       .gps-action-group .gps-export-btn { flex-shrink: 0; }
       .gps-views-btn { color: var(--d300); }
@@ -7069,6 +7073,7 @@
       @media (max-width: 700px) {
         .gps-bar { --gps-pad-x: 16px; overflow-x: auto; justify-content: flex-start; }
         .gps-controls { margin-left: 0; }
+        .gps-action-group { flex-wrap: wrap; row-gap: 6px; margin-left: 0; max-width: 100%; }
         .gps-filter-btn, .gps-export-btn, .gps-btn { font-size: 11px; padding-inline: 8px; }
       }
       .gps { position: relative; display: inline-flex; flex-shrink: 0; }
@@ -7335,9 +7340,9 @@
       :root[data-theme="light"] .fp-opt:has(input:checked) { color: #1f5fd0; }
       /* ══ end global product scope ════════════════════════════════════ */
 
-      /* ══ VIEW MY QA, the dashboard scoped to the signed-in person ═══════════
-         The All QA | My QA scope control in the top bar (assets/aimy-user-menu.js) sets
-         html.is-my-qa. Blocks marked data-my-qa="only" show only then;
+      /* ══ ONLY MY RESULTS, the dashboard scoped to the signed-in person ══════
+         The "Only my results" chip that leads the filter row
+         (assets/aimy-user-menu.js) sets html.is-my-qa. Blocks marked data-my-qa="only" show only then;
          blocks marked data-my-qa="hide" are the team versions they replace.
          Copy swaps (data-my-qa-html) live in the scope script at the end of
          <body>. Prototype data: no backend behaviour is implied. */
@@ -7348,18 +7353,9 @@
         overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
       }
 
-      /* Locked Agents chip: an applied filter that names the person. */
-      .gps-myqa-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
-      .gps-myqa-chip {
-        gap: 6px; min-height: 28px; padding: 4px 12px; border: 0; cursor: pointer;
-        color: var(--d300); font-family: inherit; font-size: 12px; line-height: 1.4; white-space: nowrap;
-        transition: background var(--transition-fast), color var(--transition-fast);
-      }
-      .gps-myqa-chip:hover { background: rgba(51, 105, 255, 0.18); color: var(--d50); }
-      .gps-myqa-chip:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
-      .gps-myqa-chip svg.lucide-lock { width: 12px; height: 12px; flex-shrink: 0; color: var(--ai-text); }
-      .gps-myqa-chip b { color: var(--ai-text); font-weight: 700; }
-      .gps-myqa-lock { color: var(--d400); }
+      /* The Director view is a portfolio view with no "own" results, so the
+         chip leaves the filter row there rather than claim a scope. */
+      html.is-director-view [data-my-results-slot] { display: none !important; }
 
       .slv-score-trend .trend-negative { color: var(--err); font-weight: 700; }
       html.is-my-qa .slv-score-val { color: var(--err); text-shadow: 0 0 22px rgba(240, 68, 56, 0.16); }
@@ -7462,7 +7458,7 @@
     <link rel="stylesheet" href="assets/aimy-responsive.css?v=7" />
     <link rel="stylesheet" href="assets/aimy-scroll.css?v=1" />
     <link rel="stylesheet" href="assets/aimy-rail.css?v=8" />
-    <link rel="stylesheet" href="assets/aimy-user-menu.css?v=9" />
+    <link rel="stylesheet" href="assets/aimy-user-menu.css?v=11" />
     <link rel="stylesheet" href="assets/aimy-typography.css?v=1" />
     <script src="assets/aimy-viewport.js?v=6"></script>
   </head>
@@ -7715,9 +7711,10 @@
              never on an option, so the options are not tabbable. -->
         <div class="gps-bar" id="gpsBar">
           <div class="gps-controls" role="toolbar" aria-label="Dashboard filters">
-            <!-- The "My results" toggle and the QA results workspace it
-                 opened were removed. The All QA | My QA control in the top bar
-                 (assets/aimy-user-menu.js) scopes this dashboard. -->
+            <!-- "Only my results" leads the filter row: a chip filled by
+                 assets/aimy-user-menu.js that scopes this dashboard to the
+                 signed-in person and, when on, is its own indicator. -->
+            <span data-my-results-slot></span>
             <button class="gps-filter-btn fp-main-btn" id="fpMainBtn" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="fpMain">
               <svg class="fp-ico lucide lucide-funnel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 20a1 1 0 0 0 .553.895l2 1A1 1 0 0 0 14 21v-7a2 2 0 0 1 .517-1.341L21.74 4.67A1 1 0 0 0 21 3H3a1 1 0 0 0-.742 1.67l7.225 7.989A2 2 0 0 1 10 14z"></path></svg>
               Filter
@@ -7771,19 +7768,6 @@
               Export
             </button>
             </div>
-          </div>
-
-          <!-- View my QA: the User filter as an applied-filter tag, locked
-               to the signed-in person while the scope is My QA.
-               It sits under the toolbar, where applied filters show, so the
-               toolbar keeps its width. It moves focus to the All QA | My QA
-               scope control in the top bar, the one place to change it. -->
-          <div class="gps-myqa-row" data-my-qa="only">
-            <button class="fp-applied-pill gps-myqa-chip" id="myQaChip" type="button" aria-controls="myQaSwitch">
-              <svg class="lucide lucide-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-              <span>User: <b data-my-qa-name>you</b></span>
-              <span class="gps-myqa-lock">· locked</span>
-            </button>
           </div>
 
           <!-- Filter popovers. Moved to <body> by the engine so the bar's
@@ -12093,12 +12077,12 @@
               + '<span class="dz-spacer"></span>'
               + '<button class="btn btn-ghost btn-sm" type="button" data-hr-decision="undo">Undo</button>';
             zone.querySelector('.dz-meta').innerHTML =
-              '<span>' + dz('accepted-meta', 'Accepted by Nour W. · 09:16 · reversible until tomorrow 09:16') + '</span>';
+              '<span>' + dz('accepted-meta', 'Accepted by Engy Y. · 09:16 · reversible until tomorrow 09:16') + '</span>';
             zone.insertAdjacentHTML('afterend',
               '<div class="audit-trail" style="margin-top:12px"><div class="audit-entry is-ok">'
               + '<span class="audit-ico"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span>'
               + '<div class="audit-main"><div class="audit-action">' + dz('audit', 'HR meeting scheduled for Omar Abdallah') + '</div>'
-              + '<div class="audit-actor">by <span class="audit-who">Nour Wael</span></div></div>'
+              + '<div class="audit-actor">by <span class="audit-who">Engy Yasser</span></div></div>'
               + '<div class="audit-side"><span class="audit-time">09:16</span>'
               + '<button class="audit-revert" type="button" data-hr-decision="undo">Undo</button></div></div></div>');
             if (typeof window.applyOutcome === 'function') {
@@ -12126,7 +12110,7 @@
               '<span class="work-state ws-failed" data-work-state="failed"><span class="ws-dot"></span>Rejected</span>'
               + '<span class="dz-spacer"></span>'
               + '<span style="font-size:10.5px;color:var(--d500)">Reason: ' + why.replace(/[<>&]/g, '') + '</span>';
-            zone.querySelector('.dz-meta').innerHTML = '<span>' + dz('rejected-meta', 'Rejected by Nour W. · 09:16 · Omar stays in the coaching loop') + '</span>';
+            zone.querySelector('.dz-meta').innerHTML = '<span>' + dz('rejected-meta', 'Rejected by Engy Y. · 09:16 · Omar stays in the coaching loop') + '</span>';
 
           } else if (decision === 'edit') {
             if (zone.querySelector('.hr-edit-panel')) return;
@@ -12194,7 +12178,7 @@
             accepted: 'Response-time fix applied to 8 agents, first response target now 30 min.',
             audit: 'Response-time fix applied to 8 agents',
             rejected: 'Fix held, the 8 agents keep their current response targets.',
-            rejectedMeta: 'Rejected by Nour W. · 09:16 · the 23 breaches stay open',
+            rejectedMeta: 'Rejected by Engy Y. · 09:16 · the 23 breaches stay open',
             rejectLabel: 'Reason for holding, recorded against the SLA goal',
             edit: 'Response target|30 minutes||Agents|8 selected'
           },
@@ -12211,7 +12195,7 @@
             accepted: '6 coaching plans sent, each attached to the agent&#8217;s next 1:1.',
             audit: '6 coaching plans sent to agents behind the off-track goals',
             rejected: 'Plans held, nothing sent, the drafts stay on your queue.',
-            rejectedMeta: 'Rejected by Nour W. · 09:16 · the 6 agents stay uncoached',
+            rejectedMeta: 'Rejected by Engy Y. · 09:16 · the 6 agents stay uncoached',
             rejectLabel: 'Reason for holding, recorded on each plan',
             edit: 'Deliver at|Next 1:1||Notify|Team leads'
           },
@@ -12228,7 +12212,7 @@
             accepted: 'Fix sequence started, ticket-status accuracy is running now.',
             audit: 'Quality fix sequence started (3 fixes, status accuracy first)',
             rejected: 'Sequence held. Quality stays at 87.3% with no fixes running.',
-            rejectedMeta: 'Rejected by Nour W. · 09:16 · the 2.7-pt gap stays open',
+            rejectedMeta: 'Rejected by Engy Y. · 09:16 · the 2.7-pt gap stays open',
             rejectLabel: 'Reason for holding, recorded against the quality goal',
             edit: 'Run first|Ticket-status accuracy||Sequence|3 fixes'
           },
@@ -12244,7 +12228,7 @@
             accepted: 'Status-code coaching sent to 8 agents, tracking their next 20 tickets.',
             audit: 'Status-code coaching sent to 8 agents',
             rejected: 'Coaching held, the 8 agents stay at 71% with no plan attached.',
-            rejectedMeta: 'Rejected by Nour W. · 09:16 · accuracy stays 24 pts under goal',
+            rejectedMeta: 'Rejected by Engy Y. · 09:16 · accuracy stays 24 pts under goal',
             rejectLabel: 'Reason for holding, recorded against the accuracy goal',
             edit: 'Rework tickets|3 each||Agents|8 selected'
           },
@@ -12260,7 +12244,7 @@
             accepted: '4-hour nudge set for 3 agents, running until end of shift.',
             audit: '4-hour follow-up nudge set for 3 agents',
             rejected: 'Nudge not set. Cadence stays at 84%.',
-            rejectedMeta: 'Rejected by Nour W. · 09:16 · the 3 agents keep their current cadence',
+            rejectedMeta: 'Rejected by Engy Y. · 09:16 · the 3 agents keep their current cadence',
             rejectLabel: 'Reason for holding, recorded against the cadence goal',
             edit: 'Nudge after|4 hours||Runs until|End of shift'
           },
@@ -12277,7 +12261,7 @@
             accepted: 'Shift rebalanced, 2 agents on the morning billing queue until close.',
             audit: 'Shift rebalanced, 2 agents moved to the morning billing queue',
             rejected: 'Rebalance held. First response stays at 71%.',
-            rejectedMeta: 'Rejected by Nour W. · 09:16 · the morning spike is uncovered',
+            rejectedMeta: 'Rejected by Engy Y. · 09:16 · the morning spike is uncovered',
             rejectLabel: 'Reason for holding, recorded against the FRT goal',
             edit: 'Agents|2 from Adestra||Until|End of shift'
           },
@@ -12294,7 +12278,7 @@
             accepted: '26 tickets reassigned to the billing pod, repeat contacts first.',
             audit: '26 friction tickets reassigned to the billing pod',
             rejected: 'Reassignment held, the 26 tickets stay in their current queues.',
-            rejectedMeta: 'Rejected by Nour W. · 09:16 · the 4 repeat contacts keep waiting',
+            rejectedMeta: 'Rejected by Engy Y. · 09:16 · the 4 repeat contacts keep waiting',
             rejectLabel: 'Reason for holding, recorded on the escalation protocol',
             edit: 'Tickets|26 selected||Order|Wait time, repeats first'
           },
@@ -12311,7 +12295,7 @@
             accepted: 'Fixes applied to Objectif Lune and Qvidian, both leads briefed.',
             audit: 'Fixes applied to Objectif Lune and Qvidian',
             rejected: 'Fixes held, both portfolios stay under target.',
-            rejectedMeta: 'Rejected by Nour W. · 09:16 · 113 negative surveys stay unaddressed',
+            rejectedMeta: 'Rejected by Engy Y. · 09:16 · 113 negative surveys stay unaddressed',
             rejectLabel: 'Reason for holding, recorded against both portfolios',
             edit: 'Portfolios|Objectif Lune, Qvidian||Brief leads|Today'
           },
@@ -12326,7 +12310,7 @@
             accepted: 'Response-time fix applied across both products.',
             audit: 'Response-time fix applied to 2 products below the SLA goal',
             rejected: 'Fix held, both products stay below the 90% goal.',
-            rejectedMeta: 'Rejected by Nour W. · 09:16 · breached tickets stay queued',
+            rejectedMeta: 'Rejected by Engy Y. · 09:16 · breached tickets stay queued',
             rejectLabel: 'Reason for holding, recorded against the SLA goal',
             edit: 'Products|2 selected||Response target|30 minutes'
           }
@@ -12343,7 +12327,7 @@
             +   ' data-dz-topic="' + topic + '"'
             +   ' data-dz-label="' + d.label + '"'
             +   ' data-dz-accepted="' + d.accepted.replace(/"/g, '&quot;') + '"'
-            +   ' data-dz-accepted-meta="Accepted by Nour W. · 09:16 · reversible until tomorrow 09:16"'
+            +   ' data-dz-accepted-meta="Accepted by Engy Y. · 09:16 · reversible until tomorrow 09:16"'
             +   ' data-dz-audit="' + d.audit.replace(/"/g, '&quot;') + '"'
             +   ' data-dz-rejected="' + d.rejected.replace(/"/g, '&quot;') + '"'
             +   ' data-dz-rejected-meta="' + d.rejectedMeta.replace(/"/g, '&quot;') + '"'
@@ -14192,6 +14176,7 @@
           }
           if (dir) dir.hidden = !isDir;
           if (mgr) mgr.hidden = isDir;
+          document.documentElement.classList.toggle("is-director-view", isDir);
           tabs.forEach(function (t) {
             var on = t.getAttribute("data-view") === v;
             t.classList.toggle("active", on);
@@ -15745,37 +15730,22 @@
     <script src="assets/aimy-scroll.js?v=3"></script>
     <script src="assets/aimy-canvas.js?v=16"></script>
     <script src="assets/aimy-rail.js?v=8"></script>
-    <script src="assets/aimy-user-menu.js?v=10"></script>
+    <script src="assets/aimy-user-menu.js?v=14"></script>
     <script>
-      /* VIEW MY QA, the dashboard scope.
-         The All QA | My QA scope control in the top bar (assets/aimy-user-menu.js) announces
-         "aimy:view-my-qa"; this swaps the Manager view between the team
-         dashboard and the signed-in person's own results. Which blocks show
-         is pure CSS off html.is-my-qa (set pre-paint in <head>); this script
-         swaps the copy marked data-my-qa-html, the AiMY questions marked
-         data-my-qa-ask, the person's name in the locked Agents chip, and the
-         quality-score line. Unticking restores the team copy exactly.
-         Prototype only: the tick is a local preference, not a permission. */
+      /* ONLY MY RESULTS, the dashboard scope.
+         The "Only my results" chip (filled by assets/aimy-user-menu.js)
+         announces "aimy:view-my-qa"; this swaps the
+         Manager view between the team dashboard and the signed-in person's
+         own results. Which blocks show is pure CSS off html.is-my-qa (set
+         pre-paint in <head>); this script swaps the copy marked
+         data-my-qa-html, the AiMY questions marked data-my-qa-ask, and the
+         quality-score line. Turning it off restores the team copy exactly.
+         Prototype only: the chip is a local preference, not a permission. */
       (function () {
         "use strict";
         var root = document.documentElement;
         var teamHtml = new WeakMap();
         var EASE = "cubic-bezier(0.22, 1, 0.36, 1)";
-
-        function personName() {
-          var n = document.querySelector(".app-topnav .topnav-user-name");
-          return n ? n.textContent.trim() : "you";
-        }
-
-        function nameChip() {
-          var name = personName();
-          document.querySelectorAll("[data-my-qa-name]").forEach(function (el) { el.textContent = name; });
-          var chip = document.getElementById("myQaChip");
-          if (chip) {
-            chip.setAttribute("aria-label", "User: " + name + ", locked while the scope is My QA. Moves to the scope control");
-            chip.title = "Locked while the scope is My QA. Choose All QA in the top bar to see everything.";
-          }
-        }
 
         function apply(on) {
           root.classList.toggle("is-my-qa", on);
@@ -15820,12 +15790,6 @@
           if (e.key === "aimy-qa-view-my-qa") swap(e.newValue === "on");
         });
 
-        var chip = document.getElementById("myQaChip");
-        if (chip) chip.addEventListener("click", function (e) {
-          e.stopPropagation();
-          if (window.AimyUserMenu && typeof window.AimyUserMenu.focusMyQa === "function") window.AimyUserMenu.focusMyQa();
-        });
-
         document.addEventListener("click", function (e) {
           var link = e.target.closest("[data-scroll-to]");
           if (!link) return;
@@ -15855,7 +15819,6 @@
           setTimeout(function () { URL.revokeObjectURL(url); }, 0);
         });
 
-        nameChip();
         if (wanted) apply(true);
       })();
     </script>

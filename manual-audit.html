@@ -1806,9 +1806,9 @@ html.is-embedded .audit-scroll {
           </button>
           </div>
         <button type="button" class="topnav-user" id="qaUserMenu" aria-label="View profile">
-          <div class="topnav-avatar">NW</div>
+          <div class="topnav-avatar">EY</div>
           <div class="topnav-user-info">
-            <span class="topnav-user-name">Nour Wael</span>
+            <span class="topnav-user-name">Engy Yasser</span>
             <span class="topnav-user-role">Product Design</span>
           </div>
           <svg
@@ -2017,7 +2017,7 @@ html.is-embedded .audit-scroll {
   const datasets = {
     call: {
       id: 'EV-0527-OMAR', channel: 'call', title: 'Voice call · Omar Abdallah', subject: 'Refund status escalation', product: 'Product Support', date: '7 May 2026', duration: '8m 34s', status: 'fail', score: 52, confidence: 91, delivered: true,
-      agent: 'Omar Abdallah', agentEmail: 'omar.abdallah@flairstech.com', customer: 'Unknown caller', queue: 'Product Support', source: 'Voice', evaluator: 'Nour Wael', auditDate: '12 May 2026 · 10:42 AM GMT+3',
+      agent: 'Omar Abdallah', agentEmail: 'omar.abdallah@flairstech.com', customer: 'Unknown caller', queue: 'Product Support', source: 'Voice', evaluator: 'Engy Yasser', auditDate: '12 May 2026 · 10:42 AM GMT+3',
       issueReported: 'Customer called after waiting three days for a refund. The interaction was evaluated for handling, ownership, clarity and follow-up confirmation.',
       actionTaken: 'The agent checked the refund queue and escalated the request, but ended the call without naming a fallback contact or confirming a follow-up time.',
       timeline: { created: '7 May 2026 · 10:05 AM', firstResponse: '7 May 2026 · 10:06 AM', resolved: '7 May 2026 · 10:13 AM', closed: '7 May 2026 · 10:13 AM', open: '8 minutes 34 seconds' },
@@ -2045,8 +2045,8 @@ html.is-embedded .audit-scroll {
       logs: [
         {kind:'ticket', time:'7 May 2026 · 10:05 AM GMT+3', actor:'System', text:'Recording ingested and interaction created.'},
         {kind:'ticket', time:'7 May 2026 · 10:14 AM GMT+3', actor:'Twilio integration', text:'Field status changed from active to completed.'},
-        {kind:'manual', time:'12 May 2026 · 10:31 AM GMT+3', actor:'Nour Wael', text:'Customer identity verification: QA result Agree (14 points).'},
-        {kind:'manual', time:'12 May 2026 · 10:34 AM GMT+3', actor:'Nour Wael', text:'Empathy and acknowledgment: QA result Agree (16 points).'}
+        {kind:'manual', time:'12 May 2026 · 10:31 AM GMT+3', actor:'Engy Yasser', text:'Customer identity verification: QA result Agree (14 points).'},
+        {kind:'manual', time:'12 May 2026 · 10:34 AM GMT+3', actor:'Engy Yasser', text:'Empathy and acknowledgment: QA result Agree (16 points).'}
       ]
     },
 
@@ -2094,7 +2094,7 @@ html.is-embedded .audit-scroll {
 
     chat: {
       id: 'CHAT-88314', channel: 'chat', title: 'Live chat · Nadia Hassan', subject: 'Invoice download error', product: 'Qvidian', date: '18 Aug 2026', duration: '12m 09s', status: 'pass', score: 84, confidence: 88, delivered: false,
-      agent: 'Nadia Hassan', agentEmail: 'nadia.hassan@flairstech.com', customer: 'Marcus Lee', customerEmail: 'marcus.lee@example.com', queue: 'Billing Support', source: 'Live chat', evaluator: 'Nour Wael', auditDate: '18 Aug 2026 · 4:22 PM GMT+3',
+      agent: 'Nadia Hassan', agentEmail: 'nadia.hassan@flairstech.com', customer: 'Marcus Lee', customerEmail: 'marcus.lee@example.com', queue: 'Billing Support', source: 'Live chat', evaluator: 'Engy Yasser', auditDate: '18 Aug 2026 · 4:22 PM GMT+3',
       issueReported: 'Customer could not download the July invoice from the billing portal.',
       actionTaken: 'The agent verified the account, generated a replacement PDF and provided a link. The customer confirmed that the file opened.',
       timeline: { created:'18 Aug 2026 · 4:01 PM', firstResponse:'18 Aug 2026 · 4:02 PM', resolved:'18 Aug 2026 · 4:12 PM', closed:'18 Aug 2026 · 4:13 PM', open:'12 minutes 09 seconds' },
@@ -2122,7 +2122,7 @@ html.is-embedded .audit-scroll {
       logs:[
         {kind:'ticket',time:'18 Aug 2026 · 4:01 PM GMT+3',actor:'Chat integration',text:'Interaction created from web widget.'},
         {kind:'ticket',time:'18 Aug 2026 · 4:13 PM GMT+3',actor:'Nadia Hassan',text:'Status changed from active to solved.'},
-        {kind:'manual',time:'18 Aug 2026 · 4:20 PM GMT+3',actor:'Nour Wael',text:'First response time: QA Result Agree (14 points).'}
+        {kind:'manual',time:'18 Aug 2026 · 4:20 PM GMT+3',actor:'Engy Yasser',text:'First response time: QA Result Agree (14 points).'}
       ]
     }
   };
@@ -2550,8 +2550,8 @@ html.is-embedded .audit-scroll {
   function saveSimpleDecision(kpi) {
     const key = decisionKey(kpi.id);
     captureAction('Agree with ' + kpi.title);
-    state.decisions[key] = {type:'agree', corrected:kpi.verdict, comment:'', actor:'Nour Wael', time:'Just now'};
-    addLog('manual', 'Just now', 'Nour Wael', kpi.title + ': QA result Agree.');
+    state.decisions[key] = {type:'agree', corrected:kpi.verdict, comment:'', actor:'Engy Yasser', time:'Just now'};
+    addLog('manual', 'Just now', 'Engy Yasser', kpi.title + ': QA result Agree.');
     renderAll(false);
     showToast('KPI agreed', kpi.title + ' was saved and the score was recalculated.', true);
   }
@@ -2572,9 +2572,9 @@ html.is-embedded .audit-scroll {
     const before = scoreMetaFor(data());
     captureAction('Change ' + kpi.title + ' to ' + verdictLabel(corrected));
     const type = corrected === 'na' ? 'na' : 'disagree';
-    state.decisions[key] = {type, corrected, comment, category, actor:'Nour Wael', time:'Just now'};
+    state.decisions[key] = {type, corrected, comment, category, actor:'Engy Yasser', time:'Just now'};
     const after = scoreMetaFor(data());
-    addLog('manual', 'Just now', 'Nour Wael', kpi.title + ': QA result corrected to ' + verdictLabel(corrected) + '. Reason: ' + category + '. Comment: ' + comment);
+    addLog('manual', 'Just now', 'Engy Yasser', kpi.title + ': QA result corrected to ' + verdictLabel(corrected) + '. Reason: ' + category + '. Comment: ' + comment);
     renderAll(false);
     showToast('Decision saved', kpi.title + ' is now ' + verdictLabel(corrected) + '. Score ' + before.score + '% → ' + after.score + '%.', true);
   }
@@ -2609,7 +2609,7 @@ html.is-embedded .audit-scroll {
     const kpi = data().kpis.find(k => k.id === card.dataset.kpiId);
     const key = decisionKey(kpi.id);
     const existing = disputeFor(kpi);
-    const reviewer = state.role === 'manager' ? 'Team Manager' : 'Nour Wael';
+    const reviewer = state.role === 'manager' ? 'Team Manager' : 'Engy Yasser';
     const reviewerRole = state.role === 'manager' ? 'Manager' : 'Quality Auditor';
     captureAction((resolution === 'accept' ? 'Accept' : 'Uphold') + ' dispute for ' + kpi.title);
     state.disputes[key] = {...existing, status:'resolved', resolution, resolvedBy:reviewer, resolvedByRole:reviewerRole};
@@ -3194,7 +3194,7 @@ html.is-embedded .audit-scroll {
       onConfirm:() => {
         captureAction('Bulk review for ' + targets.length + ' KPIs');
         scored.forEach(kpi => {
-          state.decisions[decisionKey(kpi.id)] = {type:'agree', corrected:kpi.verdict, comment:'', actor:'Nour Wael', time:'Just now'};
+          state.decisions[decisionKey(kpi.id)] = {type:'agree', corrected:kpi.verdict, comment:'', actor:'Engy Yasser', time:'Just now'};
         });
         unscored.forEach(kpi => {
           state.decisions[decisionKey(kpi.id)] = {
@@ -3202,11 +3202,11 @@ html.is-embedded .audit-scroll {
             corrected:'na',
             comment:'Bulk review: no AiMY verdict was available, so this KPI was marked N/A.',
             category:'Not measurable on this channel',
-            actor:'Nour Wael',
+            actor:'Engy Yasser',
             time:'Just now'
           };
         });
-        addLog('manual','Just now','Nour Wael','Bulk review completed for ' + targets.length + ' remaining KPIs: ' + scored.length + ' agreed' + (unscored.length ? ' and ' + unscored.length + ' unscored marked N/A' : '') + '.');
+        addLog('manual','Just now','Engy Yasser','Bulk review completed for ' + targets.length + ' remaining KPIs: ' + scored.length + ' agreed' + (unscored.length ? ' and ' + unscored.length + ' unscored marked N/A' : '') + '.');
         renderAll(false);
         const completion = completionState();
         if (completion.ready) {
@@ -3230,7 +3230,7 @@ html.is-embedded .audit-scroll {
       onConfirm:() => {
         captureAction('Complete audit');
         state.completed[state.interactionKey] = true;
-        addLog('manual','Just now','Nour Wael','Audit completed with a final score of ' + meta.score + '% and ' + meta.coverage + '% coverage.');
+        addLog('manual','Just now','Engy Yasser','Audit completed with a final score of ' + meta.score + '% and ' + meta.coverage + '% coverage.');
         renderAll(false);
         showToast('Audit completed','The final outcome and completion entry were recorded.', true);
       }
@@ -3347,7 +3347,7 @@ html.is-embedded .audit-scroll {
     if(target==='Reviews'||target==='QA') { qaSetOpen(false); document.getElementById('qaSidebar').classList.remove('shell-open'); document.getElementById('qaNavToggle').setAttribute('aria-expanded','false'); }
     else showToast(target, target+' is outside this audit prototype. Your current audit is preserved.');
   }));
-  document.getElementById('qaUserMenu').addEventListener('click',()=>showToast('Nour Wael','Product Design · QA prototype'));
+  document.getElementById('qaUserMenu').addEventListener('click',()=>showToast('Engy Yasser','Product Design · QA prototype'));
   document.getElementById('ntfBell').addEventListener('click',()=>{openPane('activity');document.getElementById('ntfDot').hidden=true;});
   document.querySelectorAll('.nav-role-switch button').forEach(button=>button.addEventListener('click',()=>showToast(button.textContent+' dashboard', 'Dashboard role switching is outside this audit prototype. Use View as to change the audit role.')));
   const shellToggle=document.getElementById('qaNavToggle'), shellSidebar=document.getElementById('qaSidebar');

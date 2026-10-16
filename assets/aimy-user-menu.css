@@ -189,59 +189,85 @@
   outline-offset: 1px;
 }
 
-/* ── The scope control: All QA | My QA ─────────────────────────────────
-   The segmented control every shell page already draws for its content
-   views (.content-view-toggle: pill track, --wash-2 fill, --wash-7
-   hairline, selected segment on --brand-dim). It sits first in the
-   right-hand cluster, so it reads as a global control with the theme,
-   notifications and profile beside it. The selected segment is the scope
-   indicator on every page. Locked, it is one "My QA" segment with a lock
-   and nothing to press. */
-:root .myqa-scope {
+/* ── "Only my results": the filter chip and the scope heading ──────────
+   Behaviour in assets/aimy-user-menu.js. The chip leads the filter row of
+   the pages that fill [data-my-results-slot]. Off it is a dashed outline,
+   an invitation; on it fills with the QA violet and carries the person's
+   avatar and an ×, so the control is its own indicator and the shape
+   changes at a glance. Locked, it is filled with a lock and no ×. */
+:root [data-my-results-slot] {
   display: inline-flex;
   align-items: center;
-  gap: 2px;
+  gap: 4px;
   flex-shrink: 0;
-  padding: 3px;
-  background: var(--wash-2);
-  border: 1px solid var(--wash-7);
-  border-radius: 9999px;
 }
-:root .myqa-seg {
+:root .myr-chip {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 5px 10px;
-  border: 0;
+  gap: 6px;
+  min-height: 28px;
+  padding: 0 11px 0 9px;
+  /* --d400 rather than a wash: the dashed outline is the whole off state,
+     so it has to read at a glance. */
+  border: 1px dashed var(--d400);
   border-radius: 9999px;
   background: transparent;
-  color: var(--d400);
-  font-family: "Urbanist", sans-serif;
-  font-size: 11px;
-  /* Regular weight, the body text weight. The typography layer sets every
-     button to 600 with !important, so this has to match it. */
-  font-weight: 500 !important;
+  color: var(--d200);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
   line-height: 1.4;
   white-space: nowrap;
   cursor: pointer;
-  transition: background var(--transition-fast, 150ms), color var(--transition-fast, 150ms);
+  transition: background var(--transition-fast, 150ms), border-color var(--transition-fast, 150ms), color var(--transition-fast, 150ms);
 }
-:root .myqa-seg:hover { color: var(--d200); }
-:root .myqa-seg.is-on {
+:root .myr-chip svg { width: 14px; height: 14px; flex-shrink: 0; }
+:root .myr-chip:hover { border-color: var(--qa-accent); color: var(--d50); background: rgba(var(--qa-accent-rgb), 0.08); }
+:root .myr-chip.is-on {
+  padding-left: 3px;
+  padding-right: 5px;
+  border: 1px solid var(--qa-accent);
+  background: rgba(var(--qa-accent-rgb), 0.18);
   color: var(--d50);
-  background: var(--brand-dim);
 }
-:root .myqa-seg:focus-visible {
+:root .myr-chip.is-on:hover { background: rgba(var(--qa-accent-rgb), 0.26); }
+:root .myr-chip.is-locked { padding-right: 10px; cursor: default; }
+:root .myr-chip.is-locked:hover { background: rgba(var(--qa-accent-rgb), 0.18); }
+:root .myr-chip.is-locked svg { width: 12px; height: 12px; }
+:root .myr-chip:focus-visible {
   outline: 2px solid var(--brand);
   outline-offset: 2px;
 }
-/* Locked: one segment, nothing to press. */
-:root .myqa-scope.is-locked .myqa-seg { cursor: default; }
-:root .myqa-lock { width: 12px; height: 12px; flex-shrink: 0; color: var(--d300); }
-/* The top bar is short of room below the shell's compact line. */
-@media (max-width: 1099.98px) {
-  :root .myqa-seg { padding-inline: 8px; font-size: 10px; }
+:root .myr-x {
+  display: inline-grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
 }
+:root .myr-chip.is-on:hover .myr-x { background: var(--wash-5, rgba(255, 255, 255, 0.12)); }
+:root .myr-x svg { width: 12px; height: 12px; }
+:root .myr-av {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--qa-accent);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+:root .myr-divider {
+  width: 1px;
+  height: 18px;
+  margin: 0 4px;
+  background: var(--wash-7);
+}
+/* Light theme: a lighter violet fill keeps the dark text at full contrast. */
+:root[data-theme="light"] .myr-chip.is-on { background: rgba(var(--qa-accent-rgb), 0.12); }
 
 @media (prefers-reduced-motion: reduce) {
   :root .um-panel,

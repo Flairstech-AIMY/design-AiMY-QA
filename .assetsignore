@@ -17,3 +17,14 @@ package.json
 package-lock.json
 wrangler.jsonc
 README.md
+
+# Agent and design-tooling files at the root (skills, notes, lockfiles).
+# They are working material, not the product.
+.agents
+.aider-desk
+AGENTS.md
+agent-skills
+custom-icons-skill
+ui-ux-pro-max-skill
+skills-lock.json
+findings.txt
