@@ -1,16 +1,23 @@
 /* ═══════════════════════════════════════════════════════════════════════════
-   THE USER MENU AND THE VIEW MY QA SWITCH
+   THE USER MENU AND THE "ONLY MY RESULTS" FILTER
    (styles in assets/aimy-user-menu.css)
 
-   THE SCOPE CONTROL, "All QA | My QA", is a segmented control in the
-   right-hand cluster of the top bar on every shell page. The scope follows
-   the person across the whole product, so the selected segment doubles as
-   the indicator of which scope they are in. Each change is announced
-   as the document event "aimy:view-my-qa" ({ detail: { on } }); the
-   Dashboard listens and scopes itself to the signed-in person (its scope
-   script in index.html). Pages that do not listen are unchanged. The state
-   is remembered per browser (localStorage) so it reads the same on every
-   page; it is a preference flag only, holding no identity or records.
+   "ONLY MY RESULTS" is a filter chip that leads the filter row of each page
+   that can narrow its results to the signed-in person (Dashboard, Reviews).
+   A page opts in with a [data-my-results-slot] first in its filter row,
+   filled from here. Off, the chip is a dashed outline; on, it fills violet
+   with the person's avatar and an ×, so the control is its own indicator.
+   One click either way.
+   Pages without a slot have nothing to narrow and show no chip, so no page
+   claims a scope it does not apply. Each change shows a toast with Undo and
+   is announced as the document event "aimy:view-my-qa" ({ detail: { on } });
+   each page's own scope script listens. The state is remembered per browser
+   (localStorage) so it carries between Dashboard and Reviews; it is a
+   preference flag only, holding no identity or records.
+
+   A person the system limits to their own data gets the same chip locked:
+   filled, with a lock instead of the ×, and nothing to press. The prototype
+   simulates that with data-my-qa-locked on <body>.
 
    THE PROFILE PILL opens a small panel holding the page's DEMO CONTROLS:
    the prototype's own switches (Manager/Director, Audit/Evaluation view,
@@ -23,9 +30,9 @@
    focuses its first control; Escape closes it and returns focus; Tab out or
    a click elsewhere closes it.
 
-   window.AimyUserMenu.open(focusFirst) opens the panel from elsewhere;
-   window.AimyUserMenu.focusMyQa() moves focus to the scope control, as the
-   Dashboard's locked Agents tag does.
+   window.AimyUserMenu.open(focusFirst) opens the panel from elsewhere.
+   window.AimyMyResults: isOn(), set(on, { toast }), isLocked(), fullName(),
+   and paint(), which refills the slot for a page that redraws its filter row.
    ═══════════════════════════════════════════════════════════════════════════ */
 (function () {
   "use strict";
@@ -52,69 +59,113 @@
     document.dispatchEvent(new CustomEvent("aimy:view-my-qa", { detail: { on: on } }));
   }
 
-  /* ── The scope control: All QA | My QA ───────────────────────────────
-     A two-option segmented control (radiogroup) in the right-hand cluster
-     of the top bar. The selected segment is the scope indicator on every
-     page. A person the system limits to their own data gets the same
-     component locked: one "My QA" segment with a lock and no "All QA". The
-     prototype simulates that with data-my-qa-locked on <body>. */
-  var ICON_LOCK = '<svg class="lucide lucide-lock myqa-lock" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>';
+  /* ── "Only my results": the chip, the heading and the toast ─────────── */
+  var ICON_LOCK = '<svg class="lucide lucide-lock" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>';
+  var ICON_USER = '<svg class="lucide lucide-user" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>';
+  var ICON_X = '<svg class="lucide lucide-x" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>';
+  var ICON_CHECK = '<svg class="lucide lucide-check" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>';
 
-  function buildMyQaScope() {
-    var nav = document.querySelector(".app-topnav");
-    var right = nav && nav.querySelector(".topnav-right");
-    if (!right || nav.querySelector(".myqa-scope")) return null;
-    var locked = document.body.hasAttribute("data-my-qa-locked");
-    if (locked && !myQaOn()) setMyQa(true);
+  function isLocked() { return document.body.hasAttribute("data-my-qa-locked"); }
+  function fullName() {
+    var n = document.querySelector(".app-topnav .topnav-user-name");
+    return n ? n.textContent.trim() : "";
+  }
+  function initials() {
+    var parts = fullName().split(/\s+/).filter(Boolean);
+    return ((parts[0] || "?").charAt(0) + (parts.length > 1 ? parts[parts.length - 1].charAt(0) : "")).toUpperCase();
+  }
+  function esc(s) {
+    return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; });
+  }
+  function avatar() { return '<span class="myr-av" aria-hidden="true">' + esc(initials()) + "</span>"; }
 
-    var group = document.createElement("div");
-    group.className = "myqa-scope" + (locked ? " is-locked" : "");
-    group.id = "myQaSwitch";
-    group.setAttribute("role", locked ? "status" : "radiogroup");
-    group.setAttribute("aria-label", locked ? "Scope: My QA, locked to your own data" : "QA scope");
+  function chipHtml(on, locked) {
     if (locked) {
-      group.innerHTML = '<span class="myqa-seg is-on">' + ICON_LOCK + "My QA</span>";
-      group.title = "You see your own QA only";
-      right.insertBefore(group, right.firstChild);
-      return group;
+      return '<span class="myr-chip is-on is-locked" role="status" title="Your account shows only your own results">' +
+        avatar() + "<span>Only your results</span>" + ICON_LOCK + "</span>";
     }
-    group.innerHTML =
-      '<button class="myqa-seg" type="button" role="radio" data-scope="all" title="Everything you can see">All QA</button>' +
-      '<button class="myqa-seg" type="button" role="radio" data-scope="me" title="Only your own QA results">My QA</button>';
-    var segs = Array.prototype.slice.call(group.querySelectorAll(".myqa-seg"));
-    function sync() {
-      var on = myQaOn();
-      segs.forEach(function (seg) {
-        var sel = (seg.getAttribute("data-scope") === "me") === on;
-        seg.classList.toggle("is-on", sel);
-        seg.setAttribute("aria-checked", String(sel));
-        seg.tabIndex = sel ? 0 : -1;
+    if (on) {
+      return '<button class="myr-chip is-on" type="button" data-myr-toggle aria-pressed="true" title="Show everyone’s results">' +
+        avatar() + "<span>Only my results</span>" + '<span class="myr-x">' + ICON_X + "</span></button>";
+    }
+    return '<button class="myr-chip" type="button" data-myr-toggle aria-pressed="false" title="Limit these results to your own work">' +
+      ICON_USER + "<span>Only my results</span></button>";
+  }
+
+  function paint() {
+    var on = myQaOn(), locked = isLocked();
+    document.querySelectorAll("[data-my-results-slot]").forEach(function (slot) {
+      slot.innerHTML = chipHtml(on, locked) + '<span class="myr-divider" aria-hidden="true"></span>';
+    });
+  }
+
+  /* The toast reuses each page's .aimy-toast look in its own element, so its
+     Undo never collides with the page's own toast and undo logic. */
+  var toastEl = null, toastTimer = null, undoTo = null;
+  function toast(on) {
+    if (!toastEl) {
+      toastEl = document.createElement("div");
+      toastEl.className = "aimy-toast myr-toast";
+      toastEl.setAttribute("role", "status");
+      toastEl.setAttribute("aria-live", "polite");
+      toastEl.innerHTML =
+        '<div class="aimy-toast-icon">' + ICON_CHECK + "</div>" +
+        '<div class="aimy-toast-body"><span class="aimy-toast-title"></span><span class="aimy-toast-sub"></span></div>' +
+        '<div class="aimy-toast-divider"></div>' +
+        '<button class="aimy-toast-undo" type="button">Undo</button>' +
+        '<div class="aimy-toast-progress"></div>';
+      document.body.appendChild(toastEl);
+      toastEl.querySelector(".aimy-toast-undo").addEventListener("click", function () {
+        hideToast();
+        if (undoTo !== null) { var back = undoTo; undoTo = null; set(back, { toast: false }); }
       });
     }
-    sync();
-    group.addEventListener("click", function (e) {
-      var seg = e.target.closest(".myqa-seg");
-      if (!seg) return;
-      var want = seg.getAttribute("data-scope") === "me";
-      if (want !== myQaOn()) setMyQa(want);
-      sync();
-    });
-    group.addEventListener("keydown", function (e) {
-      if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+    undoTo = !on;
+    toastEl.querySelector(".aimy-toast-title").textContent = on ? "Showing only your results" : "Showing everyone’s results";
+    toastEl.querySelector(".aimy-toast-sub").textContent = on ? "Only your own interactions are counted." : "Your results are back in the full view.";
+    var bar = toastEl.querySelector(".aimy-toast-progress");
+    bar.parentNode.replaceChild(bar.cloneNode(false), bar);
+    toastEl.classList.add("visible");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(hideToast, 5000);
+  }
+  function hideToast() {
+    clearTimeout(toastTimer);
+    if (toastEl) toastEl.classList.remove("visible");
+  }
+
+  function set(on, opts) {
+    if (isLocked()) on = true;
+    if (on === myQaOn()) { paint(); return; }
+    var focused = document.activeElement && document.activeElement.closest &&
+      document.activeElement.closest("[data-my-results-slot]");
+    setMyQa(on);
+    paint();
+    /* Keep focus on the control that was pressed after it re-renders. */
+    if (focused) {
+      var again = focused.querySelector("[data-myr-toggle]") || focused.querySelector(".myr-chip");
+      if (again && typeof again.focus === "function") again.focus({ preventScroll: true });
+    }
+    if (!opts || opts.toast !== false) toast(on);
+  }
+
+  function bootMyResults() {
+    if (isLocked() && !myQaOn()) setMyQa(true);
+    paint();
+    document.addEventListener("click", function (e) {
+      var t = e.target.closest && e.target.closest("[data-myr-toggle]");
+      if (!t) return;
       e.preventDefault();
-      setMyQa(!myQaOn());
-      sync();
-      group.querySelector(".myqa-seg.is-on").focus();
+      set(!myQaOn());
     });
     /* Another tab changed it. */
-    window.addEventListener("storage", function (e) { if (e.key === MY_QA_KEY) sync(); });
-    right.insertBefore(group, right.firstChild);
-    return group;
+    window.addEventListener("storage", function (e) { if (e.key === MY_QA_KEY) paint(); });
+    window.AimyMyResults = { isOn: myQaOn, set: set, isLocked: isLocked, fullName: fullName, paint: paint };
   }
 
   /* ── The profile pill and its demo-controls panel ───────────────────── */
   function boot() {
-    var myQaSwitch = buildMyQaScope();
+    bootMyResults();
 
     var pill = document.querySelector(".app-topnav .topnav-user");
     if (!pill || pill.closest(".um-anchor")) return;
@@ -220,12 +271,7 @@
     });
 
     window.AimyUserMenu = {
-      open: function (focusFirst) { setOpen(true, !!focusFirst); },
-      focusMyQa: function () {
-        if (!myQaSwitch) return;
-        var target = myQaSwitch.querySelector(".myqa-seg.is-on") || myQaSwitch;
-        if (typeof target.focus === "function") target.focus({ preventScroll: true, focusVisible: true });
-      }
+      open: function (focusFirst) { setOpen(true, !!focusFirst); }
     };
   }
 
