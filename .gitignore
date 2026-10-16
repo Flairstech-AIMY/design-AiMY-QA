@@ -10,3 +10,9 @@
 # Storybook / Node build output
 node_modules/
 storybook-static/
+
+# Local skill folders. They were committed as submodule pointers with no
+# .gitmodules, which made every Cloudflare build fail at the clone step.
+agent-skills/
+custom-icons-skill/
+ui-ux-pro-max-skill/
