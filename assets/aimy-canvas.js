@@ -57,7 +57,7 @@
   var CFG = window.AIMY_SURFACE || {};
   var MULTI = CFG.MULTI || [];
   var DEFAULTS = CFG.DEFAULTS || {};
-  var INITIALS = CFG.initials || "NW";
+  var INITIALS = CFG.initials || "EY";
 
   /* ── Local helpers. Deliberately not reaching into the page's own IIFE:
         every page has an `escHtml` and none of them is on window. ── */

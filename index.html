@@ -12028,12 +12028,12 @@
               + '<span class="dz-spacer"></span>'
               + '<button class="btn btn-ghost btn-sm" type="button" data-hr-decision="undo">Undo</button>';
             zone.querySelector('.dz-meta').innerHTML =
-              '<span>' + dz('accepted-meta', 'Accepted by Nour W. · 09:16 · reversible until tomorrow 09:16') + '</span>';
+              '<span>' + dz('accepted-meta', 'Accepted by Engy Y. · 09:16 · reversible until tomorrow 09:16') + '</span>';
             zone.insertAdjacentHTML('afterend',
               '<div class="audit-trail" style="margin-top:12px"><div class="audit-entry is-ok">'
               + '<span class="audit-ico"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span>'
               + '<div class="audit-main"><div class="audit-action">' + dz('audit', 'HR meeting scheduled for Omar Abdallah') + '</div>'
-              + '<div class="audit-actor">by <span class="audit-who">Nour Wael</span></div></div>'
+              + '<div class="audit-actor">by <span class="audit-who">Engy Yasser</span></div></div>'
               + '<div class="audit-side"><span class="audit-time">09:16</span>'
               + '<button class="audit-revert" type="button" data-hr-decision="undo">Undo</button></div></div></div>');
             if (typeof window.applyOutcome === 'function') {
@@ -12061,7 +12061,7 @@
               '<span class="work-state ws-failed" data-work-state="failed"><span class="ws-dot"></span>Rejected</span>'
               + '<span class="dz-spacer"></span>'
               + '<span style="font-size:10.5px;color:var(--d500)">Reason: ' + why.replace(/[<>&]/g, '') + '</span>';
-            zone.querySelector('.dz-meta').innerHTML = '<span>' + dz('rejected-meta', 'Rejected by Nour W. · 09:16 · Omar stays in the coaching loop') + '</span>';
+            zone.querySelector('.dz-meta').innerHTML = '<span>' + dz('rejected-meta', 'Rejected by Engy Y. · 09:16 · Omar stays in the coaching loop') + '</span>';
 
           } else if (decision === 'edit') {
             if (zone.querySelector('.hr-edit-panel')) return;
@@ -12129,7 +12129,7 @@
             accepted: 'Response-time fix applied to 8 agents, first response target now 30 min.',
             audit: 'Response-time fix applied to 8 agents',
             rejected: 'Fix held, the 8 agents keep their current response targets.',
-            rejectedMeta: 'Rejected by Nour W. · 09:16 · the 23 breaches stay open',
+            rejectedMeta: 'Rejected by Engy Y. · 09:16 · the 23 breaches stay open',
             rejectLabel: 'Reason for holding, recorded against the SLA goal',
             edit: 'Response target|30 minutes||Agents|8 selected'
           },
@@ -12146,7 +12146,7 @@
             accepted: '6 coaching plans sent, each attached to the agent&#8217;s next 1:1.',
             audit: '6 coaching plans sent to agents behind the off-track goals',
             rejected: 'Plans held, nothing sent, the drafts stay on your queue.',
-            rejectedMeta: 'Rejected by Nour W. · 09:16 · the 6 agents stay uncoached',
+            rejectedMeta: 'Rejected by Engy Y. · 09:16 · the 6 agents stay uncoached',
             rejectLabel: 'Reason for holding, recorded on each plan',
             edit: 'Deliver at|Next 1:1||Notify|Team leads'
           },
@@ -12163,7 +12163,7 @@
             accepted: 'Fix sequence started, ticket-status accuracy is running now.',
             audit: 'Quality fix sequence started (3 fixes, status accuracy first)',
             rejected: 'Sequence held. Quality stays at 87.3% with no fixes running.',
-            rejectedMeta: 'Rejected by Nour W. · 09:16 · the 2.7-pt gap stays open',
+            rejectedMeta: 'Rejected by Engy Y. · 09:16 · the 2.7-pt gap stays open',
             rejectLabel: 'Reason for holding, recorded against the quality goal',
             edit: 'Run first|Ticket-status accuracy||Sequence|3 fixes'
           },
@@ -12179,7 +12179,7 @@
             accepted: 'Status-code coaching sent to 8 agents, tracking their next 20 tickets.',
             audit: 'Status-code coaching sent to 8 agents',
             rejected: 'Coaching held, the 8 agents stay at 71% with no plan attached.',
-            rejectedMeta: 'Rejected by Nour W. · 09:16 · accuracy stays 24 pts under goal',
+            rejectedMeta: 'Rejected by Engy Y. · 09:16 · accuracy stays 24 pts under goal',
             rejectLabel: 'Reason for holding, recorded against the accuracy goal',
             edit: 'Rework tickets|3 each||Agents|8 selected'
           },
@@ -12195,7 +12195,7 @@
             accepted: '4-hour nudge set for 3 agents, running until end of shift.',
             audit: '4-hour follow-up nudge set for 3 agents',
             rejected: 'Nudge not set. Cadence stays at 84%.',
-            rejectedMeta: 'Rejected by Nour W. · 09:16 · the 3 agents keep their current cadence',
+            rejectedMeta: 'Rejected by Engy Y. · 09:16 · the 3 agents keep their current cadence',
             rejectLabel: 'Reason for holding, recorded against the cadence goal',
             edit: 'Nudge after|4 hours||Runs until|End of shift'
           },
@@ -12212,7 +12212,7 @@
             accepted: 'Shift rebalanced, 2 agents on the morning billing queue until close.',
             audit: 'Shift rebalanced, 2 agents moved to the morning billing queue',
             rejected: 'Rebalance held. First response stays at 71%.',
-            rejectedMeta: 'Rejected by Nour W. · 09:16 · the morning spike is uncovered',
+            rejectedMeta: 'Rejected by Engy Y. · 09:16 · the morning spike is uncovered',
             rejectLabel: 'Reason for holding, recorded against the FRT goal',
             edit: 'Agents|2 from Adestra||Until|End of shift'
           },
@@ -12229,7 +12229,7 @@
             accepted: '26 tickets reassigned to the billing pod, repeat contacts first.',
             audit: '26 friction tickets reassigned to the billing pod',
             rejected: 'Reassignment held, the 26 tickets stay in their current queues.',
-            rejectedMeta: 'Rejected by Nour W. · 09:16 · the 4 repeat contacts keep waiting',
+            rejectedMeta: 'Rejected by Engy Y. · 09:16 · the 4 repeat contacts keep waiting',
             rejectLabel: 'Reason for holding, recorded on the escalation protocol',
             edit: 'Tickets|26 selected||Order|Wait time, repeats first'
           },
@@ -12246,7 +12246,7 @@
             accepted: 'Fixes applied to Objectif Lune and Qvidian, both leads briefed.',
             audit: 'Fixes applied to Objectif Lune and Qvidian',
             rejected: 'Fixes held, both portfolios stay under target.',
-            rejectedMeta: 'Rejected by Nour W. · 09:16 · 113 negative surveys stay unaddressed',
+            rejectedMeta: 'Rejected by Engy Y. · 09:16 · 113 negative surveys stay unaddressed',
             rejectLabel: 'Reason for holding, recorded against both portfolios',
             edit: 'Portfolios|Objectif Lune, Qvidian||Brief leads|Today'
           },
@@ -12261,7 +12261,7 @@
             accepted: 'Response-time fix applied across both products.',
             audit: 'Response-time fix applied to 2 products below the SLA goal',
             rejected: 'Fix held, both products stay below the 90% goal.',
-            rejectedMeta: 'Rejected by Nour W. · 09:16 · breached tickets stay queued',
+            rejectedMeta: 'Rejected by Engy Y. · 09:16 · breached tickets stay queued',
             rejectLabel: 'Reason for holding, recorded against the SLA goal',
             edit: 'Products|2 selected||Response target|30 minutes'
           }
@@ -12278,7 +12278,7 @@
             +   ' data-dz-topic="' + topic + '"'
             +   ' data-dz-label="' + d.label + '"'
             +   ' data-dz-accepted="' + d.accepted.replace(/"/g, '&quot;') + '"'
-            +   ' data-dz-accepted-meta="Accepted by Nour W. · 09:16 · reversible until tomorrow 09:16"'
+            +   ' data-dz-accepted-meta="Accepted by Engy Y. · 09:16 · reversible until tomorrow 09:16"'
             +   ' data-dz-audit="' + d.audit.replace(/"/g, '&quot;') + '"'
             +   ' data-dz-rejected="' + d.rejected.replace(/"/g, '&quot;') + '"'
             +   ' data-dz-rejected-meta="' + d.rejectedMeta.replace(/"/g, '&quot;') + '"'

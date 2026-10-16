@@ -7999,9 +7999,9 @@
           </div>
         </div>
         <div class="topnav-user">
-          <div class="topnav-avatar">NW</div>
+          <div class="topnav-avatar">EY</div>
           <div class="topnav-user-info">
-            <span class="topnav-user-name">Nour Wael</span>
+            <span class="topnav-user-name">Engy Yasser</span>
             <span class="topnav-user-role">Product Design</span>
           </div>
           <svg
@@ -11981,7 +11981,7 @@
                       turn.className = 'chat-msg ' + kind;
                       var avatar = document.createElement('div');
                       avatar.className = 'msg-avatar ' + (kind === 'user' ? 'user-av' : 'aimy-av');
-                      if (kind === 'user') avatar.textContent = 'NW';
+                      if (kind === 'user') avatar.textContent = 'EY';
                       else avatar.innerHTML = '<svg viewBox="0 0 18 20" aria-hidden="true"><use href="#aimy-logo-small"></use></svg>';
                       var bubble = document.createElement('div');
                       bubble.className = 'msg-bubble';
@@ -12168,10 +12168,10 @@
                       confidence: 'AiMY confidence for this evaluation is 91%: full transcript available, all goals answerable, no conflicting signals.',
                       priority: 'This interaction is a refund status escalation handled in the Product Support queue.',
                       queue: 'Queue: Product Support · Source: Voice call.',
-                      timeline: 'The call took place on 7 May 2026 at 10:05 and ran 8 minutes 34 seconds. Audited by Nour Wael on 12 May 2026.',
+                      timeline: 'The call took place on 7 May 2026 at 10:05 and ran 8 minutes 34 seconds. Audited by Engy Yasser on 12 May 2026.',
                       duration: 'Call duration was 8 minutes 34 seconds (10:05–10:13, 7 May 2026).',
-                      evaluator: 'The evaluator is Nour Wael (Quality Auditor).',
-                      auditor: 'The evaluator is Nour Wael (Quality Auditor).',
+                      evaluator: 'The evaluator is Engy Yasser (Quality Auditor).',
+                      auditor: 'The evaluator is Engy Yasser (Quality Auditor).',
                       issue: 'Issue reported: the customer waited three days for a refund. The agent escalated it to clear the same day.',
                       resolution: 'Resolution: the refund was escalated on the call, but the agent closed without confirming resolution or next steps — both KPIs failed.',
                       verdict: 'Current verdict: Fail at 52%, awaiting your manual review of the remaining KPIs.',
@@ -12198,7 +12198,7 @@
                       var msg = document.createElement('div');
                       msg.className = 'chat-msg ' + (isUser ? 'user' : 'aimy');
                       msg.innerHTML = isUser
-                        ? '<div class="msg-bubble"></div><div class="msg-avatar user-av">NW</div>'
+                        ? '<div class="msg-bubble"></div><div class="msg-avatar user-av">EY</div>'
                         : '<div class="msg-avatar aimy-av"><svg width="23" height="25" viewBox="0 0 18 20"><use href="#aimy-logo-small"/></svg></div><div class="msg-bubble"></div>';
                       msg.querySelector('.msg-bubble').textContent = text;
                       thread.appendChild(msg);
@@ -16865,7 +16865,7 @@
           wrap.className = "chat-msg user" + (isKpiExplanation ? " kpi-explanation-request" : "");
           wrap.id = "turn-" + msgCount;
           wrap.innerHTML =
-            '<div class="msg-avatar user-av">NW</div>' +
+            '<div class="msg-avatar user-av">EY</div>' +
             '<div class="msg-bubble">' +
             escHtml(text) +
             "</div>";
@@ -17980,9 +17980,9 @@
               + '<span class="dz-spacer"></span>'
               + '<button class="btn btn-ghost btn-sm" type="button" data-hr-decision="undo">Undo</button>';
             zone.querySelector('.dz-meta').innerHTML =
-              '<span>Accepted by Nour W. · 09:16 · reversible until tomorrow 09:16</span>';
+              '<span>Accepted by Engy Y. · 09:16 · reversible until tomorrow 09:16</span>';
             zone.insertAdjacentHTML('afterend',
-              auditEntry('HR meeting scheduled for 2 agents', 'Nour Wael', false, '09:16', true));
+              auditEntry('HR meeting scheduled for 2 agents', 'Engy Yasser', false, '09:16', true));
             /* The card that raised it must move, or the surface is lying. */
             if (typeof window.applyOutcome === 'function') {
               window.applyOutcome({ topic: 'hr-meeting', resolution: 'accepted', label: 'HR meeting' });
@@ -18013,9 +18013,9 @@
               '<span class="work-state ws-failed" data-work-state="failed"><span class="ws-dot"></span>Rejected</span>'
               + '<span class="dz-spacer"></span>'
               + '<span style="font-size:10.5px;color:var(--d500)">Reason: ' + escHtml(why) + '</span>';
-            zone.querySelector('.dz-meta').innerHTML = '<span>Rejected by Nour W. · 09:16 · both agents stay in the coaching loop</span>';
+            zone.querySelector('.dz-meta').innerHTML = '<span>Rejected by Engy Y. · 09:16 · both agents stay in the coaching loop</span>';
             zone.insertAdjacentHTML('afterend',
-              auditEntry('HR meeting proposal rejected, ' + escHtml(why), 'Nour Wael', false, '09:16', false));
+              auditEntry('HR meeting proposal rejected, ' + escHtml(why), 'Engy Yasser', false, '09:16', false));
 
           } else if (decision === 'edit') {
             /* Edit is mandatory. Offering only Accept and Reject forces the
@@ -22839,7 +22839,7 @@
           if (!APPLYING && window.AimyChat) window.AimyChat.sync();
         };
         window.AIMY_SURFACE = {
-          initials: "NW",
+          initials: "EY",
           SCALAR: ["view"],
           DEFAULTS: { view: "team" },
           /* This page widens an AiMY bubble and draws a basis row over the
@@ -23635,7 +23635,7 @@
                   row2.classList.add("is-challenged");
                   row2.dataset.challenged = cr.id;
                   logAudit(panel2, {
-                    tone: "warn", who: "Nour W.", kind: "human",
+                    tone: "warn", who: "Engy Y.", kind: "human",
                     action: "Goal challenge raised · " + cr.metric + " · " + cr.id,
                     detail: "routed to Goal Hub · " + cr.grounds.toLowerCase() +
                             " · excluded from this score while open",
@@ -23671,10 +23671,10 @@
               (isAi ? "No agent score moved." : "Omar has 14 days to acknowledge or justify.") + "</p>" +
               '<div class="dz-actions"><button class="btn btn-ghost btn-sm" type="button" data-verdict-revert>Undo</button>' +
               '<span class="dz-spacer"></span>' +
-              '<span class="dz-note">Nour W. · 09:16 · reversible until tomorrow</span></div>';
+              '<span class="dz-note">Engy Y. · 09:16 · reversible until tomorrow</span></div>';
             paintAgentState(p);
             logAudit(p, {
-              tone: "ok", who: "Nour W.", kind: "human",
+              tone: "ok", who: "Engy Y.", kind: "human",
               action: "Feedback sent · " + (tl.total - tl.overturned) + " goals confirmed, " +
                       tl.overturned + " overturned",
               detail: "reviewed action · " + (isAi ? "recorded against AiMY’s accuracy" : "Omar Abdallah notified"),
@@ -23699,7 +23699,7 @@
               if (tr[ri].revert) { tr.splice(ri, 1); break; }
             }
             logAudit(pr, {
-              tone: "warn", who: "Nour W.", kind: "human",
+              tone: "warn", who: "Engy Y.", kind: "human",
               action: "Feedback withdrawn before the reversal window closed",
               detail: "Omar’s copy retracted · back to draft",
               time: "09:18", state: "Irreversible"
@@ -26213,7 +26213,7 @@
             id: id, goalId: S.goalId, metric: S.def.name, field: g.field,
             grounds: g.label, current: S.def[g.field], proposed: S.proposed,
             rationale: S.rationale, status: "Pending Review", workState: "staged",
-            proposer: "Nour Wael", proposerInitials: "NW",
+            proposer: "Engy Yasser", proposerInitials: "EY",
             origin: "Reviews", originRef: S.agent + " · " + S.when,
             blast: { templates: S.def.templates, agents: S.def.agents, evals: S.def.evals }
           };
