@@ -7341,7 +7341,7 @@
       /* ══ end global product scope ════════════════════════════════════ */
 
       /* ══ ONLY MY RESULTS, the dashboard scoped to the signed-in person ══════
-         The "Only my results" chip that leads the filter row
+         The "Only my results" chip in the top bar
          (assets/aimy-user-menu.js) sets html.is-my-qa. Blocks marked data-my-qa="only" show only then;
          blocks marked data-my-qa="hide" are the team versions they replace.
          Copy swaps (data-my-qa-html) live in the scope script at the end of
@@ -7354,8 +7354,10 @@
       }
 
       /* The Director view is a portfolio view with no "own" results, so the
-         chip leaves the filter row there rather than claim a scope. */
-      html.is-director-view [data-my-results-slot] { display: none !important; }
+         filter-row chip leaves, and hiding the empty narrowable-area marker
+         takes the logo's "MY" control and the "My QA" shell with it. */
+      html.is-director-view [data-my-results-chip],
+      html.is-director-view [data-my-results-area] { display: none !important; }
 
       .slv-score-trend .trend-negative { color: var(--err); font-weight: 700; }
       html.is-my-qa .slv-score-val { color: var(--err); text-shadow: 0 0 22px rgba(240, 68, 56, 0.16); }
@@ -7458,7 +7460,7 @@
     <link rel="stylesheet" href="assets/aimy-responsive.css?v=7" />
     <link rel="stylesheet" href="assets/aimy-scroll.css?v=1" />
     <link rel="stylesheet" href="assets/aimy-rail.css?v=8" />
-    <link rel="stylesheet" href="assets/aimy-user-menu.css?v=11" />
+    <link rel="stylesheet" href="assets/aimy-user-menu.css?v=21" />
     <link rel="stylesheet" href="assets/aimy-typography.css?v=1" />
     <script src="assets/aimy-viewport.js?v=6"></script>
   </head>
@@ -7712,9 +7714,9 @@
         <div class="gps-bar" id="gpsBar">
           <div class="gps-controls" role="toolbar" aria-label="Dashboard filters">
             <!-- "Only my results" leads the filter row: a chip filled by
-                 assets/aimy-user-menu.js that scopes this dashboard to the
-                 signed-in person and, when on, is its own indicator. -->
-            <span data-my-results-slot></span>
+                 assets/aimy-user-menu.js, sharing its state with the logo's
+                 "MY". -->
+            <span data-my-results-chip></span>
             <button class="gps-filter-btn fp-main-btn" id="fpMainBtn" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="fpMain">
               <svg class="fp-ico lucide lucide-funnel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 20a1 1 0 0 0 .553.895l2 1A1 1 0 0 0 14 21v-7a2 2 0 0 1 .517-1.341L21.74 4.67A1 1 0 0 0 21 3H3a1 1 0 0 0-.742 1.67l7.225 7.989A2 2 0 0 1 10 14z"></path></svg>
               Filter
@@ -7800,6 +7802,10 @@
         </div>
 
         <div class="dashboard-scroll">
+          <!-- Marks the narrowable content for assets/aimy-user-menu.js: it
+               shows the logo's "MY" control and the "My QA" shell while this
+               is on screen. Empty on purpose. -->
+          <div data-my-results-area></div>
           <div class="dash-view" id="viewManager">
         <!-- ════ AIMY DAILY SUMMARY CARD ════════════════════════════════════════
              Headline metric + 3 key signals + primary action for today.
@@ -15730,7 +15736,7 @@
     <script src="assets/aimy-scroll.js?v=3"></script>
     <script src="assets/aimy-canvas.js?v=16"></script>
     <script src="assets/aimy-rail.js?v=8"></script>
-    <script src="assets/aimy-user-menu.js?v=14"></script>
+    <script src="assets/aimy-user-menu.js?v=23"></script>
     <script>
       /* ONLY MY RESULTS, the dashboard scope.
          The "Only my results" chip (filled by assets/aimy-user-menu.js)

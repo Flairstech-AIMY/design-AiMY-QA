@@ -189,13 +189,145 @@
   outline-offset: 1px;
 }
 
-/* ── "Only my results": the filter chip and the scope heading ──────────
-   Behaviour in assets/aimy-user-menu.js. The chip leads the filter row of
-   the pages that fill [data-my-results-slot]. Off it is a dashed outline,
-   an invitation; on it fills with the QA violet and carries the person's
-   avatar and an ×, so the control is its own indicator and the shape
-   changes at a glance. Locked, it is filled with a lock and no ×. */
-:root [data-my-results-slot] {
+/* ── "Only my results": the "MY" in the logo ──────────────────────────────
+   Behaviour in assets/aimy-user-menu.js. The wordmark already says AiMY, and
+   "MY" is in it, so that is the control: a transparent button sits over the
+   two letters (the logo's SVG is 104×32 here; "MY" spans 62–93% of its
+   width and 28–74% of its height). Off, a dashed underline is the
+   invitation, and hovering previews the violet. On, the letters turn the QA
+   violet and the underline goes solid. Locked, it is lit and inert. */
+:root .topnav-logo-mark { position: relative; }
+:root .topnav-logo .myr-my {
+  transition: fill 200ms var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1));
+}
+:root.is-my-scope .topnav-logo .myr-my,
+:root .topnav-logo-mark:has(.myr-my-hit:not([hidden]):hover) .myr-my,
+:root .topnav-logo-mark:has(.myr-my-hit:focus-visible) .myr-my {
+  fill: var(--qa-accent);
+}
+:root .myr-my-hit {
+  position: absolute;
+  left: 60%;
+  right: 5%;
+  top: 14%;
+  bottom: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+}
+:root .myr-my-hit[hidden] { display: none; }
+:root .myr-my-hit::after {
+  content: "";
+  position: absolute;
+  left: 2px;
+  right: 2px;
+  bottom: 2px;
+  border-top: 2px dashed var(--d400);
+  transition: border-color 200ms var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1));
+}
+:root .myr-my-hit:hover::after { border-top-color: var(--qa-accent); }
+:root.is-my-scope .myr-my-hit::after {
+  border-top-style: solid;
+  border-top-color: var(--qa-accent);
+}
+:root .myr-my-hit:active { transform: scale(0.96); }
+:root .myr-my-hit:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+:root .myr-my-hit[data-locked] { cursor: default; }
+:root .myr-my-hit[data-locked]:hover::after { border-top-color: var(--qa-accent); }
+
+/* The tooltip: ours, so it opens at once on hover and focus (a title
+   attribute waits about a second). Same surface as the rail's tooltip. It
+   hangs under "MY" with an arrow, and is also what the first-visit hint
+   uses. */
+:root .myr-tip {
+  position: absolute;
+  top: calc(100% + 9px);
+  left: -4px;
+  z-index: 400;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: var(--card-bg, #141b24);
+  border: 1px solid var(--card-border, rgba(255, 255, 255, 0.1));
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(0, 0, 0, 0.2);
+  color: var(--d100, #e8edf2);
+  font-family: "Urbanist", sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.3;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-4px);
+  pointer-events: none;
+  transition:
+    opacity 150ms var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1)),
+    transform 150ms var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1)),
+    visibility 0s linear 150ms;
+}
+:root .myr-tip::before {
+  content: "";
+  position: absolute;
+  top: -5px;
+  left: 81px;
+  width: 8px;
+  height: 8px;
+  transform: rotate(45deg);
+  background: var(--card-bg, #141b24);
+  border-top: 1px solid var(--card-border, rgba(255, 255, 255, 0.1));
+  border-left: 1px solid var(--card-border, rgba(255, 255, 255, 0.1));
+}
+:root .myr-my-hit:hover ~ .myr-tip,
+:root .myr-my-hit:focus-visible ~ .myr-tip,
+:root .topnav-logo-mark.is-hinting .myr-tip {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition-delay: 0s;
+}
+:root .myr-my-hit[hidden] ~ .myr-tip { display: none; }
+:root .topnav-logo-mark.is-hinting .myr-tip {
+  border-color: rgba(var(--qa-accent-rgb), 0.55);
+}
+:root .topnav-logo-mark.is-hinting .myr-tip::before {
+  border-top-color: rgba(var(--qa-accent-rgb), 0.55);
+  border-left-color: rgba(var(--qa-accent-rgb), 0.55);
+}
+
+/* The first-visit hint: "MY" and its underline breathe between the brand
+   blue and the violet, three times. */
+@keyframes myrNudge {
+  0%, 100% { fill: #0366ff; }
+  50% { fill: var(--qa-accent); }
+}
+@keyframes myrNudgeLine {
+  0%, 100% { border-top-color: var(--d400); }
+  50% { border-top-color: var(--qa-accent); }
+}
+:root .topnav-logo-mark.is-hinting .myr-my {
+  animation: myrNudge 1.6s ease-in-out 3;
+}
+:root .topnav-logo-mark.is-hinting .myr-my-hit::after {
+  animation: myrNudgeLine 1.6s ease-in-out 3;
+}
+@media (prefers-reduced-motion: reduce) {
+  :root .myr-tip { transform: none; }
+  :root .topnav-logo-mark.is-hinting .myr-my,
+  :root .topnav-logo-mark.is-hinting .myr-my-hit::after { animation: none; }
+}
+
+/* ── "Only my results": the filter-row chip ─────────────────────────────
+   Behaviour in assets/aimy-user-menu.js. Leads the filter row, where people
+   already trigger scoping, and shares its state with the logo's "MY". No
+   borders: off it is a plain person icon and a verb ("Show only
+   mine"), an invitation; on it fills with the QA violet and carries the
+   person's avatar and an ×, so the control is its own indicator. Locked, it
+   is filled with a lock and no ×. */
+:root [data-my-results-chip] {
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -207,26 +339,23 @@
   gap: 6px;
   min-height: 28px;
   padding: 0 11px 0 9px;
-  /* --d400 rather than a wash: the dashed outline is the whole off state,
-     so it has to read at a glance. */
-  border: 1px dashed var(--d400);
+  border: 0;
   border-radius: 9999px;
   background: transparent;
   color: var(--d200);
-  font-family: inherit;
+  font-family: "Urbanist", sans-serif;
   font-size: 12px;
   font-weight: 600;
   line-height: 1.4;
   white-space: nowrap;
   cursor: pointer;
-  transition: background var(--transition-fast, 150ms), border-color var(--transition-fast, 150ms), color var(--transition-fast, 150ms);
+  transition: background var(--transition-fast, 150ms), color var(--transition-fast, 150ms);
 }
 :root .myr-chip svg { width: 14px; height: 14px; flex-shrink: 0; }
-:root .myr-chip:hover { border-color: var(--qa-accent); color: var(--d50); background: rgba(var(--qa-accent-rgb), 0.08); }
+:root .myr-chip:hover { color: var(--d50); background: rgba(var(--qa-accent-rgb), 0.14); }
 :root .myr-chip.is-on {
   padding-left: 3px;
   padding-right: 5px;
-  border: 1px solid var(--qa-accent);
   background: rgba(var(--qa-accent-rgb), 0.18);
   color: var(--d50);
 }
@@ -254,7 +383,7 @@
   height: 22px;
   flex-shrink: 0;
   border-radius: 50%;
-  background: var(--qa-accent);
+  background: linear-gradient(135deg, #7c3aed, var(--brand));
   color: #fff;
   font-size: 9px;
   font-weight: 700;
@@ -268,6 +397,40 @@
 }
 /* Light theme: a lighter violet fill keeps the dark text at full contrast. */
 :root[data-theme="light"] .myr-chip.is-on { background: rgba(var(--qa-accent-rgb), 0.12); }
+
+/* ── The shell while the scope is on ───────────────────────────────────
+   html.is-my-scope (set by assets/aimy-user-menu.js only while a narrowable
+   area is on screen and the scope is on): an edge under the top bar, a tint
+   and ringed avatar on the profile pill, and "My" on the product tab. */
+@keyframes myrScopeFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+:root.is-my-scope .app-topnav::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  pointer-events: none;
+  background: linear-gradient(90deg, rgba(var(--qa-accent-rgb), 0), var(--qa-accent) 18%, var(--qa-accent) 82%, rgba(var(--qa-accent-rgb), 0));
+  animation: myrScopeFade 240ms var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1)) both;
+}
+:root.is-my-scope .topnav-user,
+:root.is-my-scope .topnav-user:hover {
+  border-color: rgba(var(--qa-accent-rgb), 0.45);
+  background: rgba(var(--qa-accent-rgb), 0.1);
+}
+:root.is-my-scope .topnav-avatar {
+  outline: 2px solid var(--qa-accent);
+  outline-offset: 1px;
+}
+:root .topnav-tab .myr-tab-my {
+  color: var(--qa-accent);
+  font-weight: 700;
+  animation: myrScopeFade 240ms var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1)) both;
+}
 
 @media (prefers-reduced-motion: reduce) {
   :root .um-panel,

@@ -7839,7 +7839,7 @@
   <link rel="stylesheet" href="assets/aimy-responsive.css?v=7" />
   <link rel="stylesheet" href="assets/aimy-scroll.css?v=1" />
   <link rel="stylesheet" href="assets/aimy-rail.css?v=8" />
-  <link rel="stylesheet" href="assets/aimy-user-menu.css?v=11" />
+  <link rel="stylesheet" href="assets/aimy-user-menu.css?v=21" />
   <script src="assets/aimy-viewport.js?v=6"></script>
   </head>
   <body>
@@ -11051,6 +11051,11 @@
                ══════════════════════════════════════════════════════════ -->
           <div class="view-pane" id="viewEvals" role="tabpanel" aria-labelledby="toggleEvals">
             <div class="eval-list-section" id="evalListAccountWide">
+
+              <!-- Marks the narrowable list for assets/aimy-user-menu.js: it
+                   shows the logo's "MY" control and the "My QA" shell while
+                   this is on screen. Empty on purpose. -->
+              <div data-my-results-area></div>
 
               <!-- ══ WHAT THIS TABLE IS LOOKING AT ═══════════════════════════
                    Three questions, not one list with eight filters on it.
@@ -24057,7 +24062,7 @@
         });
 
         /* ── Only my results ────────────────────────────────────────────
-           With the "Only my results" chip on (it leads the filter row,
+           With the "Only my results" chip on (it sits in the top bar,
            assets/aimy-user-menu.js), every tab lists the signed-in person's
            own evaluated work instead of the team's. That person is not one
            of the fixture agents, so their evaluations are sample rows of
@@ -24271,7 +24276,7 @@
           var out =
             /* "Only my results" leads the row, filled by
                assets/aimy-user-menu.js (AimyMyResults.paint below). */
-            '<span data-my-results-slot></span>' +
+            '<span data-my-results-chip></span>' +
             /* Search first, as every reference does. It matches the agent
                name too, which is why the agent dropdown could go. */
             '<span class="flt-search">' +
@@ -27101,7 +27106,7 @@
     <script src="assets/aimy-scroll.js?v=3"></script>
     <script src="assets/aimy-canvas.js?v=16"></script>
     <script src="assets/aimy-rail.js?v=8"></script>
-    <script src="assets/aimy-user-menu.js?v=14"></script>
+    <script src="assets/aimy-user-menu.js?v=23"></script>
     <script>
       /* The input docks float over the threads, so each thread needs to know how tall its dock is. */
       (function () {
