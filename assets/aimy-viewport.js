@@ -138,6 +138,14 @@
     root.setAttribute("data-rail", narrow ? "collapsed" : pref === "collapsed" ? "collapsed" : "open");
   })();
 
+  /* "ONLY MY RESULTS" MODE, PRE-PAINT. While it is on, the whole product
+     takes the QA violet (assets/aimy-user-menu.css), so the attribute has to
+     be on <html> before first paint or every page would flash blue first.
+     assets/aimy-user-menu.js owns it from here on. */
+  try {
+    if (localStorage.getItem("aimy-qa-view-my-qa") === "on") root.setAttribute("data-my-qa-mode", "on");
+  } catch (e) {}
+
   addEventListener("resize", schedule, { passive: true });
   addEventListener("orientationchange", schedule, { passive: true });
   if (window.visualViewport) {

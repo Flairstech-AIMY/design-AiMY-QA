@@ -189,6 +189,55 @@
   outline-offset: 1px;
 }
 
+/* ── The demo dock (Sales-style prototype controls) ─────────────────────
+   Behaviour in aimy-user-menu.js (mountDemoDock). A quiet 32px button with
+   a dashed edge in the bottom-right corner; the dashed edge says
+   "scaffolding, not product". Its panel opens upward, also dashed. The
+   segmented controls inside reuse the .um-demo rules above. */
+:root .um-proto {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 240;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  font-family: var(--font-sans, "Poppins", system-ui, sans-serif);
+}
+:root .um-proto-toggle {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px dashed var(--d500);
+  border-radius: 8px;
+  background: var(--card-bg);
+  color: var(--d300);
+  cursor: pointer;
+  transition: color var(--transition-fast, 150ms), border-color var(--transition-fast, 150ms);
+}
+:root .um-proto-toggle svg { width: 16px; height: 16px; }
+:root .um-proto-toggle:hover,
+:root .um-proto.is-open .um-proto-toggle { color: var(--d50); border-color: var(--d300); }
+:root .um-proto-toggle:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+:root .um-proto-panel {
+  order: -1;
+  width: 320px;
+  max-width: calc(100vw - 32px);
+  max-height: min(70vh, 560px);
+  overflow-y: auto;
+  padding: 12px;
+  border: 1px dashed var(--d500);
+  border-radius: 12px;
+  background: var(--card-bg);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(0, 0, 0, 0.2);
+  text-align: left;
+}
+:root .um-proto-panel[hidden] { display: none; }
+:root[data-theme="light"] .um-proto-panel { box-shadow: 0 12px 40px rgba(16, 24, 40, 0.14); }
+
 /* ── "Only my results": the filter chip and the scope heading ──────────
    Behaviour in assets/aimy-user-menu.js. The chip leads the filter row of
    the pages that fill [data-my-results-slot]. Off it is a dashed outline,
@@ -207,9 +256,10 @@
   gap: 6px;
   min-height: 28px;
   padding: 0 11px 0 9px;
-  /* --d400 rather than a wash: the dashed outline is the whole off state,
-     so it has to read at a glance. */
-  border: 1px dashed var(--d400);
+  /* Off, no outline, like the toolbar buttons beside it: the person icon
+     and "Show only mine" carry it. The border stays, transparent, so the
+     violet edge of the on state does not shift the row. */
+  border: 1px solid transparent;
   border-radius: 9999px;
   background: transparent;
   color: var(--d200);
@@ -222,7 +272,7 @@
   transition: background var(--transition-fast, 150ms), border-color var(--transition-fast, 150ms), color var(--transition-fast, 150ms);
 }
 :root .myr-chip svg { width: 14px; height: 14px; flex-shrink: 0; }
-:root .myr-chip:hover { border-color: var(--qa-accent); color: var(--d50); background: rgba(var(--qa-accent-rgb), 0.08); }
+:root .myr-chip:hover { color: var(--d50); background: rgba(var(--qa-accent-rgb), 0.08); }
 :root .myr-chip.is-on {
   padding-left: 3px;
   padding-right: 5px;
@@ -269,7 +319,283 @@
 /* Light theme: a lighter violet fill keeps the dark text at full contrast. */
 :root[data-theme="light"] .myr-chip.is-on { background: rgba(var(--qa-accent-rgb), 0.12); }
 
+/* ── The "Only my results" switch at the head of the profile menu ───────
+   One row in the menu's own geometry: the person's avatar, the mode and
+   what it does, its key, and a switch track. Every page has the profile
+   menu, so this is the switch on pages with no filter row for the chip. */
+:root .um-scope-switch {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--d100);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--transition-fast, 150ms);
+}
+:root .um-scope-switch:hover { background: var(--wash-3); }
+:root .um-scope-switch:focus-visible { outline: 2px solid var(--qa-accent); outline-offset: -2px; }
+:root .um-scope-switch:disabled { cursor: default; }
+:root .um-scope-switch .myr-av { width: 26px; height: 26px; font-size: 10px; }
+:root .um-scope-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+:root .um-scope-title { font-size: 12px; font-weight: 700; color: var(--d50); }
+:root .um-scope-sub { font-size: 10.5px; font-weight: 500; line-height: 1.35; color: var(--d400); }
+:root .um-scope-key {
+  min-width: 18px;
+  padding: 1px 5px;
+  border: 1px solid var(--wash-7);
+  border-radius: 4px;
+  color: var(--d300);
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.4;
+  text-align: center;
+}
+:root .um-switch {
+  position: relative;
+  flex-shrink: 0;
+  width: 28px;
+  height: 16px;
+  border-radius: 9999px;
+  background: var(--wash-7);
+  transition: background var(--transition-fast, 150ms);
+}
+:root .um-switch-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--d200);
+  transition: transform 180ms var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1)), background var(--transition-fast, 150ms);
+}
+:root .um-scope-switch[aria-checked="true"] .um-switch { background: var(--qa-accent); }
+:root .um-scope-switch[aria-checked="true"] .um-switch-thumb { transform: translateX(12px); background: #fff; }
+:root .um-scope-switch[aria-checked="true"] .um-scope-sub { color: var(--my-qa-text, #c9b0ff); }
+:root .um-sep { height: 1px; margin: 4px 4px; background: var(--wash-6); }
+
+/* ═══ "ONLY MY RESULTS" AS A MODE OF THE WHOLE PRODUCT ═══════════════════
+   Solution D (AIMY-2423 round 2): while the person is looking only at their
+   own work, the product swaps its blue for the QA violet, like a browser's
+   private mode, so "about me" is felt on every page and not only on the
+   chip. <html data-my-qa-mode="on"> is set before paint by aimy-viewport.js.
+
+   ONE TOKEN SWAP, NOT A RESTYLE. Every page reads the same tokens, so the
+   accent (--brand), AiMY's own text, links, surfaces, borders and the page
+   glow all follow; components keep their shapes. :root:root and the extra
+   attribute out-rank every page's own :root and light-theme blocks.
+
+   Contrast: --my-qa-text on the violet tints measures above 7:1 in dark and
+   6:1 in light; the violet is never the only signal, because the pill and
+   the chip say "Only my results" in words. */
+:root:root[data-my-qa-mode="on"] {
+  --my-qa-text: #c9b0ff;
+  --brand: #9b62ff;
+  --brand-dim: rgba(139, 79, 244, 0.18);
+  --ai-text: #b99bff;
+  --text-link: #b99bff;
+  --body-bg: #16121d;
+  --card-bg: #1a1524;
+  --card-bg-raised: #231b30;
+  --card-border: rgba(214, 194, 255, 0.12);
+  --glass-border: rgba(214, 194, 255, 0.14);
+  --grad-ellipse-1: radial-gradient(ellipse at center, rgba(139, 79, 244, 0.24) 0%, rgba(155, 98, 255, 0.11) 30%, transparent 62%);
+  --grad-ellipse-2: radial-gradient(ellipse at center, rgba(194, 120, 255, 0.12) 0%, rgba(139, 79, 244, 0.08) 38%, transparent 60%);
+}
+:root:root[data-my-qa-mode="on"][data-theme="light"] {
+  --my-qa-text: #5b2bbf;
+  --brand: #6a33d4;
+  --brand-dim: rgba(106, 51, 212, 0.12);
+  --ai-text: #5b2bbf;
+  --text-link: #5b2bbf;
+  --body-bg: #f6f2fd;
+  --card-bg: #ffffff;
+  --card-bg-raised: #faf7fe;
+  --card-border: rgba(106, 51, 212, 0.14);
+  --glass-border: rgba(106, 51, 212, 0.14);
+  --grad-ellipse-1: radial-gradient(ellipse at center, rgba(139, 79, 244, 0.10) 0%, rgba(155, 98, 255, 0.05) 30%, transparent 62%);
+  --grad-ellipse-2: radial-gradient(ellipse at center, rgba(194, 120, 255, 0.06) 0%, rgba(139, 79, 244, 0.04) 38%, transparent 60%);
+}
+/* Pages that paint the canvas straight from --body-bg pick the tint up
+   through the token; this covers the ones that set their own body colour. */
+:root[data-my-qa-mode="on"] body { background-color: var(--body-bg); }
+/* The insight rail paints a fixed blue-grey glass (aimy-rail.css) rather
+   than a token, so it is tinted here. Dark only: light keeps its white. */
+:root:root[data-my-qa-mode="on"]:not([data-theme="light"]) .app-sidebar .sidebar-nav,
+:root:root[data-my-qa-mode="on"]:not([data-theme="light"]) .rail-head {
+  background: rgba(26, 21, 36, 0.86);
+}
+
+/* The profile pill, active: the chip's violet, and "Only my results" under
+   the name in place of the job title. */
+:root .um-anchor .topnav-user.um-mine-on {
+  border-color: var(--qa-accent);
+  background: rgba(var(--qa-accent-rgb), 0.18);
+}
+:root .um-anchor .topnav-user.um-mine-on:hover,
+:root .um-anchor .topnav-user.um-mine-on[aria-expanded="true"] {
+  border-color: var(--qa-accent);
+  background: rgba(var(--qa-accent-rgb), 0.26);
+}
+:root .topnav-user.um-mine-on .topnav-avatar { background: var(--qa-accent); }
+/* With a profile photo the avatar shows it in both modes; the inline
+   background-image outranks the mode's background above. */
+:root .topnav-user .topnav-avatar.um-has-photo,
+:root .topnav-user.um-mine-on .topnav-avatar.um-has-photo {
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  color: transparent;
+}
+:root .topnav-user.um-mine-on .topnav-user-role { color: var(--my-qa-text, #c9b0ff); font-weight: 600; }
+:root .topnav-user.um-mine-on > svg { color: var(--my-qa-text, #c9b0ff); }
+:root[data-theme="light"] .um-anchor .topnav-user.um-mine-on { background: rgba(var(--qa-accent-rgb), 0.12); }
+
+/* The end cap (T6, design-strategy/my-results-tinted-cap-variants.html).
+   While the mode is on, the right end of the Ask AiMY bar is a tinted
+   capsule holding the person's photo, "Only mine", an × and the send button.
+   Photo and send are both 36px (send keeps its size in both states), 1px in from their ends, so the capsule's two
+   ends mirror each other. Off, the capsule is just the send button.
+
+   The scope's reveal animates a grid column (0fr to 1fr) and its opacity,
+   never a width or margin. Nothing outside the bar moves. */
+:root .aimy-float-bar { position: relative; transition: border-color 220ms var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1)); }
+:root .aimy-float-bar.myr-has-tag { border-color: rgba(var(--qa-accent-rgb), 0.6); }
+:root .aimy-float-bar.myr-has-tag .aimy-float-input,
+:root .overlay-input-bar.myr-has-tag .overlay-input { min-width: 0; }
+/* In the open chat the capsule sits on the input's bottom row, beside send. */
+:root .overlay-input-bar .myr-cap { align-self: flex-end; }
+:root .aimy-float-bar.myr-has-tag .aimy-float-hint { display: none; }
+
+:root .myr-cap {
+  flex: none;
+  display: flex;
+  align-items: center;
+  height: 38px;
+  margin-right: -1px;
+  border-radius: 9999px;
+  transition: background-color 220ms var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1));
+}
+:root .myr-cap.is-on {
+  padding-right: 1px;
+  background: rgba(var(--qa-accent-rgb), 0.32);
+}
+:root[data-theme="light"] .myr-cap.is-on { background: rgba(var(--qa-accent-rgb), 0.2); }
+
+:root .myr-cap-reveal {
+  display: grid;
+  grid-template-columns: 0fr;
+  transition: grid-template-columns 240ms var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1));
+}
+:root .myr-cap.is-on .myr-cap-reveal { grid-template-columns: 1fr; }
+:root .myr-cap-scope {
+  min-width: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+  color: var(--my-qa-text, #c9b0ff);
+  font-size: 11.5px;
+  font-weight: 600;
+  opacity: 0;
+  transition: opacity 140ms var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1));
+}
+:root .myr-cap.is-on .myr-cap-scope {
+  opacity: 1;
+  transition: opacity 200ms var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1)) 60ms;
+}
+:root .myr-cap-scope > :last-child { margin-right: 6px; }
+
+/* The face: the photo, or the initials as a deeper step of the tint. */
+:root .myr-cap-face {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 36px;
+  height: 36px;
+  margin-left: 1px;
+  border-radius: 50%;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+:root .myr-cap-face.is-initials {
+  background-color: rgba(var(--qa-accent-rgb), 0.36);
+  color: var(--my-qa-text, #c9b0ff);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+:root[data-theme="light"] .myr-cap-face.is-initials { background-color: rgba(var(--qa-accent-rgb), 0.22); }
+
+:root .myr-cap-x,
+:root .myr-cap-lock {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--my-qa-text, #c9b0ff);
+}
+:root .myr-cap-x { cursor: pointer; transition: background-color var(--transition-fast, 150ms); }
+/* A 32px hit area around the 22px ×, without moving the layout. */
+:root .myr-cap-x::before { content: ""; position: absolute; inset: -5px; }
+:root .myr-cap-x:hover { background: rgba(var(--qa-accent-rgb), 0.3); }
+:root .myr-cap-x:focus-visible { outline: 2px solid var(--my-qa-text, #c9b0ff); outline-offset: 1px; }
+:root .myr-cap-x svg,
+:root .myr-cap-lock svg { width: 12px; height: 12px; }
+
+/* A bounce on the way in: the face pops, then the words and the ×
+   settle, 40ms apart (--duration-stagger), on the gentle overshoot curve
+   (a stronger --ease-bounce, cubic-bezier(0.34, 1.8, 0.64, 1), by request).
+   Transform only. Leaving never bounces: a quick 150ms return. */
+:root .myr-cap-face,
+:root .myr-cap-text,
+:root .myr-cap-x,
+:root .myr-cap-lock {
+  transition: transform 150ms var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1));
+}
+:root .myr-cap:not(.is-on) .myr-cap-face { transform: scale(0.4); }
+:root .myr-cap:not(.is-on) .myr-cap-text { transform: translateX(12px); }
+:root .myr-cap:not(.is-on) .myr-cap-x,
+:root .myr-cap:not(.is-on) .myr-cap-lock { transform: scale(0.5); }
+:root .myr-cap.is-on .myr-cap-face,
+:root .myr-cap.is-on .myr-cap-text,
+:root .myr-cap.is-on .myr-cap-x,
+:root .myr-cap.is-on .myr-cap-lock {
+  transition: transform 520ms cubic-bezier(0.34, 1.8, 0.64, 1), background-color var(--transition-fast, 150ms);
+}
+:root .myr-cap.is-on .myr-cap-face { transition-delay: 40ms, 0s; }
+:root .myr-cap.is-on .myr-cap-text { transition-delay: 80ms, 0s; }
+:root .myr-cap.is-on .myr-cap-x,
+:root .myr-cap.is-on .myr-cap-lock { transition-delay: 120ms, 0s; }
+
+/* Phones: the words go (still read by screen readers via the × label and
+   the photo's name), the face and × stay. */
+@media (max-width: 759.98px) {
+  :root .myr-cap-text {
+    position: absolute; width: 1px; height: 1px; overflow: hidden;
+    clip-path: inset(50%); white-space: nowrap;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
+  :root .aimy-float-bar, :root .myr-cap, :root .myr-cap-reveal, :root .myr-cap-scope, :root .myr-cap.is-on .myr-cap-scope { transition: none; }
+  :root:root .myr-cap .myr-cap-face, :root:root .myr-cap .myr-cap-text, :root:root .myr-cap .myr-cap-x, :root:root .myr-cap .myr-cap-lock { transition: none; transform: none; }
+  :root .um-switch-thumb { transition: none; }
   :root .um-panel,
   :root .um-panel.is-open {
     transform: none;
