@@ -1,0 +1,20 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "bounce-easing",
+        "value": "cubic-bezier(0.34, 1.36, 0.64, 1)",
+        "createdAt": "2026-10-19T15:58:55.589Z",
+        "reason": "user confirmed: asked to 'put a little bounce in the animation when it is activated' for the Only my results end cap (2026-10-19); entrance only, --ease-bounce badge-pop token"
+      },
+      {
+        "rule": "bounce-easing",
+        "value": "cubic-bezier(0.34, 1.8, 0.64, 1)",
+        "createdAt": "2026-10-19T16:04:45.450Z",
+        "reason": "user confirmed: asked to 'make the bouncing more' on the Only my results end cap entrance (2026-10-19); entrance only, close stays 150ms without bounce"
+      }
+    ]
+  }
+}

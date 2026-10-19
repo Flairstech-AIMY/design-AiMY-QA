@@ -31,6 +31,14 @@
    focuses its first control; Escape closes it and returns focus; Tab out or
    a click elsewhere closes it.
 
+   MY RESULTS AS A MODE OF THE WHOLE PRODUCT (Solution D, AIMY-2423 round
+   2). While it is on, <html data-my-qa-mode="on"> swaps the product's blue for
+   the QA violet on every page (assets/aimy-user-menu.css), the profile pill
+   turns violet and reads "Only my results" under the name, and the profile
+   menu leads with an "Only my results" switch so pages without the chip can
+   change it too. M switches it anywhere. Only the Dashboard and Reviews
+   actually narrow their data; the other pages show the mode, not a filter.
+
    window.AimyUserMenu.open(focusFirst) opens the panel from elsewhere.
    window.AimyMyResults: isOn(), set(on, { toast }), isLocked(), fullName(),
    and paint(), which refills the slot for a page that redraws its filter row.
@@ -57,7 +65,17 @@
       if (on) localStorage.setItem(MY_QA_KEY, "on");
       else localStorage.removeItem(MY_QA_KEY);
     } catch (e) {}
+    applyMode(on);
     document.dispatchEvent(new CustomEvent("aimy:view-my-qa", { detail: { on: on } }));
+  }
+
+  /* THE MODE ON <html>. While it is on, the whole product takes the QA violet
+     (assets/aimy-user-menu.css): accent, links, AiMY text, surfaces, borders
+     and the background glow. assets/aimy-viewport.js sets it before first
+     paint; this keeps it true from then on. */
+  function applyMode(on) {
+    if (on) document.documentElement.setAttribute("data-my-qa-mode", "on");
+    else document.documentElement.removeAttribute("data-my-qa-mode");
   }
 
   /* ── "Only my results": the chip, the heading and the toast ─────────── */
@@ -98,9 +116,109 @@
 
   function paint() {
     var on = myQaOn(), locked = isLocked();
+    applyMode(on);
     document.querySelectorAll("[data-my-results-slot]").forEach(function (slot) {
       slot.innerHTML = chipHtml(on, locked) + '<span class="myr-divider" aria-hidden="true"></span>';
     });
+    paintPill(on);
+    paintSwitch(on, locked);
+    paintFloatTag(on, locked);
+  }
+
+  /* PROFILE PHOTOS. Prototype only: the signed-in person's photo by name.
+     A real build reads the account's own photo; anyone without one gets the
+     initials. Sample photo: Jake Nackos on Unsplash (Unsplash License),
+     standing in for Engy's own. */
+  var PHOTOS = { "Engy Yasser": "assets/avatar-sample-unsplash-jakenackos.jpg" };
+
+  /* THE END CAP (T6, design-strategy/my-results-tinted-cap-variants.html).
+     While the mode is on, the right end of the Ask AiMY bar becomes a tinted
+     capsule that holds your photo, "Only mine", an × and the send button.
+     The photo and send are the same size and inset, so the capsule's two
+     ends mirror each other, and the scope visibly travels with every
+     question. The send button is moved into the capsule, not copied, so its
+     listeners keep working (pages style it by class and find it by id).
+     Locked, a lock replaces the ×. Off, the capsule is just the send button. */
+  /* The same capsule sits in every AiMY composer on the page: the floating
+     Ask AiMY bar and the input of the open AiMY chat (#overlaySend). */
+  var CAP_SENDS = ["aimyFloatSend", "overlaySend"];
+  function paintFloatTag(on, locked) {
+    CAP_SENDS.forEach(function (id) {
+      var send = document.getElementById(id);
+      if (send) paintCap(send, on, locked);
+    });
+  }
+  function paintCap(send, on, locked) {
+    var cap = send.parentElement;
+    if (!cap.classList.contains("myr-cap")) {
+      cap = document.createElement("span");
+      cap.className = "myr-cap";
+      cap.innerHTML = '<span class="myr-cap-reveal"><span class="myr-cap-scope" role="status"></span></span>';
+      send.parentNode.insertBefore(cap, send);
+      cap.appendChild(send);
+    }
+    var bar = cap.parentElement;
+    var name = fullName(), photo = PHOTOS[name];
+    var face = photo
+      ? '<span class="myr-cap-face" role="img" aria-label="' + esc(name) + '" style="background-image:url(&quot;' + esc(photo) + '&quot;)"></span>'
+      : '<span class="myr-cap-face is-initials" aria-hidden="true">' + esc(initials()) + "</span>";
+    var scope = cap.querySelector(".myr-cap-scope");
+    /* Rebuild only when what it shows changes. Rewriting it on every paint
+       would hand the browser new elements already in the "on" state, and
+       the entrance would never animate. */
+    var key = (photo || initials()) + "|" + locked;
+    if (scope.getAttribute("data-key") !== key) {
+      scope.setAttribute("data-key", key);
+      scope.innerHTML = face + '<span class="myr-cap-text">Only mine</span>' +
+        (locked ? '<span class="myr-cap-lock" title="Your account shows only your own results">' + ICON_LOCK + "</span>"
+          : '<button class="myr-cap-x" type="button" data-myr-toggle aria-label="Show everyone’s results" title="Show everyone’s results">' + ICON_X + "</button>");
+      void scope.offsetWidth; /* commit the resting state before "on" */
+    }
+    scope.setAttribute("aria-hidden", String(!on));
+    var act = scope.querySelector("button");
+    if (act) act.tabIndex = on ? 0 : -1;
+    cap.classList.toggle("is-on", on);
+    bar.classList.toggle("myr-has-tag", on);
+    var stale = bar.querySelector(":scope > .myr-float-tag");
+    if (stale) stale.remove();
+  }
+
+  /* THE PROFILE PILL is where people look for who they are, so it carries the
+     mode too: violet like the chip, and the line under the name says the
+     scope instead of the job title. */
+  function paintPill(on) {
+    var pill = document.querySelector(".app-topnav .topnav-user");
+    if (!pill) return;
+    var role = pill.querySelector(".topnav-user-role");
+    if (role) {
+      if (!role.hasAttribute("data-role-text")) role.setAttribute("data-role-text", role.textContent.trim());
+      role.textContent = on ? "Only my results" : role.getAttribute("data-role-text");
+    }
+    pill.classList.toggle("um-mine-on", on);
+    /* The pill's avatar shows the same photo as the end cap; initials stay
+       in the markup as the fallback and for anything that reads text. */
+    var av = pill.querySelector(".topnav-avatar"), photo = PHOTOS[fullName()];
+    if (av && photo && !av.classList.contains("um-has-photo")) {
+      av.classList.add("um-has-photo");
+      av.style.backgroundImage = 'url("' + photo + '")';
+      av.setAttribute("aria-hidden", "true");
+    }
+    pill.setAttribute("aria-label", fullName() + (on ? ", showing only your results" : "") + ", account menu");
+  }
+
+  /* The switch in the profile menu, so every page can change the mode,
+     including pages with no filter row to hold the chip. */
+  function paintSwitch(on, locked) {
+    var sw = document.querySelector(".um-scope-switch");
+    if (!sw) return;
+    sw.setAttribute("aria-checked", String(on));
+    sw.disabled = locked;
+    var sub = sw.querySelector(".um-scope-sub");
+    if (sub) {
+      sub.textContent = locked ? "Your account shows only your own work"
+        : on ? "Every page shows only your own work"
+        : "Show only your own work on every page";
+    }
   }
 
   /* The toast reuses each page's .aimy-toast look in its own element, so its
@@ -164,11 +282,125 @@
       set(!myQaOn());
     });
     /* Another tab changed it. */
-    window.addEventListener("storage", function (e) { if (e.key === MY_QA_KEY) paint(); });
+    window.addEventListener("storage", function (e) {
+      if (e.key !== MY_QA_KEY) return;
+      paint();
+      document.dispatchEvent(new CustomEvent("aimy:view-my-qa", { detail: { on: myQaOn() } }));
+    });
+    /* M switches it on every page. Not while typing, and not with a modifier,
+       so it never steals a letter or a browser shortcut. */
+    document.addEventListener("keydown", function (e) {
+      if (e.key !== "m" && e.key !== "M") return;
+      if (e.ctrlKey || e.metaKey || e.altKey || e.repeat || e.defaultPrevented) return;
+      var t = e.target;
+      if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
+      if (isLocked()) return;
+      e.preventDefault();
+      set(!myQaOn());
+    });
     window.AimyMyResults = { isOn: myQaOn, set: set, isLocked: isLocked, fullName: fullName, paint: paint };
   }
 
   /* ── The profile pill and its demo-controls panel ───────────────────── */
+  /* ── The demo dock: the prototype's own switches, Sales-style ───────────
+     After design-aimy-sales' "Prototype controls": a quiet 32px button with
+     a dashed edge in the bottom-right corner (dashed says scaffolding, not
+     product), opening a dashed panel upward. Fixed, so it never pushes
+     anything; lifted above the Ask AiMY bar where the bar reaches the
+     corner. The page's own controls are moved in, not copied, so their
+     scripts keep working. A page with no demo controls shows no dock.
+     Escape, a click outside or Tab out of the panel closes it. */
+  var ICON_SLIDERS = '<svg class="lucide lucide-sliders-horizontal" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 5H3" /><path d="M12 19H3" /><path d="M14 3v4" /><path d="M16 17v4" /><path d="M21 12h-9" /><path d="M21 19h-5" /><path d="M21 5h-7" /><path d="M8 10v4" /><path d="M8 12H3" /></svg>';
+  function mountDemoDock() {
+    var found = DEMO_CONTROLS.map(function (c) {
+      return { c: c, el: document.querySelector(".app-topnav " + c.selector) };
+    }).filter(function (x) { return x.el; });
+    if (!found.length || document.getElementById("umProto")) return;
+
+    var dock = document.createElement("div");
+    dock.className = "um-proto";
+    dock.id = "umProto";
+    dock.innerHTML =
+      '<div class="um-proto-panel um-demo" id="umProtoPanel" role="dialog" aria-labelledby="umDemoTitle" hidden>' +
+        '<div class="um-demo-head">' + ICON_FLASK +
+          '<span class="um-demo-title" id="umDemoTitle">Demo controls</span>' +
+          '<span class="um-demo-tag">Prototype only</span>' +
+        "</div>" +
+        '<p class="um-demo-note">Switch what this prototype shows. These are not part of the product.</p>' +
+        '<div class="um-demo-rows"></div>' +
+      "</div>" +
+      '<button class="um-proto-toggle" id="umProtoToggle" type="button" aria-expanded="false" aria-controls="umProtoPanel" aria-label="Demo controls" title="Demo controls">' + ICON_SLIDERS + "</button>";
+    document.body.appendChild(dock);
+
+    var rows = dock.querySelector(".um-demo-rows");
+    found.forEach(function (x, i) {
+      var row = document.createElement("div");
+      row.className = "um-demo-row";
+      var label = document.createElement("span");
+      label.className = "um-demo-label";
+      label.textContent = x.c.label(x.el);
+      label.id = "umDemoLabel" + i;
+      x.el.setAttribute("aria-labelledby", label.id);
+      x.el.removeAttribute("aria-label");
+      row.appendChild(label);
+      row.appendChild(x.el);
+      rows.appendChild(row);
+    });
+
+    var panel = dock.querySelector(".um-proto-panel");
+    var toggle = dock.querySelector(".um-proto-toggle");
+    var open = false;
+    function setOpen(next, returnFocus) {
+      if (open === next) return;
+      open = next;
+      panel.hidden = !open;
+      dock.classList.toggle("is-open", open);
+      toggle.setAttribute("aria-expanded", String(open));
+      if (open) document.addEventListener("pointerdown", onOutside, true);
+      else {
+        document.removeEventListener("pointerdown", onOutside, true);
+        if (returnFocus) toggle.focus({ preventScroll: true });
+      }
+    }
+    function onOutside(e) { if (!dock.contains(e.target)) setOpen(false); }
+    toggle.addEventListener("click", function () { setOpen(!open); });
+    dock.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && open) { e.preventDefault(); e.stopPropagation(); setOpen(false, true); }
+    });
+    panel.addEventListener("focusout", function (e) {
+      if (open && e.relatedTarget && !dock.contains(e.relatedTarget)) setOpen(false);
+    });
+
+    /* Stay clear of the Ask AiMY bar (and the filter tray over it): when
+       they reach the dock's corner, sit 8px above them; otherwise 16px. */
+    /* The button only moves when the bar reaches its own corner (narrow
+       screens), never because the panel opened. The wider panel clears the
+       bar on its own by lifting itself, so the button stays under the
+       pointer that just pressed it. */
+    var lastBottom = null, lastLift = null;
+    function clearance(width) {
+      var need = 0, edge = window.innerWidth - 16 - width - 8;
+      ["#aimyFloatBar", "#filterTray", ".aimy-overlay.open .overlay-input-bar"].forEach(function (sel) {
+        var el = document.querySelector(sel);
+        if (!el) return;
+        var r = el.getBoundingClientRect();
+        if (r.width && r.height && r.right > edge) need = Math.max(need, Math.round(window.innerHeight - r.top + 8));
+      });
+      return need;
+    }
+    function place() {
+      var bottom = Math.max(16, clearance(32));
+      var panelBottom = bottom + 32 + 8;
+      var lift = Math.max(0, clearance(320) - panelBottom);
+      if (bottom !== lastBottom) { dock.style.bottom = bottom + "px"; lastBottom = bottom; }
+      if (lift !== lastLift) { panel.style.marginBottom = lift + "px"; lastLift = lift; }
+    }
+    place();
+    window.addEventListener("resize", place, { passive: true });
+    toggle.addEventListener("click", place);
+    setInterval(place, 600);
+  }
+
   function boot() {
     bootMyResults();
 
@@ -186,49 +418,27 @@
     pill.setAttribute("aria-haspopup", "dialog");
     pill.setAttribute("aria-expanded", "false");
     pill.setAttribute("aria-controls", "aimyUserMenu");
-    pill.setAttribute("aria-label", (name ? name.textContent.trim() + ", " : "") + "account and demo controls");
+    pill.setAttribute("aria-label", (name ? name.textContent.trim() + ", " : "") + "account menu");
     var chevron = pill.querySelector(":scope > svg");
     if (chevron) chevron.setAttribute("aria-hidden", "true");
 
+    /* The profile menu holds the person's own setting: Only my results.
+       The prototype's demo switches live in their own floating dock
+       (mountDemoDock), so they are never read as part of the account. */
     var panel = document.createElement("div");
     panel.className = "um-panel";
     panel.id = "aimyUserMenu";
     panel.setAttribute("role", "dialog");
-    panel.setAttribute("aria-labelledby", "umDemoTitle");
+    panel.setAttribute("aria-labelledby", "umScopeTitle");
     panel.innerHTML =
-      '<div class="um-demo">' +
-        '<div class="um-demo-head">' +
-          ICON_FLASK +
-          '<span class="um-demo-title" id="umDemoTitle">Demo controls</span>' +
-          '<span class="um-demo-tag">Prototype only</span>' +
-        "</div>" +
-        '<p class="um-demo-note">Switch what this prototype shows. These are not part of the product.</p>' +
-        '<div class="um-demo-rows"></div>' +
-      "</div>";
+      '<button class="um-scope-switch" type="button" role="switch" aria-checked="false" data-myr-toggle aria-keyshortcuts="M">' +
+        avatar() +
+        '<span class="um-scope-text"><span class="um-scope-title" id="umScopeTitle">Only my results</span><span class="um-scope-sub"></span></span>' +
+        '<kbd class="um-scope-key" aria-hidden="true">M</kbd>' +
+        '<span class="um-switch" aria-hidden="true"><span class="um-switch-thumb"></span></span>' +
+      "</button>";
     anchor.appendChild(panel);
-
-    var rows = panel.querySelector(".um-demo-rows");
-    DEMO_CONTROLS.forEach(function (c) {
-      var el = document.querySelector(".app-topnav " + c.selector);
-      if (!el) return;
-      var row = document.createElement("div");
-      row.className = "um-demo-row";
-      var label = document.createElement("span");
-      label.className = "um-demo-label";
-      label.textContent = c.label(el);
-      label.id = "umDemoLabel" + rows.children.length;
-      el.setAttribute("aria-labelledby", label.id);
-      el.removeAttribute("aria-label");
-      row.appendChild(label);
-      row.appendChild(el);
-      rows.appendChild(row);
-    });
-    if (!rows.children.length) {
-      var none = document.createElement("p");
-      none.className = "um-demo-empty";
-      none.textContent = "This page has no demo controls.";
-      rows.appendChild(none);
-    }
+    mountDemoDock();
 
     var open = false;
     function focusables() {
@@ -278,6 +488,7 @@
     window.AimyUserMenu = {
       open: function (focusFirst) { setOpen(true, !!focusFirst); }
     };
+    paint();
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
