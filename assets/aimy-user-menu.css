@@ -382,32 +382,23 @@
 :root .um-sep { height: 1px; margin: 4px 4px; background: var(--wash-6); }
 
 /* ═══ "ONLY MY RESULTS" AS A MODE OF THE WHOLE PRODUCT ═══════════════════
-   Solution D (AIMY-2423 round 2): while the person is looking only at their
-   own work, the product swaps its blue for the QA violet, like a browser's
-   private mode, so "about me" is felt on every page and not only on the
-   chip. <html data-my-qa-mode="on"> is set before paint by aimy-viewport.js.
+   While the person is looking only at their own work, the product's accent
+   swaps from blue to the QA violet (links, AiMY's own text, the brand
+   accent), and the chip, the profile pill and the composer's end cap say
+   "Only my results" in words. <html data-my-qa-mode="on"> is set before
+   paint by aimy-viewport.js.
 
-   ONE TOKEN SWAP, NOT A RESTYLE. Every page reads the same tokens, so the
-   accent (--brand), AiMY's own text, links, surfaces, borders and the page
-   glow all follow; components keep their shapes. :root:root and the extra
-   attribute out-rank every page's own :root and light-theme blocks.
-
-   Contrast: --my-qa-text on the violet tints measures above 7:1 in dark and
-   6:1 in light; the violet is never the only signal, because the pill and
-   the chip say "Only my results" in words. */
+   THE BACKGROUND STAYS AS IT IS. The page, cards, borders, the background
+   glow and the insight rail keep their normal colours in this mode; an
+   earlier pass tinted them violet too, and that was taken back by request.
+   :root:root and the extra attribute out-rank every page's own :root and
+   light-theme blocks. */
 :root:root[data-my-qa-mode="on"] {
   --my-qa-text: #c9b0ff;
   --brand: #9b62ff;
   --brand-dim: rgba(139, 79, 244, 0.18);
   --ai-text: #b99bff;
   --text-link: #b99bff;
-  --body-bg: #16121d;
-  --card-bg: #1a1524;
-  --card-bg-raised: #231b30;
-  --card-border: rgba(214, 194, 255, 0.12);
-  --glass-border: rgba(214, 194, 255, 0.14);
-  --grad-ellipse-1: radial-gradient(ellipse at center, rgba(139, 79, 244, 0.24) 0%, rgba(155, 98, 255, 0.11) 30%, transparent 62%);
-  --grad-ellipse-2: radial-gradient(ellipse at center, rgba(194, 120, 255, 0.12) 0%, rgba(139, 79, 244, 0.08) 38%, transparent 60%);
 }
 :root:root[data-my-qa-mode="on"][data-theme="light"] {
   --my-qa-text: #5b2bbf;
@@ -415,22 +406,6 @@
   --brand-dim: rgba(106, 51, 212, 0.12);
   --ai-text: #5b2bbf;
   --text-link: #5b2bbf;
-  --body-bg: #f6f2fd;
-  --card-bg: #ffffff;
-  --card-bg-raised: #faf7fe;
-  --card-border: rgba(106, 51, 212, 0.14);
-  --glass-border: rgba(106, 51, 212, 0.14);
-  --grad-ellipse-1: radial-gradient(ellipse at center, rgba(139, 79, 244, 0.10) 0%, rgba(155, 98, 255, 0.05) 30%, transparent 62%);
-  --grad-ellipse-2: radial-gradient(ellipse at center, rgba(194, 120, 255, 0.06) 0%, rgba(139, 79, 244, 0.04) 38%, transparent 60%);
-}
-/* Pages that paint the canvas straight from --body-bg pick the tint up
-   through the token; this covers the ones that set their own body colour. */
-:root[data-my-qa-mode="on"] body { background-color: var(--body-bg); }
-/* The insight rail paints a fixed blue-grey glass (aimy-rail.css) rather
-   than a token, so it is tinted here. Dark only: light keeps its white. */
-:root:root[data-my-qa-mode="on"]:not([data-theme="light"]) .app-sidebar .sidebar-nav,
-:root:root[data-my-qa-mode="on"]:not([data-theme="light"]) .rail-head {
-  background: rgba(26, 21, 36, 0.86);
 }
 
 /* The profile pill, active: the chip's violet, and "Only my results" under
