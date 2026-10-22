@@ -1,0 +1,425 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><title>Product Insights Cases</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap">
+</head><body>
+<style>
+/* Layout: one reading column. One shared conversation mock, then five variants of the dashboard block that leads into it. Mocks use AiMY QA tokens verbatim. */
+:root{
+  --bg:#f5f5f8; --surface:#ffffff; --line:#dcdbe6; --fg:#15161c; --fg2:#383a46;
+  --accent:#3369ff; --accent-soft:#e8eeff; --good:#16714a; --bad:#ae2530;
+  --display:"Urbanist",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#101114; --surface:#18191e; --line:#2c2d36; --fg:#ececf2; --fg2:#c3c4cf;
+  --accent:#7ea7ff; --accent-soft:#1a2340; --good:#4ed6a1; --bad:#ff7282; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#101114; --surface:#18191e; --line:#2c2d36; --fg:#ececf2; --fg2:#c3c4cf;
+  --accent:#7ea7ff; --accent-soft:#1a2340; --good:#4ed6a1; --bad:#ff7282; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--display);font-size:15px;line-height:1.6}
+.wrap{max-width:1120px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:44px 88px}
+h1,h2,h3{line-height:1.12;margin:0;text-wrap:balance;letter-spacing:-.01em}
+h1{font-size:clamp(34px,5.4vw,52px);font-weight:800;letter-spacing:-.02em}
+h2{font-size:26px;font-weight:700}
+h3{font-size:21px;font-weight:700}
+p{margin:0;max-width:66ch}
+a{color:var(--accent);text-underline-offset:3px}
+ul{margin:0;padding-left:20px;display:grid;gap:6px;max-width:74ch}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.lede{font-size:17px;color:var(--fg2);margin-top:14px}
+section{display:grid;gap:14px;margin-top:52px}
+.decided{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:6px}
+.dc{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:grid;gap:3px;font-size:13.5px}
+.dc b{font-size:15px}.dc small{color:var(--fg2)}
+.variant{display:grid;gap:16px;margin-top:56px;padding-top:28px;border-top:1px solid var(--line)}
+.v-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 14px}
+.v-id{font-weight:800;font-size:15px;color:var(--accent);background:var(--accent-soft);border-radius:8px;padding:1px 9px}
+.tag-rec{font-size:12px;font-weight:600;color:var(--good);border:1px solid currentColor;border-radius:999px;padding:1px 10px}
+.v-sum{color:var(--fg2)}
+.demo{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:13px}
+.demo b{font-weight:600;margin-right:2px}
+.demo button{font:inherit;font-size:13px;color:var(--fg);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:4px 12px;cursor:pointer}
+.demo button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+.where{font-size:14px}.where b{font-weight:600}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px 28px}
+.cols h4{margin:0 0 6px;font-size:14px;font-weight:600}
+.cols .pro h4{color:var(--good)} .cols .con h4{color:var(--bad)}
+.refs{font-size:13px;color:var(--fg2)}
+.callout{margin-top:56px;background:var(--accent-soft);border-radius:16px;padding:24px;display:grid;gap:12px}
+button:focus-visible,.mock:focus-visible,.mock button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* AiMY QA mock. Tokens from design-system-new.md: body-bg, card-bg, card-bg-raised, card-border, brand, qa-accent, teal, ok/warn/err, d50/d300/d400, radii. */
+.scroller{overflow-x:auto;border-radius:14px}
+.mock{
+  --body:#0f1215; --card:#141b24; --raised:#1c2630; --bd:rgba(255,255,255,.07); --bdh:rgba(255,255,255,.14);
+  --d50:#f5f7fb; --d300:#a8b5c5; --d400:#93a2b4; --d700:#2e3d50;
+  --brand:#3369ff; --brand-bg:rgba(51,105,255,.14); --qa:#8b4ff4; --qa-bg:rgba(139,79,244,.14); --qa-bd:rgba(139,79,244,.22);
+  --teal:#45d3e6; --ok:#4ed6a1; --ok-bg:rgba(78,214,161,.14); --warn:#f7c95c; --warn-bg:rgba(247,201,92,.14); --err:#ff7282; --err-bg:rgba(255,114,130,.14);
+  position:relative;min-width:960px;background:var(--body);color:var(--d50);
+  font:12px/1.45 "Urbanist",system-ui,sans-serif;border-radius:14px;overflow:hidden;border:1px solid var(--bd)
+}
+:where(.mock button){font:inherit;color:inherit;background:none;border:0;cursor:pointer;padding:0;text-align:left}
+.mock svg{width:15px;height:15px;flex:none}
+.m-nav{display:flex;align-items:center;gap:14px;height:48px;padding:0 14px;border-bottom:1px solid var(--bd);background:var(--card)}
+.m-logo{display:flex;align-items:center;gap:7px;font-weight:800;font-size:16px;color:var(--d50)}
+.m-logo i{width:18px;height:18px;border-radius:5px;background:linear-gradient(104deg,#0066ff,#61adf1 47%,#45d3e6);display:inline-block}
+.m-tabs{display:flex;gap:2px;margin:0 auto;border:1px solid var(--bd);border-radius:9999px;padding:3px}
+.m-tabs span{padding:4px 12px;border-radius:9999px;color:var(--d300)}
+.m-tabs span.on{background:var(--qa-bg);color:var(--d50)}
+.m-right{display:flex;align-items:center;gap:8px}
+.m-ib{width:30px;height:30px;border-radius:8px;border:1px solid var(--bd);display:grid;place-items:center;color:var(--d300)}
+.m-pill{display:flex;align-items:center;gap:8px;border:1px solid var(--bd);border-radius:9999px;padding:3px 10px 3px 3px}
+.m-pill .t{display:grid;line-height:1.2}.m-pill b{font-weight:600}.m-pill small{font-size:10px;color:var(--d300)}
+.m-av{width:24px;height:24px;border-radius:8px;background:linear-gradient(135deg,#7c3aed,#3369ff);color:#fff;font-size:9px;font-weight:700;display:inline-grid;place-items:center;flex:none}
+.m-shell{display:flex;height:470px;position:relative}
+.m-rail{width:178px;flex:none;border-right:1px solid var(--bd);background:var(--card);padding:12px 10px;display:flex;flex-direction:column;gap:3px}
+.m-rail-h{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--d400);padding:2px 8px 8px}
+.m-ri{display:flex;align-items:center;gap:8px;width:100%;padding:8px;border-radius:8px;color:var(--d300)}
+.m-ri.on{background:var(--qa-bg);color:var(--d50)}
+.m-ri span{flex:1}.m-ri em{font-style:normal;font-weight:600;color:var(--d50);font-variant-numeric:tabular-nums}
+.m-main{flex:1;min-width:0;position:relative;padding:14px 18px 64px;display:flex;flex-direction:column;gap:10px;overflow:hidden}
+.m-ph{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.m-ph h5{margin:0;font-size:17px;font-weight:700;letter-spacing:-.01em}
+.m-ph span{color:var(--d300);font-size:11px}
+.m-filters{display:flex;gap:4px;color:var(--d300);flex-wrap:wrap}
+.m-filters>span{display:flex;align-items:center;gap:5px;padding:5px 9px;border-radius:8px}
+.m-filters .flt{color:var(--qa);background:var(--qa-bg)}
+.m-two{display:grid;grid-template-columns:minmax(0,1fr) 230px;gap:10px;align-items:start}
+.bcard{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:14px 16px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.bmeta{display:flex;align-items:center;gap:8px;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--teal)}
+.bmeta small{margin-left:auto;font-weight:500;letter-spacing:0;text-transform:none;color:var(--d400);font-size:11px}
+.bconc{font-size:13.5px;font-weight:600;line-height:1.5;color:var(--d50)}
+.bconc i{font-style:normal;color:var(--warn)}
+.bconc a{color:var(--d50);text-decoration:underline;text-decoration-color:var(--qa);text-underline-offset:3px;cursor:pointer}
+.ev{display:flex;flex-wrap:wrap;gap:6px}
+.ev span{border:1px solid var(--bd);background:rgba(255,255,255,.03);border-radius:20px;padding:2px 9px;font-size:11px;color:var(--d300)}
+.ev span b{color:var(--d50);font-weight:600}
+.stmt{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:3px 10px;align-items:center;padding:8px 0;border-top:1px solid var(--bd)}
+.stmt b{font-weight:600;font-size:12.5px}
+.stmt .n{font-family:"JetBrains Mono",monospace;font-size:10.5px;color:var(--d300);white-space:nowrap}
+.stmt .q{grid-column:1/-1}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--bd);border-radius:9999px;padding:4px 10px;font-size:11px;font-weight:600;color:var(--d300)}
+.chip.q{color:var(--d50);border-color:var(--qa-bd);background:var(--qa-bg)}
+.chip svg{width:12px;height:12px;color:var(--qa)}
+.st{font-weight:700;font-size:9.5px;letter-spacing:.04em;text-transform:uppercase;border-radius:9999px;padding:2px 7px;white-space:nowrap}
+.st.det{color:var(--d300);background:rgba(255,255,255,.07)}.st.rec{color:var(--warn);background:var(--warn-bg)}.st.dra{color:#d6c2ff;background:var(--qa-bg)}.st.new{color:var(--ok);background:var(--ok-bg)}
+.list .row{display:flex;align-items:center;gap:10px;padding:7px 0;border-top:1px solid var(--bd);width:100%;border-radius:6px}
+.list .row:first-of-type{border-top:0}
+.list .row b{flex:1;font-weight:600;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.list .row .n{font-family:"JetBrains Mono",monospace;font-size:10.5px;color:var(--d300)}
+.side{display:grid;gap:8px}
+.side .k{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--d400)}
+.side .v{font-size:22px;font-weight:700;line-height:1.1;font-variant-numeric:tabular-nums}
+.side .s{color:var(--d300);font-size:11px}
+.inline-ask{display:flex;align-items:center;gap:8px;border:1px solid var(--qa-bd);border-radius:9999px;padding:6px 6px 6px 10px;background:var(--raised)}
+.inline-ask .ph{flex:1;color:var(--d300)}
+.inline-ask .go{width:26px;height:26px;border-radius:50%;background:var(--brand);display:grid;place-items:center;color:#fff}
+.sugg{display:flex;gap:6px;flex-wrap:wrap}
+.cnt{display:inline-grid;place-items:center;min-width:18px;height:18px;border-radius:9999px;background:var(--qa);color:#fff;font-size:10px;font-weight:700;padding:0 5px}
+.float{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);width:min(560px,86%);display:flex;align-items:center;gap:10px;padding:6px 6px 6px 8px;border-radius:9999px;background:var(--raised);border:1px solid var(--bd);box-shadow:0 10px 30px rgba(0,0,0,.45);z-index:2}
+.float .ph{flex:1;color:var(--d300);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.float .go{width:28px;height:28px;border-radius:50%;background:var(--brand);display:grid;place-items:center;color:#fff}
+.float .mk{width:26px;height:26px;border-radius:8px;background:rgba(70,40,140,.35);border:1px solid var(--qa-bd);display:grid;place-items:center;color:var(--teal)}
+/* Canvas overlay: blur, no black dim; thread max 720; badge top center; close top right */
+.ov{position:absolute;inset:0;backdrop-filter:blur(28px) saturate(1.4) brightness(.85);background:rgba(15,18,21,.35);z-index:5;display:flex;justify-content:center}
+.ov-badge{position:absolute;top:14px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:6px;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--d400);border:1px solid var(--bd);border-radius:9999px;padding:4px 10px;background:var(--card)}
+.ov-badge i{width:12px;height:12px;border-radius:3px;background:linear-gradient(104deg,#0066ff,#61adf1 47%,#45d3e6);display:inline-block}
+.ov-close{position:absolute;top:10px;right:14px;width:30px;height:30px;border-radius:10px;border:1px solid var(--bd);background:var(--card);display:grid;place-items:center;color:var(--d300)}
+.thread{width:min(720px,90%);display:flex;flex-direction:column;gap:12px;padding:52px 0 60px;overflow:auto}
+.msg{display:flex;gap:10px;align-items:flex-start;padding:0 4px}
+.msg.user{flex-direction:row-reverse}
+.mav{width:28px;height:28px;border-radius:8px;flex:none;display:grid;place-items:center;font-size:9px;font-weight:700;color:#fff}
+.mav.ai{background:rgba(70,40,140,.35);border:1px solid rgba(139,79,244,.3);color:var(--teal)}
+.mav.me{background:linear-gradient(135deg,#7c3aed,#3369ff)}
+.bub{max-width:560px;padding:11px 14px;font-size:12.5px;line-height:1.55;color:var(--d50)}
+.msg.ai .bub{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:4px 12px 12px 12px;display:grid;gap:9px;max-width:600px}
+.msg.user .bub{background:var(--qa-bg);border:1px solid var(--qa-bd);border-radius:12px 4px 12px 12px}
+.basis{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.basis .lab{font-size:9.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--teal)}
+.basis span:not(.lab){font-size:10px;color:var(--d300);border:1px solid var(--bd);border-radius:9999px;padding:1px 7px}
+.basis b{color:var(--d50);font-weight:600}
+.part{display:grid;gap:5px;padding:8px 10px;border-radius:10px;background:rgba(0,0,0,.2);border:1px solid var(--bd)}
+.part .lab{font-size:9.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--d400);display:flex;gap:7px;align-items:center}
+.part .lab i{width:7px;height:7px;border-radius:50%;background:var(--d400)}
+.part.calls .lab i{background:var(--brand)}.part.res .lab i{background:var(--warn)}
+.part.sug{background:rgba(0,102,255,.07);border-color:rgba(0,102,255,.22)}.part.sug .lab{color:#61adf1}.part.sug .lab i{background:#61adf1}
+.part p{margin:0;max-width:none;font-size:12px}
+.part p b{font-weight:600}
+.qt{display:flex;gap:8px;align-items:center;font-size:11.5px;color:var(--d300)}
+.qt span{flex:1;border-left:2px solid var(--qa-bd);padding-left:8px}
+.qt button{color:var(--teal);font-weight:600;white-space:nowrap;font-size:11px}
+.src{font-size:10.5px;color:var(--d400)}.src b{color:var(--d300);font-weight:500}
+.evtag{display:inline-block;font-size:9.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;border-radius:9999px;padding:1px 7px;background:var(--warn-bg);color:var(--warn);margin-right:6px}
+.btns{display:flex;gap:6px;flex-wrap:wrap}
+.btn{border:1px solid var(--bd);border-radius:8px;padding:5px 10px;font-weight:700;font-size:11px;color:var(--d50)}
+.btn.pri{background:var(--brand);border-color:var(--brand);color:#fff}
+.btn.ghost{color:var(--d300)}
+.draft{background:rgba(0,0,0,.2);border:1px solid var(--bd);border-radius:10px;padding:9px 10px;font-size:11.5px;display:grid;gap:3px}
+.draft .add{color:var(--ok)}
+.rank{display:grid;gap:5px}
+.rank .r{display:flex;gap:8px;align-items:center;font-size:11.5px}
+.rank .r b{flex:1;font-weight:600;min-width:0}
+.rank .bar{width:90px;height:5px;border-radius:3px;background:rgba(255,255,255,.08);position:relative;overflow:hidden}
+.rank .bar i{position:absolute;inset:0 auto 0 0;background:var(--brand);border-radius:3px}
+.rank .n{font-family:"JetBrains Mono",monospace;font-size:10.5px;color:var(--d300);white-space:nowrap}
+.dots{display:flex;gap:4px;align-items:center;height:14px}.dots i{width:6px;height:6px;border-radius:50%;background:var(--d400);animation:tb 1s ease-in-out infinite}.dots i:nth-child(2){animation-delay:.15s}.dots i:nth-child(3){animation-delay:.3s}
+@keyframes tb{0%,100%{transform:translateY(0);opacity:.4}50%{transform:translateY(-3px);opacity:1}}
+.ov-sugg{position:absolute;left:50%;bottom:54px;transform:translateX(-50%);display:flex;gap:7px;flex-wrap:wrap;justify-content:center;width:min(720px,90%);z-index:6}
+.ov-sugg .chip{background:var(--card)}
+.ov-in{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);width:min(720px,90%);display:flex;align-items:center;gap:10px;padding:6px 6px 6px 12px;border-radius:9999px;background:var(--raised);border:1px solid var(--qa-bd);box-shadow:0 0 0 3px var(--qa-bg);z-index:6}
+.ov-in .ph{flex:1;color:var(--d300)}
+.ov-in .go{width:28px;height:28px;border-radius:50%;background:var(--brand);display:grid;place-items:center;color:#fff}
+.toast{position:absolute;left:50%;bottom:62px;transform:translate(-50%,8px);opacity:0;pointer-events:none;display:flex;align-items:center;gap:12px;padding:8px 8px 8px 12px;border-radius:12px;background:var(--raised);border:1px solid var(--bdh);box-shadow:0 12px 28px rgba(0,0,0,.45);transition:opacity .2s ease,transform .2s ease;z-index:9;white-space:nowrap}
+.toast.show{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+.toast .tx{display:grid;line-height:1.3}.toast b{font-weight:600}.toast small{color:var(--d300);font-size:10.5px}
+.toast button{font-weight:700;color:#d6c2ff;padding:4px 9px;border-radius:7px}
+@media (prefers-reduced-motion: reduce){.dots i{animation:none}.toast{transition:none}}
+
+.skel{height:11px;border-radius:6px;background:linear-gradient(90deg,rgba(255,255,255,.06),rgba(255,255,255,.12),rgba(255,255,255,.06));background-size:200% 100%;animation:sh 1.4s ease-in-out infinite;display:block}
+@keyframes sh{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.empty{display:grid;gap:3px;color:var(--d300);font-size:12px;padding:6px 0}.empty b{color:var(--d50);font-weight:600;font-size:12.5px}.empty.good b{color:var(--ok)}
+.note{font-size:11px;color:var(--warn);display:flex;gap:6px;align-items:center}
+.lock{display:inline-flex;align-items:center;gap:6px;font-size:11px;color:#d6c2ff;background:var(--qa-bg);border:1px solid var(--qa-bd);border-radius:9999px;padding:2px 9px;justify-self:start}
+.case-when{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px 28px;font-size:14px}
+.case-when h4{margin:0 0 4px;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--fg2)}
+.case-when p{max-width:none}
+@media (prefers-reduced-motion: reduce){.skel{animation:none}}
+</style>
+<div class="wrap">
+  <p class="eyebrow">Product Insights, cases sheet</p>
+  <h1>Every case, and what the design does</h1>
+  <p class="lede">The Dashboard uses variant A, three statements with ready questions, and the depth lives in the AiMY conversation. This sheet walks through the situations a QA manager can land in, from the first visit to a filter change mid-conversation, and shows the design's answer to each. Every mock is live and uses illustrative data.</p>
+
+  <section>
+    <h2>The happy path</h2>
+    <p class="v-sum">Cases 1 to 6 are one journey: notice, ask, read the evidence, see where the research is, act, and come back later.</p>
+  </section>
+
+  <article class="variant" id="c1">
+    <div class="v-head"><span class="v-id">Case 1</span><h3>First visit: notice what recurs</h3></div>
+    <div class="case-when"><div><h4>When</h4><p>A QA manager opens the Dashboard for Product A. They have not asked anything yet.</p></div><div><h4>What the design does</h4><p>The insights card leads with one conclusion, then the three issues that matter most this period, each with its count, work state and a question ready to send. The scope line says exactly which calls this is based on.</p></div></div>
+    <div class="scroller"><div class="mock" data-v="a" data-case="c1" tabindex="0" aria-label="First visit: notice what recurs, live mock"></div></div>
+    <p class="where"><b>Try it:</b> click a question chip.</p>
+  </article>
+
+  <article class="variant" id="c2">
+    <div class="v-head"><span class="v-id">Case 2</span><h3>Investigate one issue</h3></div>
+    <div class="case-when"><div><h4>When</h4><p>The manager clicks "Why do customers find setup unclear?".</p></div><div><h4>What the design does</h4><p>The conversation opens over the Dashboard with the question already sent. AiMY answers in one message: Based on chips, From your calls with quotes that open the call, External research with its source and date, and the Suggested next step in AiMY blue with its own basis line.</p></div></div>
+    <div class="scroller"><div class="mock" data-v="a" data-case="c2" tabindex="0" aria-label="Investigate one issue, live mock"></div></div>
+    <p class="where"><b>Try it:</b> open a call, dismiss the suggestion and undo it.</p>
+  </article>
+
+  <article class="variant" id="c3">
+    <div class="v-head"><span class="v-id">Case 3</span><h3>Research is not available</h3></div>
+    <div class="case-when"><div><h4>When</h4><p>Same question, but comparable-product research has not run for this issue.</p></div><div><h4>What the design does</h4><p>The research part says so in one sentence with the reason, and nothing is invented. The Based on chips lose the source chip. The suggestion stays, labelled as based on your calls only, and the knowledge action stays with it.</p></div></div>
+    <div class="scroller"><div class="mock" data-v="a" data-case="c3" tabindex="0" aria-label="Research is not available, live mock"></div></div>
+    
+  </article>
+
+  <article class="variant" id="c4">
+    <div class="v-head"><span class="v-id">Case 4</span><h3>Which customers keep repeating</h3></div>
+    <div class="case-when"><div><h4>When</h4><p>The manager wants the pattern by customer rather than by issue.</p></div><div><h4>What the design does</h4><p>They ask in the chat, from the card chip or by typing. AiMY answers with a sentence and a short ranked list of business units with counts, each with a follow-up. No Group by control, no table on the page.</p></div></div>
+    <div class="scroller"><div class="mock" data-v="a" data-case="c4" tabindex="0" aria-label="Which customers keep repeating, live mock"></div></div>
+    
+  </article>
+
+  <article class="variant" id="c5">
+    <div class="v-head"><span class="v-id">Case 5</span><h3>Act: draft a knowledge article</h3></div>
+    <div class="case-when"><div><h4>When</h4><p>The manager agrees with the suggestion and wants the article fixed.</p></div><div><h4>What the design does</h4><p>AiMY writes the draft into the thread as a reviewed action: the text, what it is based on, where it goes, and Accept, Edit, Reject. Accept sends it to the Knowledge review queue, the toast offers Undo, and the issue turns Drafted on the card.</p></div></div>
+    <div class="scroller"><div class="mock" data-v="a" data-case="c5" tabindex="0" aria-label="Act: draft a knowledge article, live mock"></div></div>
+    <p class="where"><b>Try it:</b> accept, undo from the toast, or reject.</p>
+  </article>
+
+  <article class="variant" id="c6">
+    <div class="v-head"><span class="v-id">Case 6</span><h3>Coming back a week later</h3></div>
+    <div class="case-when"><div><h4>When</h4><p>The manager returns to the same issue after sending the draft.</p></div><div><h4>What the design does</h4><p>The card shows Drafted. Opening the chat continues the earlier thread instead of starting over: AiMY says what was sent, where it stands, and what changed since, with the next questions ready.</p></div></div>
+    <div class="scroller"><div class="mock" data-v="a" data-case="c6" tabindex="0" aria-label="Coming back a week later, live mock"></div></div>
+    
+  </article>
+
+  <section>
+    <h2>When the data is not what the user expects</h2>
+    <p class="v-sum">Cases 7 to 12 are the states the happy path does not show. Each says what is missing and offers a way forward; none shows a blank card.</p>
+  </section>
+
+  <article class="variant" id="c7">
+    <div class="v-head"><span class="v-id">Case 7</span><h3>No calls in this period</h3></div>
+    <div class="case-when"><div><h4>When</h4><p>The selected period has no analyzed calls for Product A.</p></div><div><h4>What the design does</h4><p>The card says so, names the last analyzed call, and offers the two moves that usually fix it as questions: a longer period or a wider product scope.</p></div></div>
+    <div class="scroller"><div class="mock" data-v="a" data-case="c7" tabindex="0" aria-label="No calls in this period, live mock"></div></div>
+    
+  </article>
+
+  <article class="variant" id="c8">
+    <div class="v-head"><span class="v-id">Case 8</span><h3>Nothing is recurring</h3></div>
+    <div class="case-when"><div><h4>When</h4><p>Calls exist, but no issue crossed the recurring threshold.</p></div><div><h4>What the design does</h4><p>This is good news and looks like it. The card states the rule in plain words so the user knows what "recurring" means here, and offers to show the one-off problems instead.</p></div></div>
+    <div class="scroller"><div class="mock" data-v="a" data-case="c8" tabindex="0" aria-label="Nothing is recurring, live mock"></div></div>
+    
+  </article>
+
+  <article class="variant" id="c9">
+    <div class="v-head"><span class="v-id">Case 9</span><h3>Only part of the calls are analyzed</h3></div>
+    <div class="case-when"><div><h4>When</h4><p>Analysis is still running on 68 of 248 calls.</p></div><div><h4>What the design does</h4><p>The card carries a note with the exact numbers. In the chat, AiMY says the same thing in its Based on chips and its sentence, and promises to update the answer. The two never disagree.</p></div></div>
+    <div class="scroller"><div class="mock" data-v="a" data-case="c9" tabindex="0" aria-label="Only part of the calls are analyzed, live mock"></div></div>
+    
+  </article>
+
+  <article class="variant" id="c10">
+    <div class="v-head"><span class="v-id">Case 10</span><h3>AiMY is still working</h3></div>
+    <div class="case-when"><div><h4>When</h4><p>The question was sent and the answer has not arrived.</p></div><div><h4>What the design does</h4><p>The thread shows the typing indicator with one line about what AiMY is reading, so the wait is explained rather than silent.</p></div></div>
+    <div class="scroller"><div class="mock" data-v="a" data-case="c10" tabindex="0" aria-label="AiMY is still working, live mock"></div></div>
+    
+  </article>
+
+  <article class="variant" id="c11">
+    <div class="v-head"><span class="v-id">Case 11</span><h3>Filters changed during the conversation</h3></div>
+    <div class="case-when"><div><h4>When</h4><p>The manager switches the product filter while the chat is open on a Product A issue.</p></div><div><h4>What the design does</h4><p>AiMY notices and says the issue is now outside the selection, then offers either to go back to Product A or to ask the same question for the new product. The page underneath already reflects the new filter.</p></div></div>
+    <div class="scroller"><div class="mock" data-v="a" data-case="c11" tabindex="0" aria-label="Filters changed during the conversation, live mock"></div></div>
+    <p class="where"><b>Try it:</b> choose "Back to Product A insights".</p>
+  </article>
+
+  <article class="variant" id="c12">
+    <div class="v-head"><span class="v-id">Case 12</span><h3>A user limited to their own data</h3></div>
+    <div class="case-when"><div><h4>When</h4><p>An agent whose scope is "Only my results" opens the Dashboard.</p></div><div><h4>What the design does</h4><p>Product insights are about customers, not about the agent, so the card does not switch to a personal view. It says so, points to My Profile for the agent&#39;s own feedback, and shows no team member names anywhere.</p></div></div>
+    <div class="scroller"><div class="mock" data-v="a" data-case="c12" tabindex="0" aria-label="A user limited to their own data, live mock"></div></div>
+    
+  </article>
+
+  <section class="callout">
+    <h2>One rule across all twelve</h2>
+    <p>The card and the conversation always say the same thing about the same data: the same counts, the same scope, the same state. If one of them cannot answer, it says why and offers a question, never a blank.</p>
+    <p class="refs">All figures, issues and customer names in the mocks are illustrative.</p>
+  </section>
+</div>
+<script>
+function ic(p){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+p+'</svg>';}
+var I={
+  dash:ic('<rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/>'),
+  reviews:ic('<path d="m3 17 2 2 4-4"/><path d="m3 7 2 2 4-4"/><path d="M13 6h8"/><path d="M13 12h8"/><path d="M13 18h8"/>'),
+  target:ic('<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>'),
+  user:ic('<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>'),
+  settings:ic('<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>'),
+  x:ic('<path d="M18 6 6 18"/><path d="m6 6 12 12"/>'),
+  chev:ic('<path d="m6 9 6 6 6-6"/>'),
+  bell:ic('<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>'),
+  sun:ic('<circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>'),
+  send:ic('<path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"/><path d="m21.854 2.147-10.94 10.939"/>'),
+  funnel:ic('<path d="M10 20a1 1 0 0 0 .553.895l2 1A1 1 0 0 0 14 21v-7a2 2 0 0 1 .517-1.341L21.74 4.67A1 1 0 0 0 21 3H3a1 1 0 0 0-.742 1.67l7.225 7.989A2 2 0 0 1 10 14z"/>'),
+  calendar:ic('<path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>'),
+  spark:ic('<path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>'),
+  ext:ic('<path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>'),
+  msg:ic('<path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/>')
+};
+var ISS=[
+  {name:"Setup instructions unclear",calls:38,cust:14,st:["Detected","det"],q:"Why do customers find setup unclear?"},
+  {name:"Login code not received",calls:29,cust:11,st:["Recommended","rec"],q:"What changed about login codes?"},
+  {name:"Invoice total differs from quote",calls:21,cust:9,st:["Detected","det"],q:"Why do invoices differ from quotes?"},
+  {name:"Export fails for large files",calls:17,cust:6,st:["Drafted","dra"],q:"Why do large exports fail?"},
+  {name:"Agent could not find refund policy",calls:12,cust:7,st:["Detected","det"],q:"Which article should change for refunds?"}
+];
+var QUOTES=[["Call 1042, 9 Sep","I did the first step and then nothing tells me what to do next."],["Call 1077, 14 Sep","The guide stops at the login page, I had to call."]];
+var S=new Map();
+function nav(){return '<div class="m-nav"><span class="m-logo"><i></i>AiMY</span><div class="m-tabs"><span>AiMY</span><span>Connect</span><span>Talent</span><span class="on">QA</span><span>Sales</span></div><div class="m-right"><span class="m-ib">V1</span><span class="m-ib">'+I.sun+'</span><span class="m-ib">'+I.bell+'</span><span class="m-pill"><span class="m-av">EY</span><span class="t"><b>Engy Yasser</b><small>Product Design</small></span>'+I.chev+'</span></div></div>';}
+function rail(){var it=[["Dashboard",I.dash,"87.3%",1],["Reviews",I.reviews,"53"],["Goal Hub",I.target,"3 below"],["My Profile",I.user,"2"],["Settings",I.settings,""]];return '<nav class="m-rail" aria-label="QA pages"><div class="m-rail-h">AiMY insights</div>'+it.map(function(p){return '<button class="m-ri'+(p[3]?" on":"")+'" type="button">'+p[1]+'<span>'+p[0]+'</span><em>'+p[2]+'</em></button>';}).join("")+'</nav>';}
+function header(st){return '<div class="m-ph"><h5>Dashboard</h5><span>Since your last visit: 34 new audits, 1 dispute waiting</span></div><div class="m-filters"><span class="flt">'+I.funnel+'Filter</span><span>Client: Upland'+I.chev+'</span><span>Product: Product A'+I.chev+'</span><span>Calls'+I.chev+'</span><span>'+I.calendar+'Last 30 days</span></div>';}
+function meta(){return '<div class="bmeta">'+I.spark+'Product insights<small>248 calls · as of 13 Oct</small></div>';}
+function stBadge(st,i){var s=(st.drafted&&i===0)?["Drafted","dra"]:ISS[i].st;return '<span class="st '+s[1]+'">'+s[0]+'</span>';}
+function qchip(i,txt){return '<button class="chip q" type="button" data-ask="'+i+'">'+I.msg+(txt||ISS[i].q)+'</button>';}
+function side(st){return '<div class="bcard side"><div><span class="k">Quality score</span><div class="v">87.3%</div><span class="s">2.7 under the 90% goal</span></div><div><span class="k">Recurring issues</span><div class="v">12</div><span class="s">16 business units</span></div><div><span class="k">Knowledge drafts</span><div class="v">'+(st.drafted?1:0)+'</div><span class="s">'+(st.drafted?"waiting for review":"none yet")+'</span></div></div>';}
+var CARDS={
+  a:function(st){
+    if(st.state==="loading")return '<div class="bcard">'+meta()+'<span class="skel" style="width:85%"></span><span class="skel" style="width:55%"></span><div class="stmt"><span class="skel" style="width:45%"></span><span class="skel" style="width:30%"></span></div><div class="stmt"><span class="skel" style="width:50%"></span><span class="skel" style="width:28%"></span></div></div>';
+    if(st.state==="nocalls")return '<div class="bcard">'+meta().replace('248 calls','0 calls')+'<div class="empty"><b>No calls for Product A in the last 30 days.</b><span>The last call analyzed was on 2 Sep.</span></div><div class="sugg">'+qchip("rest","Show me the last 90 days")+qchip("rest","Switch to All products")+'</div></div>';
+    if(st.state==="noissues")return '<div class="bcard">'+meta()+'<div class="empty good"><b>Nothing recurring in 248 calls.</b><span>An issue appears here when the same problem comes up in 5 or more calls within 7 days.</span></div><div class="sugg">'+qchip("rest","What were the one-off problems?")+'</div></div>';
+    if(st.state==="mine")return '<div class="bcard">'+meta()+'<div class="empty"><span class="lock">Only my results</span><b>Product insights are about customers, not about you.</b><span>They stay team-level and do not change with this switch. Your own feedback is on My Profile.</span></div></div>';
+    var note=st.state==="partial"?'<div class="note">'+I.spark+'Based on 180 of 248 calls. 68 are still being analyzed; counts may rise.</div>':'';
+    return '<div class="bcard">'+meta()+note+'<div class="bconc">12 issues keep coming back. <i>Setup</i> is the largest; login codes grew fastest.</div>'+[0,1,4].map(function(i){var it=ISS[i];return '<div class="stmt"><b>'+it.name+'</b><span class="n">'+it.calls+' calls · '+it.cust+' cust. '+stBadge(st,i)+'</span><span class="q">'+qchip(i)+'</span></div>';}).join("")+'<div class="stmt"><span class="q sugg">'+qchip("rest","What are the other 9 issues?")+qchip("cust","Which customers keep hitting the same issues?")+'</span></div></div>';},
+  b:function(st){return '<div class="bcard">'+meta()+'<div class="bconc">Since your last visit I found <b>12 recurring issues</b> in 248 calls. <a data-ask="0">Setup instructions unclear</a> is the largest at 38 calls and <a data-ask="1">login codes not received</a> grew fastest, 12 to 29. <a data-ask="4">Refund policy</a> is a knowledge fix: two articles disagree.</div><div class="ev"><span><b>5</b> issue types</span><span><b>16</b> business units</span><span><b>1</b> emerging</span></div><div class="sugg">'+qchip("rest","Tell me more")+'</div></div>';},
+  c:function(st){return '<div class="bcard">'+meta()+'<div class="bconc" style="font-weight:500;color:var(--d300)">12 recurring issues in 248 calls. Ask about them.</div><div class="inline-ask">'+I.spark+'<span class="ph">What are customers struggling with?</span><span class="go">'+I.send+'</span></div><div class="sugg">'+qchip(0,"Why is setup unclear?")+qchip(1,"What grew most?")+qchip("cust","Which customers repeat?")+'</div></div>';},
+  d:function(st){return '<div class="bcard list">'+meta()+ISS.map(function(it,i){return '<button class="row" type="button" data-ask="'+i+'"><b>'+it.name+'</b><span class="n">'+it.calls+' calls</span>'+stBadge(st,i)+'</button>';}).join("")+'</div>';},
+  e:function(st){return '<button class="bcard" type="button" data-ask="list" style="flex-direction:row;align-items:center;gap:12px"><span class="cnt">12</span><span class="bconc" style="flex:1">12 recurring issues this month. Ask AiMY which to act on.</span>'+I.chev+'</button>';},
+  conv:function(st){return CARDS.a(st);}
+};
+function basis(st,extra){var it=['<b>Product A</b>','Upland','<b>Last 30 days</b>','<b>38 calls</b>','14 customers'];if(extra)it=it.concat(extra);return '<div class="basis"><span class="lab">Based on</span>'+it.map(function(x){return '<span>'+x+'</span>';}).join("")+'</div>';}
+function aiMsg(inner){return '<div class="msg ai"><div class="mav ai">'+I.spark+'</div><div class="bub">'+inner+'</div></div>';}
+function userMsg(t){return '<div class="msg user"><div class="bub">'+t+'</div><div class="mav me">EY</div></div>';}
+function answerIssue(st){
+  var p='<div class="part calls"><div class="lab"><i></i>From your calls</div><p>Customers finish the first setup step and do not know what comes next. <b>38 calls</b>, 14 business units.</p>'+QUOTES.map(function(q){return '<div class="qt"><span>“'+q[1]+'”</span><button type="button" data-act="quote">Open call</button></div>';}).join("")+'</div>';
+  if(st.research)p+='<div class="part res"><div class="lab"><i></i>External research</div><p><span class="evtag">Documented approach</span>Two comparable products split setup into a numbered checklist with a progress marker.</p><div class="src">Source: <b>vendor help center, Guided setup</b> · 10 Oct 2026 · <span style="color:var(--teal)">Open '+I.ext+'</span></div></div>';
+  else p+='<div class="part res"><div class="lab"><i></i>External research</div><p style="color:var(--d300)"><b style="color:var(--d50)">Not run for this issue yet.</b> It runs on the top issues weekly; this one is 3 days old.</p></div>';
+  if(st.dismissed)p+='<div class="part"><div class="lab"><i></i>Suggested next step</div><p style="color:var(--d300)">Dismissed. Undo from the toast if that was a mistake.</p></div>';
+  else if(st.drafted)p+='<div class="part sug"><div class="lab"><i></i>Suggested next step</div><p><b>Draft sent to the Knowledge review queue.</b> This issue is now Drafted.</p></div>';
+  else p+='<div class="part sug"><div class="lab"><i></i>Suggested next step</div><p><b>Improve the setup article with numbered steps.</b></p><div class="src">Based on 38 calls'+(st.research?' and finding 1':' only')+'. Not yet tested with your customers.</div><div class="btns"><button class="btn pri" type="button" data-act="draft">Draft a knowledge article</button><button class="btn ghost" type="button" data-act="dismiss">Dismiss</button></div></div>';
+  return aiMsg(basis(st,st.research?['<b>1 source</b>']:null)+p);
+}
+function answerList(st){return aiMsg(basis(st)+'<p style="margin:0;font-size:12.5px"><b>12 issues keep coming back.</b> Setup is the largest, login codes grew fastest, refunds are a knowledge fix.</p><div class="rank">'+ISS.slice(0,5).map(function(it){return '<div class="r"><b>'+it.name+'</b><span class="bar"><i style="width:'+Math.round(it.calls/38*100)+'%"></i></span><span class="n">'+it.calls+' calls</span></div>';}).join("")+'</div><div class="btns">'+qchip(0,"Why is setup unclear?")+qchip("cust","Which customers repeat?")+'</div>');}
+function answerCust(st){var C=[["Content Lifecycle Automation",27,3],["Objectif Lune",19,2],["Qvidian",14,2],["PowerSteering",9,1]];return aiMsg(basis(st)+'<p style="margin:0;font-size:12.5px"><b>Four business units</b> keep hitting the same issues. Setup is the common one.</p><div class="rank">'+C.map(function(c){return '<div class="r"><b>'+c[0]+'</b><span class="bar"><i style="width:'+Math.round(c[1]/27*100)+'%"></i></span><span class="n">'+c[1]+' calls · '+c[2]+' issues</span></div>';}).join("")+'</div><div class="btns">'+qchip(0,"What repeats for Content Lifecycle Automation?")+'</div>');}
+function draftCard(st){return aiMsg('<p style="margin:0"><b>Here is a draft for the Knowledge review queue.</b> A Knowledge Manager approves before anything publishes.</p><div class="draft"><b style="font-weight:600">Finish setting up Product A</b><span>1. Sign in and open Settings.</span><span class="add">2. Complete the three steps on the checklist.</span><span class="add">3. The "What to do next" panel confirms setup is done.</span></div><div class="src">Based on 38 calls, 2 quotes attached'+(st.research?', 1 finding with source':'')+'.</div><div class="btns"><button class="btn pri" type="button" data-act="accept">Accept and send to review</button><button class="btn" type="button">Edit first</button><button class="btn ghost" type="button" data-act="reject">Reject</button></div>');}
+function overlay(st){
+  if(!st.chat)return '';
+  var m='';
+  st.thread.forEach(function(t){
+    if(t[0]==="u")m+=userMsg(t[1]);else if(t[0]==="issue")m+=answerIssue(st);else if(t[0]==="list")m+=answerList(st);else if(t[0]==="cust")m+=answerCust(st);else if(t[0]==="draft")m+=draftCard(st);
+    else if(t[0]==="think")m+=aiMsg('<div class="dots"><i></i><i></i><i></i></div><p style="margin:0;font-size:11px;color:var(--d300)">Reading 248 calls for Product A\u2026</p>');
+    else if(t[0]==="partial")m+=aiMsg(basis(st,['<span style="color:var(--warn)">180 of 248 analyzed</span>'])+'<p style="margin:0"><b>So far, Setup instructions unclear leads</b> with 31 calls. 68 calls are still being analyzed, so these counts may rise. I will update this answer when they are in.</p>');
+    else if(t[0]==="ctx")m+=aiMsg('<p style="margin:0"><b>You changed the product to Product B while we were talking.</b> Setup instructions unclear is a Product A issue, so it is out of the current selection.</p><div class="btns"><button class="btn" type="button" data-act="close">Back to Product A insights</button><button class="btn ghost" type="button" data-free="What recurs for Product B?">What recurs for Product B?</button></div>');
+    else if(t[0]==="memory")m+=aiMsg('<div class="basis"><span class="lab" style="color:#d6c2ff">Continuing</span><span>Last time, 13 Oct</span></div><p style="margin:0"><b>You sent a knowledge draft for Setup instructions unclear on 13 Oct.</b> It is still waiting in the Knowledge review queue. Since then, 6 more calls raised the same issue.</p><div class="btns"><button class="btn" type="button" data-free="Who is reviewing it?">Who is reviewing it?</button><button class="btn ghost" type="button" data-free="Show the 6 new calls">Show the 6 new calls</button></div>');else if(t[0]==="text")m+=aiMsg('<p style="margin:0">'+t[1]+'</p>');
+  });
+  var hasIssue=st.thread.some(function(t){return t[0]==="issue";});
+  var sugg=hasIssue&&!st.drafted?'<div class="ov-sugg">'+["Which customers report this most?","Has this grown since last month?","Show all 38 calls"].map(function(q){return '<button class="chip" type="button" data-free="'+q+'">'+q+'</button>';}).join("")+'</div>':'';
+  return '<div class="ov" role="dialog" aria-label="AiMY canvas"><div class="ov-badge"><i></i>AiMY canvas</div><button class="ov-close" type="button" data-act="close" aria-label="Close">'+I.x+'</button><div class="thread" aria-live="polite">'+m+'</div>'+sugg+'<div class="ov-in">'+I.spark+'<span class="ph">Ask a follow-up…</span><span class="go">'+I.send+'</span></div></div>';
+}
+function render(m){var st=S.get(m);
+  var card=CARDS.a(st);
+  m.innerHTML=nav()+'<div class="m-shell">'+rail()+'<div class="m-main">'+header(st)+'<div class="m-two">'+card+side(st)+'</div>'+(st.chat?'':'<div class="float"><span class="mk">'+I.spark+'</span><span class="ph">Ask AiMY anything, or describe a filter…</span><span class="go">'+I.send+'</span></div>')+'</div>'+overlay(st)+'</div><div class="toast" role="status" aria-live="polite"><span class="tx"><b></b><small></small></span><button type="button" data-act="undo">Undo</button></div>';
+  var th=m.querySelector(".thread");if(th)th.scrollTop=th.scrollHeight;
+  syncDemo(m);
+}
+function toast(m,b,s,undo){var t=m.querySelector(".toast");t.querySelector("b").textContent=b;t.querySelector("small").textContent=s;t.querySelector("button").hidden=!undo;t.classList.add("show");clearTimeout(t._t);t._t=setTimeout(function(){t.classList.remove("show");},4200);}
+var DEMOS={conv:[["Research",[["1","Available","research"],["0","Unavailable","research"]]],["Chat",[["1","Open","chat"],["0","Closed","chat"]]]]};
+["a","b","c","d","e"].forEach(function(v){DEMOS[v]=[["Chat",[["0","Closed","chat"],["1","Open","chat"]]]];});
+function syncDemo(m){var v=m.getAttribute("data-v"),st=S.get(m),d=document.querySelector('.demo[data-for="'+v+'"]');if(!d)return;
+  d.innerHTML=(DEMOS[v]||[]).map(function(g){return '<b>'+g[0]+':</b>'+g[1].map(function(o){var cur=st[o[2]]===true?"1":st[o[2]]===false?"0":String(st[o[2]]);return '<button type="button" data-k="'+o[2]+'" data-val="'+o[0]+'" aria-pressed="'+(cur===o[0])+'">'+o[1]+'</button>';}).join("");}).join('<span style="width:10px"></span>');}
+function ask(st,key){st.chat=true;
+  if(key==="list"||key==="rest"){st.thread=[["u",key==="rest"?"What are the other 9 issues?":"Which issues should I act on?"],["list"]];}
+  else if(key==="cust"){st.thread=[["u","Which customers keep hitting the same issues?"],["cust"]];}
+  else{var i=+key;st.thread=[["u",ISS[i].q],["issue"]];}
+}
+document.querySelectorAll(".mock").forEach(function(m){
+  var v="a",st={v:v,chat:false,thread:[],research:true,dismissed:false,drafted:false,state:"ready"};
+  var CASES={
+    c1:{},
+    c2:{chat:true,thread:[["u",ISS[0].q],["issue"]]},
+    c3:{chat:true,research:false,thread:[["u",ISS[0].q],["issue"]]},
+    c4:{chat:true,thread:[["u","Which customers keep hitting the same issues?"],["cust"]]},
+    c5:{chat:true,thread:[["u",ISS[0].q],["issue"],["u","Draft a knowledge article"],["draft"]]},
+    c6:{chat:true,drafted:true,thread:[["memory"]]},
+    c7:{state:"nocalls"},
+    c8:{state:"noissues"},
+    c9:{state:"partial",chat:true,thread:[["u","What are customers struggling with?"],["partial"]]},
+    c10:{chat:true,thread:[["u",ISS[0].q],["think"]]},
+    c11:{chat:true,thread:[["u",ISS[0].q],["ctx"]]},
+    c12:{state:"mine"}
+  };
+  Object.assign(st,CASES[m.getAttribute("data-case")]||{});
+  S.set(m,st);render(m);
+  m.addEventListener("click",function(e){var b=e.target.closest("[data-ask],button");if(!b||!m.contains(b))return;
+    if(b.dataset.ask!==undefined){ask(st,b.dataset.ask);render(m);return;}
+    if(b.dataset.free){st.thread.push(["u",b.dataset.free]);st.thread.push(["text","Illustrative follow-up. In the product this is a new answer from the same scope."]);render(m);return;}
+    var a=b.dataset.act;
+    if(a==="close"){st.chat=false;render(m);}
+    else if(a==="dismiss"){st.dismissed=true;render(m);toast(m,"Suggestion dismissed","Setup instructions unclear",true);}
+    else if(a==="undo"){if(st.dismissed)st.dismissed=false;else if(st.drafted){st.drafted=false;st.thread=st.thread.filter(function(t){return t[0]!=="text";});}render(m);toast(m,"Undone","",false);}
+    else if(a==="draft"){st.thread.push(["u","Draft a knowledge article"]);st.thread.push(["draft"]);render(m);}
+    else if(a==="accept"){st.drafted=true;st.thread=st.thread.filter(function(t){return t[0]!=="draft";});st.thread.push(["text","Sent to the Knowledge review queue. The issue shows <b>Drafted</b> on your Dashboard."]);render(m);toast(m,"Draft sent to the Knowledge review queue","Setup instructions unclear is now Drafted",true);}
+    else if(a==="reject"){st.thread=st.thread.filter(function(t){return t[0]!=="draft";});st.thread.push(["text","Draft discarded. Tell me what was wrong and I can write another."]);render(m);toast(m,"Draft rejected","Nothing was sent",false);}
+    else if(a==="quote"){toast(m,"Opens call 1042 at 02:14","Reuses the KPI evidence deep-link",false);}
+  });
+});
+document.querySelectorAll(".demo").forEach(function(d){d.addEventListener("click",function(e){var b=e.target.closest("button[data-k]");if(!b)return;var m=document.querySelector('.mock[data-v="'+d.dataset.for+'"]'),st=S.get(m),k=b.dataset.k,val=b.dataset.val;
+  if(k==="research")st.research=val==="1";
+  if(k==="chat"){st.chat=val==="1";if(st.chat&&!st.thread.length){if(st.v==="e"||st.v==="c")ask(st,"list");else ask(st,"0");}}
+  render(m);});});
+</script>
+
+</body></html>

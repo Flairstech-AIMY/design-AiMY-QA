@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Score Rail Mixes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* Round 4 of "Your evaluations" (Dashboard, Only my results): 4E (score on
+   the rail) at 4I's one-line density, mixed with 4A (days, Ask AiMY),
+   4B (goal meter) and 4C (change since last). Same four records. */
+:root {
+  --qa: #8b4ff4; --qa-rgb: 139, 79, 244; --mine: #b99bff;
+  --page: #171a1c; --card: #141b24; --card-2: #1c2630; --line: rgba(255,255,255,.07); --line-2: rgba(255,255,255,.12);
+  --ink: #f5f7fb; --ink-2: #c3ceda; --ink-3: #93a2b4;
+  --err: #ff7282; --err-bg: rgba(255,114,130,.12); --ok: #4ed6a1; --ok-bg: rgba(78,214,161,.12); --warn: #f7c95c; --warn-bg: rgba(247,201,92,.13);
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  color-scheme: dark;
+}
+:root[data-theme="light"] {
+  --mine: #5b2bbf;
+  --page: #eef1f6; --card: #ffffff; --card-2: #f4f6fa; --line: rgba(16,24,40,.09); --line-2: rgba(16,24,40,.15);
+  --ink: #10151b; --ink-2: #2a3540; --ink-3: #566472;
+  --err: #b42318; --err-bg: rgba(180,35,24,.08); --ok: #0a6b40; --ok-bg: rgba(10,107,64,.08); --warn: #8a5a00; --warn-bg: rgba(138,90,0,.09);
+  color-scheme: light;
+}
+* { box-sizing: border-box; margin: 0; }
+body { background: var(--page); color: var(--ink); font-family: "Poppins", system-ui, sans-serif; line-height: 1.5; }
+::selection { background: rgba(var(--qa-rgb), .35); }
+button { font: inherit; color: inherit; }
+button:focus-visible { outline: 2px solid var(--mine); outline-offset: 2px; }
+svg.i { width: 16px; height: 16px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+.wrap { max-width: 1040px; margin: 0 auto; padding: 56px 24px 96px; }
+.top { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 20px; margin-bottom: 36px; }
+h1 { font-size: clamp(28px, 4vw, 40px); font-weight: 800; letter-spacing: -0.02em; line-height: 1.1; }
+.lede { max-width: 70ch; margin-top: 10px; color: var(--ink-2); font-size: 15px; }
+.ctl { min-height: 36px; padding: 0 14px; border: 0; border-radius: 9999px; background: var(--card-2); font-size: 13px; font-weight: 600; cursor: pointer; }
+.ctl:hover { background: rgba(var(--qa-rgb), .22); }
+.ctl[aria-pressed="true"] { background: var(--qa); color: #fff; }
+
+.grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 36px; }
+.v { min-width: 0; }
+.v-meta { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+.v-id { display: inline-grid; place-items: center; min-width: 34px; height: 28px; padding: 0 8px; border-radius: 8px; background: rgba(var(--qa-rgb), .2); color: var(--mine); font-weight: 800; font-size: 13px; }
+h2.v-title { font-size: 18px; font-weight: 700; }
+.mix { display: inline-flex; gap: 6px; flex-wrap: wrap; }
+.mix span { padding: 2px 8px; border-radius: 9999px; background: var(--card-2); color: var(--ink-3); font-size: 11.5px; font-weight: 600; }
+.v-sum { flex-basis: 100%; max-width: 80ch; color: var(--ink-2); font-size: 13.5px; }
+
+.frame { padding: 22px; border-radius: 18px; background: radial-gradient(70% 120% at 50% 0%, rgba(var(--qa-rgb), .08), transparent 70%), var(--page); border: 1px solid var(--line); }
+.sec-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 14px; }
+.sec-head h3 { font-size: 20px; font-weight: 700; letter-spacing: -0.01em; white-space: nowrap; }
+.sec-head .sub { color: var(--ink-3); font-size: 12.5px; }
+.sec-head .exp { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border: 0; border-radius: 8px; background: transparent; color: var(--ink-2); font-size: 13px; font-weight: 600; white-space: nowrap; cursor: pointer; }
+.sec-head .exp:hover { background: var(--card-2); color: var(--ink); }
+.panel { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 6px; }
+.picked { margin-top: 10px; min-height: 20px; color: var(--ink-3); font-size: 12.5px; }
+.picked b { color: var(--mine); font-weight: 600; }
+
+.notes { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 8px 28px; margin-top: 12px; font-size: 13px; color: var(--ink-2); }
+.notes b { display: block; color: var(--ink); font-size: 12.5px; margin-bottom: 2px; }
+.notes ul { padding-left: 18px; }
+
+.tone-err { color: var(--err); } .tone-ok { color: var(--ok); } .tone-warn { color: var(--warn); }
+.chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px; border-radius: 9999px; font-size: 10.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; white-space: nowrap; background: var(--err-bg); color: var(--err); }
+.chip::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.ask { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border: 1px solid rgba(var(--qa-rgb), .35); border-radius: 9px; background: rgba(var(--qa-rgb), .14); color: var(--mine); font-size: 12.5px; font-weight: 600; white-space: nowrap; }
+.num { font-variant-numeric: tabular-nums; }
+
+/* The shared row: date | score node on the rail | one line | extras */
+.rail { --dw: 84px; --nw: 36px; --gap: 14px; --px: 10px; }
+.rail.has-ago { --dw: 92px; }
+.row { position: relative; display: grid; grid-template-columns: var(--dw) var(--nw) minmax(0, 1fr) auto; gap: var(--gap); align-items: center; width: 100%; min-height: 52px; padding: 8px var(--px); border: 0; border-radius: 10px; background: none; text-align: left; cursor: pointer; transition: background-color 150ms var(--ease); }
+.rail.has-delta .row { min-height: 62px; }
+.row:hover { background: var(--card-2); }
+.row[aria-pressed="true"] { background: rgba(var(--qa-rgb), .1); }
+.row::before { content: ""; position: absolute; left: calc(var(--px) + var(--dw) + var(--gap) + var(--nw) / 2 - 1px); top: 0; bottom: 0; width: 2px; background: var(--ink-3); opacity: .3; }
+.row:first-child::before { top: 50%; } .row:last-child::before { bottom: 50%; }
+.d { color: var(--ink-3); font-size: 12.5px; font-weight: 600; white-space: nowrap; line-height: 1.3; }
+.d small { display: block; font-size: 11.5px; font-weight: 500; opacity: .85; }
+.node { position: relative; z-index: 1; display: grid; place-items: center; width: var(--nw); height: var(--nw); border-radius: 50%; border: 2.5px solid var(--c); background: var(--card); color: var(--c); font-size: 12.5px; font-weight: 800; }
+.row.is-err .node { background: var(--err-bg); box-shadow: 0 0 0 3px var(--card); }
+.t { min-width: 0; font-size: 14px; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.t b { color: var(--ink); }
+.x { display: flex; align-items: center; gap: 10px; justify-content: flex-end; }
+
+/* Change since last, sitting on the rail between two scores */
+.rd { position: absolute; z-index: 3; left: calc(var(--px) + var(--dw) + var(--gap) + var(--nw) / 2); bottom: 0; transform: translate(-50%, 50%); padding: 0 6px; border-radius: 9999px; background: var(--card); border: 1px solid var(--line-2); font-size: 11px; font-weight: 800; line-height: 18px; white-space: nowrap; }
+.rd.up { color: var(--ok); } .rd.down { color: var(--err); }
+
+/* Goal meter (from 4B) */
+.meter { position: relative; display: block; width: 120px; height: 6px; border-radius: 9999px; background: var(--line-2); }
+.meter .fill { position: absolute; inset: 0 auto 0 0; border-radius: inherit; background: var(--c); }
+.meter .tick { position: absolute; top: -4px; bottom: -4px; left: calc(85% - 1px); width: 2px; border-radius: 2px; background: var(--ink); }
+.slot { display: flex; justify-content: flex-end; width: 136px; }
+.gapn { min-width: 38px; text-align: right; font-size: 12.5px; font-weight: 700; }
+
+@media (max-width: 760px) {
+  .wrap { padding: 36px 16px 64px; }
+  .frame { padding: 14px; }
+  .sec-head { flex-wrap: wrap; row-gap: 2px; }
+  .sec-head h3 { font-size: 18px; }
+  .sec-head .sub { order: 3; flex-basis: 100%; }
+  .sec-head .exp { padding: 6px 4px; }
+  .rail, .rail.has-ago { --dw: 50px; --nw: 34px; --gap: 10px; --px: 6px; }
+  .row { grid-template-columns: var(--dw) var(--nw) minmax(0, 1fr); row-gap: 6px; }
+  .d { white-space: normal; font-size: 11.5px; }
+  .t { white-space: normal; }
+  .x { grid-column: 3; justify-content: flex-start; flex-wrap: wrap; }
+  .x:empty { display: none; }
+  .meter { width: 96px; }
+  .slot { width: auto; }
+  .slot:empty { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div>
+      <h1>Score rail mixes</h1>
+      <p class="lede">4E's score-on-the-rail at 4I's one-line height, then combined with what you liked from round 2: 4A (days and an inline Ask AiMY), 4B (goal meter) and 4C (change since your last evaluation). Same four evaluations against your 85% goal. Click any row to see what it would open.</p>
+    </div>
+    <button class="ctl" type="button" id="themeBtn" aria-pressed="false">Light theme</button>
+  </div>
+  <div class="grid" id="grid"></div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var GOAL = 85, TODAY = Date.UTC(2026, 9, 21);
+  var EVALS = [
+    { id: "EV-0541", date: "2026-10-13", product: "Upland · KCM", type: "Ticket", score: 71, tone: "err" },
+    { id: "EV-0538", date: "2026-10-12", product: "Upland · KCM", type: "Ticket", score: 88, tone: "ok" },
+    { id: "EV-0533", date: "2026-10-10", product: "Upland · KCM", type: "Call", score: 93, tone: "ok" },
+    { id: "EV-0529", date: "2026-10-09", product: "Upland · KCM", type: "Ticket", score: 84, tone: "ok" }
+  ];
+  function svg(p) { return '<svg class="i" viewBox="0 0 24 24" aria-hidden="true">' + p + "</svg>"; }
+  var I = {
+    download: svg('<path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/>'),
+    sparkles: svg('<path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"/><path d="M20 2v4"/><path d="M22 4h-4"/><circle cx="4" cy="20" r="2"/>')
+  };
+  var MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  var DAYS = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+  function ts(e) { var p = e.date.split("-"); return Date.UTC(+p[0], +p[1] - 1, +p[2]); }
+  function short(e) { var x = new Date(ts(e)); return x.getUTCDate() + " " + MONTHS[x.getUTCMonth()]; }
+  function weekday(e) { return DAYS[new Date(ts(e)).getUTCDay()]; }
+  function ago(e) { var n = Math.round((TODAY - ts(e)) / 864e5); return n === 0 ? "today" : n === 1 ? "yesterday" : n + " days ago"; }
+  function gapN(e) { return e.score - GOAL; }
+  function pts(n) { return n + (n === 1 ? " pt" : " pts"); }
+  function gapText(e) { var g = gapN(e); return g < 0 ? pts(-g) + " under goal" : g === 0 ? "at goal" : pts(g) + " over goal"; }
+  function signed(n) { return (n > 0 ? "+" : n < 0 ? "−" : "") + Math.abs(n); }
+  function tone(e) { return e.tone === "err" ? "err" : e.score < GOAL ? "warn" : "ok"; }
+  function chrono() { return EVALS.slice().sort(function (x, y) { return ts(x) - ts(y); }); }
+  function prevOf(e) { var c = chrono(), i = c.indexOf(e); return i > 0 ? c[i - 1] : null; }
+  function head(sub) { return '<div class="sec-head"><h3>Your evaluations</h3><span class="sub">' + sub + '</span><button class="exp" type="button">' + I.download + "Export CSV</button></div>"; }
+
+  // One builder, switched by which ideas are mixed in.
+  // a = 4A (days ago, Ask AiMY inline), b = 4B (goal meter), c = 4C (change since last on the rail)
+  function rail(o) {
+    var cls = "panel rail" + (o.a ? " has-ago" : "") + (o.c ? " has-delta" : "");
+    return '<div class="' + cls + '">' + EVALS.map(function (e) {
+      var p = prevOf(e), err = e.tone === "err", x = "";
+      if (o.b) x += '<span class="meter" aria-hidden="true"><span class="fill" style="width:' + e.score + '%"></span><span class="tick"></span></span><span class="gapn num tone-' + tone(e) + '">' + signed(gapN(e)) + "</span>";
+      if (o.b) { x += '<span class="slot">' + (err ? (o.a ? '<span class="ask">' + I.sparkles + "Ask AiMY</span>" : '<span class="chip">Needs attention</span>') : "") + "</span>"; }
+      else if (err) x += '<span class="chip">Needs attention</span>';
+      if (err && o.a && !o.b) x += '<span class="ask">' + I.sparkles + "Ask AiMY</span>";
+      var line = "<b>" + e.id + "</b> · " + e.type + " · " + gapText(e) + (o.c && p && !o.b && !o.a ? ", " + (e.score >= p.score ? "up " : "down ") + pts(Math.abs(e.score - p.score)) + " from " + p.id : "");
+      var delta = o.c && p ? '<span class="rd num ' + (e.score >= p.score ? "up" : "down") + '" title="Change from ' + p.id + '" aria-hidden="true">' + signed(e.score - p.score) + "</span>" : "";
+      return '<button class="row' + (err ? " is-err" : "") + '" type="button" data-ev="' + e.id + '" aria-pressed="false" style="--c:var(--' + tone(e) + ')">' +
+        '<span class="d">' + weekday(e) + " " + short(e) + (o.a ? "<small>" + ago(e) + "</small>" : "") + "</span>" +
+        '<span class="node num" aria-label="' + e.score + '%">' + e.score + '</span><span class="t">' + line + '</span><span class="x">' + x + "</span>" + delta + "</button>";
+    }).join("") + "</div>";
+  }
+
+  var V = [
+    { n: "M1", title: "Compact score rail", mix: ["4E", "4I"], sum: "The base for the rest: each evaluation is one line at 4I's height, and the score sits in a small ring on the timeline rail like 4E. Ring colour and number say where it lands against your goal. Only the one that needs attention gets a tag.",
+      pro: ["Timeline and score in one glance at table height", "Quiet: only EV-0541 carries a tag"],
+      con: ["No action on the row yet", "Gap to goal is text only"],
+      opts: {} },
+    { n: "M2", title: "Rail with days and Ask AiMY", mix: ["4E", "4I", "4A"], sum: "Adds 4A: each date also says how long ago it was, and the row that needs attention carries Ask AiMY right next to its tag, so the next step sits where the problem is.",
+      pro: ["'8 days ago' makes the age of a problem obvious", "The action appears only where it's needed"],
+      con: ["Date column gets wider", "Ask AiMY on one row only can look inconsistent"],
+      opts: { a: true } },
+    { n: "M3", title: "Rail with goal meters", mix: ["4E", "4I", "4B"], sum: "Adds 4B: a short meter on the right with a tick at 85% and the gap in points. The ring gives the score; the meter shows how close that score was to your goal.",
+      pro: ["84% vs 85% reads as 'almost there' in the meter", "Right edge lines up into a comparable column"],
+      con: ["Score appears twice (ring and meter)", "Busier than M1"],
+      opts: { b: true } },
+    { n: "M4", title: "Rail with change on the line", mix: ["4E", "4I", "4C"], sum: "Adds 4C, placed on the rail itself: between two rings, a small label says how much the score moved (+9, −5, −17). The sentence also says it in words. The rail now tells the story of the period.",
+      pro: ["The trend sits exactly between the two scores it compares", "−17 into EV-0541 is impossible to miss"],
+      con: ["Rows need a bit more height for the labels", "Labels compare different evaluation types when they vary"],
+      opts: { c: true } },
+    { n: "M5", title: "Days, change and Ask AiMY", mix: ["4E", "4I", "4A", "4C"], sum: "M2 and M4 together: how long ago, the change between scores on the rail, and Ask AiMY on the evaluation that needs you. The sentence stays short because the rail carries the change.",
+      pro: ["Answers when, how much, which way, and what to do", "No extra columns; the rail carries the trend"],
+      con: ["Most information per row of the set", "Sentence gets long on narrower screens"],
+      opts: { a: true, c: true } },
+    { n: "M6", title: "Everything, still one line", mix: ["4E", "4I", "4A", "4B", "4C"], sum: "All of them: days ago, rings on the rail with change labels between them, a goal meter with the gap, and Ask AiMY on EV-0541 in place of its tag (its red ring already marks it).",
+      pro: ["The richest view without leaving one line per evaluation", "Every number has a visual partner"],
+      con: ["Dense; may be too much for a dashboard section", "On a phone the extras drop to a second line"],
+      opts: { a: true, b: true, c: true } }
+  ];
+
+  var grid = document.getElementById("grid");
+  V.forEach(function (v) {
+    var art = document.createElement("article");
+    art.className = "v";
+    art.innerHTML = '<div class="v-meta"><span class="v-id">' + v.n + '</span><h2 class="v-title">' + v.title + '</h2><span class="mix">' + v.mix.map(function (m) { return "<span>" + m + "</span>"; }).join("") + '</span><p class="v-sum">' + v.sum + "</p></div>" +
+      '<div class="frame">' + head("Newest first") + rail(v.opts) + '<p class="picked" aria-live="polite"></p></div>' +
+      '<div class="notes"><div><b>Strong</b><ul>' + v.pro.map(function (p) { return "<li>" + p + "</li>"; }).join("") + "</ul></div>" +
+      '<div><b>Weak</b><ul>' + v.con.map(function (p) { return "<li>" + p + "</li>"; }).join("") + "</ul></div></div>";
+    grid.appendChild(art);
+  });
+
+  document.addEventListener("click", function (ev) {
+    var r = ev.target.closest && ev.target.closest(".row");
+    if (!r) return;
+    var frame = r.closest(".frame"), id = r.getAttribute("data-ev"), e = EVALS.filter(function (x) { return x.id === id; })[0];
+    frame.querySelectorAll(".row").forEach(function (x) { x.setAttribute("aria-pressed", String(x === r)); });
+    frame.querySelector(".picked").innerHTML = "Opens <b>" + e.id + "</b> in AiMY: the " + e.type.toLowerCase() + " evaluation from " + e.date + " scored " + e.score + "%, with its KPIs and what to change next time.";
+  });
+  var themeBtn = document.getElementById("themeBtn");
+  themeBtn.addEventListener("click", function () {
+    var light = document.documentElement.getAttribute("data-theme") !== "light";
+    if (light) document.documentElement.setAttribute("data-theme", "light"); else document.documentElement.removeAttribute("data-theme");
+    themeBtn.setAttribute("aria-pressed", String(light));
+  });
+})();
+</script>
+</body>
+</html>

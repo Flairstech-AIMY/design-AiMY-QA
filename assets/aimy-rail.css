@@ -164,7 +164,25 @@
   flex-direction: column;
 }
 :root .rail-section {
+  position: relative;
   padding: 8px 4px;
+  border-radius: 10px;
+  transition: background-color var(--t-fast, 150ms) ease;
+}
+/* The whole card is the link: the header's own <a> stretches over it, so a
+   click on the figure, the label or the space between still opens the page,
+   with one tab stop per card. Findings that carry their own link (Reviews'
+   three queues) sit above it and keep their deep link. */
+:root a.rail-section-head::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+:root .rail-section:has(> a.rail-section-head) { cursor: pointer; }
+:root a.rail-finding-row {
+  position: relative;
+  z-index: 1;
 }
 :root .rail-section:not(.is-current) + .rail-section:not(.is-current) {
   border-top: 1px solid var(--wash-6, rgba(255,255,255,0.07));
@@ -216,8 +234,10 @@
   color: var(--d400);
   transition: transform var(--t-base, 200ms) var(--ease-out, cubic-bezier(0.22,1,0.36,1));
 }
-:root a.rail-section-head:hover {
+:root .rail-section:has(> a.rail-section-head:hover) {
   background: var(--wash-3);
+}
+:root a.rail-section-head:hover {
   color: var(--d50);
 }
 :root a.rail-section-head:hover .lucide-chevron-right {
@@ -287,7 +307,12 @@
   color: var(--d100);
 }
 
-:root .rail-section-head:focus-visible,
+/* The focus ring goes round the card the link now covers. */
+:root a.rail-section-head:focus-visible { outline: none; }
+:root a.rail-section-head:focus-visible::after {
+  outline: 2px solid var(--brand, #3369ff);
+  outline-offset: -2px;
+}
 :root .rail-finding-row:focus-visible,
 :root .rail-collapse:focus-visible,
 :root .rail-expand:focus-visible {

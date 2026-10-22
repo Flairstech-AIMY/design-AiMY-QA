@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Your Evaluations Variants</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* Six ways to show "Your evaluations" (Dashboard, Only my results) without
+   a table, all from the same four records. Tokens follow the product's dark
+   and light themes in Only my results mode (violet accent). */
+:root {
+  --qa: #8b4ff4; --qa-rgb: 139, 79, 244; --mine: #b99bff;
+  --page: #171a1c; --card: #141b24; --card-2: #1c2630; --line: rgba(255,255,255,.07); --line-2: rgba(255,255,255,.12);
+  --ink: #f5f7fb; --ink-2: #c3ceda; --ink-3: #93a2b4;
+  --err: #ff7282; --err-bg: rgba(255,114,130,.12); --ok: #4ed6a1; --ok-bg: rgba(78,214,161,.12); --warn: #f7c95c;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  color-scheme: dark;
+}
+:root[data-theme="light"] {
+  --mine: #5b2bbf;
+  --page: #eef1f6; --card: #ffffff; --card-2: #f7f9fc; --line: rgba(16,24,40,.09); --line-2: rgba(16,24,40,.14);
+  --ink: #10151b; --ink-2: #2a3540; --ink-3: #566472;
+  --err: #b42318; --err-bg: rgba(180,35,24,.08); --ok: #0a6b40; --ok-bg: rgba(10,107,64,.08); --warn: #8a5a00;
+  color-scheme: light;
+}
+* { box-sizing: border-box; margin: 0; }
+body { background: var(--page); color: var(--ink); font-family: "Poppins", system-ui, sans-serif; line-height: 1.5; }
+::selection { background: rgba(var(--qa-rgb), .35); }
+button { font: inherit; color: inherit; }
+button:focus-visible { outline: 2px solid var(--mine); outline-offset: 2px; }
+svg.i { width: 16px; height: 16px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+.wrap { max-width: 1040px; margin: 0 auto; padding: 56px 24px 96px; }
+.top { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 20px; margin-bottom: 36px; }
+h1 { font-size: clamp(28px, 4vw, 40px); font-weight: 800; letter-spacing: -0.02em; line-height: 1.1; }
+.lede { max-width: 66ch; margin-top: 10px; color: var(--ink-2); font-size: 15px; }
+.ctl { min-height: 36px; padding: 0 14px; border: 0; border-radius: 9999px; background: var(--card-2); font-size: 13px; font-weight: 600; cursor: pointer; }
+.ctl:hover { background: rgba(var(--qa-rgb), .22); }
+.ctl[aria-pressed="true"] { background: var(--qa); color: #fff; }
+
+.grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 28px; }
+.v { min-width: 0; }
+.v-meta { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+.v-id { display: inline-grid; place-items: center; min-width: 30px; height: 28px; padding: 0 8px; border-radius: 8px; background: rgba(var(--qa-rgb), .2); color: var(--mine); font-weight: 800; font-size: 13px; }
+h2.v-title { font-size: 18px; font-weight: 700; }
+.v-sum { flex-basis: 100%; max-width: 80ch; color: var(--ink-2); font-size: 13.5px; }
+
+/* The product's section head, reused by every variant. */
+.frame { padding: 22px; border-radius: 18px; background: radial-gradient(70% 120% at 50% 0%, rgba(var(--qa-rgb), .08), transparent 70%), var(--page); border: 1px solid var(--line); }
+.sec-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 14px; }
+.sec-head h3 { font-size: 20px; font-weight: 700; letter-spacing: -0.01em; }
+.sec-head .sub { color: var(--ink-3); font-size: 12.5px; }
+.sec-head .exp { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border: 0; border-radius: 8px; background: transparent; color: var(--ink-2); font-size: 13px; font-weight: 600; cursor: pointer; }
+.sec-head .exp:hover { background: var(--card-2); color: var(--ink); }
+.panel { background: var(--card); border: 1px solid var(--line); border-radius: 16px; }
+.picked { margin-top: 10px; min-height: 20px; color: var(--ink-3); font-size: 12.5px; }
+.picked b { color: var(--mine); font-weight: 600; }
+
+.notes { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 8px 28px; margin-top: 12px; font-size: 13px; color: var(--ink-2); }
+.notes b { display: block; color: var(--ink); font-size: 12.5px; margin-bottom: 2px; }
+.notes ul { padding-left: 18px; }
+
+.tone-err { color: var(--err); } .tone-ok { color: var(--ok); } .tone-warn { color: var(--warn); }
+.chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px; border-radius: 9999px; font-size: 10.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; white-space: nowrap; }
+.chip::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.chip.err { background: var(--err-bg); color: var(--err); } .chip.ok { background: var(--ok-bg); color: var(--ok); }
+.ask { display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; border: 1px solid rgba(var(--qa-rgb), .35); border-radius: 9px; background: rgba(var(--qa-rgb), .14); color: var(--mine); font-size: 12.5px; font-weight: 600; cursor: pointer; }
+.ask:hover { background: rgba(var(--qa-rgb), .24); }
+.pick { cursor: pointer; transition: background-color 150ms var(--ease), border-color 150ms var(--ease), transform 150ms var(--ease); }
+.pick[aria-pressed="true"] { border-color: rgba(var(--qa-rgb), .55) !important; background-color: rgba(var(--qa-rgb), .1) !important; }
+
+/* 1. Score cards */
+.cards { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.card { position: relative; padding: 16px; border: 1px solid var(--line); border-radius: 14px; background: var(--card); text-align: left; }
+.card:hover { border-color: var(--line-2); transform: translateY(-1px); }
+.card.is-err { background: linear-gradient(var(--err-bg), var(--err-bg)), var(--card); }
+.card-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; color: var(--ink-3); font-size: 12px; font-weight: 600; }
+.card-top span { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.ring { position: relative; width: 84px; height: 84px; margin: 14px 0 12px; }
+.ring svg { width: 84px; height: 84px; transform: rotate(-90deg); }
+.ring .track { fill: none; stroke: var(--line-2); stroke-width: 7; }
+.ring .val { fill: none; stroke-width: 7; stroke-linecap: round; }
+.ring .goal { stroke: var(--ink); stroke-width: 2; }
+.ring b { position: absolute; inset: 0; display: grid; place-items: center; font-size: 20px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.card-date { color: var(--ink-2); font-size: 12.5px; margin-bottom: 10px; }
+
+/* 2. Attention first */
+.split { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 12px; }
+.feature { padding: 20px; border-radius: 16px; border: 1px solid rgba(255,114,130,.28); background: linear-gradient(var(--err-bg), var(--err-bg)), var(--card); }
+:root[data-theme="light"] .feature { border-color: rgba(180,35,24,.22); }
+.feature-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.feature-id { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; }
+.feature-score { margin: 14px 0 2px; font-size: 44px; font-weight: 800; line-height: 1; letter-spacing: -0.03em; color: var(--err); font-variant-numeric: tabular-nums; }
+.feature-gap { color: var(--ink-2); font-size: 14px; margin-bottom: 4px; }
+.feature-meta { color: var(--ink-3); font-size: 12.5px; margin-bottom: 16px; }
+.done { padding: 14px 16px; }
+.done-head { display: flex; justify-content: space-between; align-items: baseline; color: var(--ink-3); font-size: 12px; font-weight: 600; margin-bottom: 6px; }
+.done-head b { color: var(--ink); font-size: 13px; }
+.done-row { width: 100%; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 10px; padding: 10px 8px; border: 1px solid transparent; border-radius: 10px; background: transparent; text-align: left; }
+.done-row:hover { background: var(--card-2); }
+.done-row .t { display: flex; flex-direction: column; line-height: 1.3; }
+.done-row .t span { color: var(--ink-3); font-size: 12px; }
+.done-row .s { font-weight: 700; font-variant-numeric: tabular-nums; }
+.ico-box { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 9px; background: var(--card-2); color: var(--ink-2); }
+
+/* 3. Score over time */
+.chart { padding: 18px 18px 12px; }
+.chart svg { display: block; width: 100%; height: 220px; overflow: visible; }
+.chart .gl { stroke: var(--line); }
+.chart .goal { stroke: var(--ink-3); stroke-dasharray: 4 4; }
+.chart .goal-l { fill: var(--ink-3); font-size: 11px; }
+.chart .line { fill: none; stroke: var(--qa); stroke-width: 2.5; }
+.chart .area { fill: rgba(var(--qa-rgb), .12); }
+.chart .pt { cursor: pointer; }
+.chart .pt circle.o { fill: var(--card); stroke-width: 3; transition: r 150ms var(--ease); }
+.chart .pt:hover circle.o, .chart .pt[aria-pressed="true"] circle.o { r: 9; }
+.chart .pt text { font-size: 12px; font-weight: 700; text-anchor: middle; }
+.chart .xl { fill: var(--ink-3); font-size: 11.5px; text-anchor: middle; }
+.chart .pt:focus-visible { outline: none; }
+.chart .pt:focus-visible circle.o { stroke: var(--mine); }
+
+/* 4. Activity feed */
+.feed { padding: 8px 18px; }
+.feed-item { position: relative; display: grid; grid-template-columns: 74px 22px 1fr auto; align-items: start; gap: 12px; width: 100%; padding: 14px 0; border: 0; border-bottom: 1px solid var(--line); background: none; text-align: left; border-radius: 0; }
+.feed-item:last-child { border-bottom: 0; }
+.feed-day { color: var(--ink-3); font-size: 12px; font-weight: 600; line-height: 1.3; padding-top: 2px; }
+.feed-day b { display: block; color: var(--ink); font-size: 18px; font-weight: 800; }
+.feed-dot { position: relative; display: grid; place-items: center; height: 100%; }
+.feed-dot i { width: 12px; height: 12px; margin-top: 6px; border-radius: 50%; border: 3px solid var(--card); outline: 2px solid currentColor; background: currentColor; }
+.feed-text { font-size: 14px; color: var(--ink-2); }
+.feed-text b { color: var(--ink); }
+.feed-text small { display: block; color: var(--ink-3); font-size: 12px; margin-top: 2px; }
+.feed-item:hover .feed-text b { color: var(--mine); }
+
+/* 5. Goal bars */
+.bars { padding: 10px 18px 16px; }
+.bars-scale { display: grid; grid-template-columns: 150px 1fr 52px; gap: 14px; color: var(--ink-3); font-size: 11px; padding: 6px 0 2px; }
+.bars-scale div { position: relative; }
+.bars-scale span { position: absolute; transform: translateX(-50%); }
+.bar-row { display: grid; grid-template-columns: 150px 1fr 52px; align-items: center; gap: 14px; width: 100%; padding: 12px 8px; margin: 0 -8px; border: 1px solid transparent; border-radius: 10px; background: none; text-align: left; }
+.bar-row:hover { background: var(--card-2); }
+.bar-row .lbl { display: flex; flex-direction: column; line-height: 1.3; }
+.bar-row .lbl b { font-size: 13.5px; }
+.bar-row .lbl span { color: var(--ink-3); font-size: 12px; }
+.track { position: relative; height: 10px; border-radius: 9999px; background: var(--line); }
+.track .fill { position: absolute; inset: 0 auto 0 0; border-radius: inherit; }
+.track .tick { position: absolute; top: -5px; bottom: -5px; width: 2px; border-radius: 2px; background: var(--ink); }
+.bar-row .s { text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+/* 6. Digest */
+.digest { padding: 18px; }
+.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-bottom: 14px; }
+.stat { padding: 12px 14px; border-radius: 12px; background: var(--card-2); }
+.stat b { display: block; font-size: 24px; font-weight: 800; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.stat span { color: var(--ink-3); font-size: 12px; }
+.pills { display: flex; flex-wrap: wrap; gap: 8px; }
+.pill { display: inline-flex; align-items: center; gap: 10px; padding: 8px 12px 8px 8px; border: 1px solid var(--line); border-radius: 9999px; background: var(--card); }
+.pill:hover { border-color: var(--line-2); }
+.pill .sc { display: grid; place-items: center; min-width: 44px; height: 30px; padding: 0 8px; border-radius: 9999px; font-size: 12.5px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.pill .sc.err { background: var(--err-bg); color: var(--err); } .pill .sc.ok { background: var(--ok-bg); color: var(--ok); }
+.pill .sc.warn { background: rgba(247,201,92,.14); color: var(--warn); }
+:root[data-theme="light"] .pill .sc.warn { background: rgba(138,90,0,.1); }
+.pill .t { display: flex; flex-direction: column; line-height: 1.25; text-align: left; }
+.pill .t b { font-size: 13px; } .pill .t span { color: var(--ink-3); font-size: 11.5px; }
+
+@media (max-width: 760px) {
+  .wrap { padding: 36px 16px 64px; }
+  .frame { padding: 14px; }
+  .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .card { padding: 12px; }
+  .card-top span:last-child { display: none; }
+  .sec-head { flex-wrap: wrap; row-gap: 2px; }
+  .sec-head h3 { font-size: 18px; white-space: nowrap; }
+  .sec-head .sub { order: 3; flex-basis: 100%; }
+  .sec-head .exp { white-space: nowrap; padding: 6px 4px; }
+  .split { grid-template-columns: minmax(0, 1fr); }
+  .feed-item { grid-template-columns: 56px 18px 1fr; }
+  .feed-item .chip { grid-column: 3; justify-self: start; }
+  .bars-scale, .bar-row { grid-template-columns: 96px 1fr 44px; gap: 10px; }
+  .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div>
+      <h1>Your evaluations, six ways</h1>
+      <p class="lede">Alternatives to the table on the Dashboard in Only my results, using exactly the same four evaluations: EV-0541 (71%, needs attention), EV-0538 (88%), EV-0533 (93%, a call) and EV-0529 (84%), all on Upland · KCM, against your 85% goal. Click any evaluation to see what it would open.</p>
+    </div>
+    <button class="ctl" type="button" id="themeBtn" aria-pressed="false">Light theme</button>
+  </div>
+  <div class="grid" id="grid"></div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var GOAL = 85;
+  var EVALS = [
+    { id: "EV-0541", date: "2026-10-13", product: "Upland · KCM", type: "Ticket", score: 71, status: "Needs attention", tone: "err" },
+    { id: "EV-0538", date: "2026-10-12", product: "Upland · KCM", type: "Ticket", score: 88, status: "Completed", tone: "ok" },
+    { id: "EV-0533", date: "2026-10-10", product: "Upland · KCM", type: "Call", score: 93, status: "Completed", tone: "ok" },
+    { id: "EV-0529", date: "2026-10-09", product: "Upland · KCM", type: "Ticket", score: 84, status: "Completed", tone: "ok" }
+  ];
+  function svg(paths) { return '<svg class="i" viewBox="0 0 24 24" aria-hidden="true">' + paths + "</svg>"; }
+  var I = {
+    ticket: svg('<path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/>'),
+    phone: svg('<path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384"/>'),
+    download: svg('<path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/>'),
+    sparkles: svg('<path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"/><path d="M20 2v4"/><path d="M22 4h-4"/><circle cx="4" cy="20" r="2"/>'),
+    alert: svg('<circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/>'),
+    check: svg('<circle cx="12" cy="12" r="10"/><path d="m16 9-5.5 5.5L8 12"/>')
+  };
+  function typeIco(e) { return e.type === "Call" ? I.phone : I.ticket; }
+  var MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  var DAYS = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+  function d(e) { var p = e.date.split("-"); return new Date(Date.UTC(+p[0], +p[1] - 1, +p[2])); }
+  function short(e) { var x = d(e); return x.getUTCDate() + " " + MONTHS[x.getUTCMonth()]; }
+  function weekday(e) { return DAYS[d(e).getUTCDay()]; }
+  function gap(e) { var g = e.score - GOAL; var n = Math.abs(g), u = n === 1 ? " pt" : " pts"; return g < 0 ? n + u + " under your goal" : g === 0 ? "at your goal" : n + u + " over your goal"; }
+  function chip(e) { return '<span class="chip ' + e.tone + '">' + e.status + "</span>"; }
+  function scoreTone(e) { return e.score < GOAL ? (e.tone === "err" ? "tone-err" : "tone-warn") : "tone-ok"; }
+  function pickAttrs(e) { return ' data-ev="' + e.id + '" aria-pressed="false"'; }
+  var avg = Math.round(EVALS.reduce(function (a, e) { return a + e.score; }, 0) / EVALS.length);
+  var below = EVALS.filter(function (e) { return e.score < GOAL; }).length;
+
+  function head(sub) {
+    return '<div class="sec-head"><h3>Your evaluations</h3><span class="sub">' + sub + '</span><button class="exp" type="button">' + I.download + "Export CSV</button></div>";
+  }
+
+  var V = [
+    { n: 1, title: "Score cards", sum: "Each evaluation is a card with its score in a ring measured against your 85% goal (the tick on the ring). The one that needs attention is tinted. Scans in one glance, left to right, newest first.",
+      pro: ["The score and the goal read together, without columns", "Four cards fit one row on desktop, two on a phone"],
+      con: ["Gets long past eight or so evaluations", "Rings take more space than a number"],
+      html: function () {
+        return head("Newest first") + '<div class="cards">' + EVALS.map(function (e) {
+          var r = 36, c = 2 * Math.PI * r, val = c * e.score / 100, ga = (GOAL / 100) * 360;
+          var col = e.score < GOAL ? (e.tone === "err" ? "var(--err)" : "var(--warn)") : "var(--ok)";
+          return '<button class="card pick' + (e.tone === "err" ? " is-err" : "") + '" type="button"' + pickAttrs(e) + '>' +
+            '<div class="card-top"><span>' + typeIco(e) + e.id + "</span><span>" + e.type + "</span></div>" +
+            '<div class="ring"><svg viewBox="0 0 84 84"><circle class="track" cx="42" cy="42" r="' + r + '"/>' +
+            '<circle class="val" cx="42" cy="42" r="' + r + '" stroke="' + col + '" stroke-dasharray="' + val + " " + c + '"/>' +
+            '<line class="goal" x1="' + (42 + (r - 6) * Math.cos(ga * Math.PI / 180)) + '" y1="' + (42 + (r - 6) * Math.sin(ga * Math.PI / 180)) + '" x2="' + (42 + (r + 6) * Math.cos(ga * Math.PI / 180)) + '" y2="' + (42 + (r + 6) * Math.sin(ga * Math.PI / 180)) + '"/></svg>' +
+            '<b class="' + scoreTone(e) + '">' + e.score + "%</b></div>" +
+            '<div class="card-date">' + weekday(e) + " " + short(e) + " · " + e.product + "</div>" + chip(e) + "</button>";
+        }).join("") + "</div>";
+      } },
+    { n: 2, title: "Attention first", sum: "The evaluation that needs you leads, large, with how far it is from your goal and the next step (Ask AiMY). The completed ones collapse into a short list beside it with their average.",
+      pro: ["Puts the one thing to act on first, as the briefing does", "The completed list stays calm and compact"],
+      con: ["When nothing needs attention, the layout has to change", "Order is by urgency, not date"],
+      html: function () {
+        var f = EVALS.filter(function (e) { return e.tone === "err"; })[0];
+        var rest = EVALS.filter(function (e) { return e !== f; });
+        var restAvg = Math.round(rest.reduce(function (a, e) { return a + e.score; }, 0) / rest.length);
+        return head("Needs you first") + '<div class="split">' +
+          '<div class="feature pick" role="button" tabindex="0"' + pickAttrs(f) + '>' +
+            '<div class="feature-top"><span class="feature-id">' + typeIco(f) + f.id + " · " + f.type + "</span>" + chip(f) + "</div>" +
+            '<div class="feature-score">' + f.score + "%</div>" +
+            '<div class="feature-gap">' + gap(f).replace("your goal", "your 85% goal") + "</div>" +
+            '<div class="feature-meta">' + weekday(f) + " " + short(f) + " · " + f.product + "</div>" +
+            '<span class="ask">' + I.sparkles + "Ask AiMY what to change</span>" +
+          "</div>" +
+          '<div class="panel done"><div class="done-head"><b>' + rest.length + " completed</b><span>avg " + restAvg + "%</span></div>" +
+          rest.map(function (e) {
+            return '<button class="done-row pick" type="button"' + pickAttrs(e) + '><span class="ico-box">' + typeIco(e) + '</span><span class="t"><b>' + e.id + "</b><span>" + e.type + " · " + short(e) + '</span></span><span class="s ' + scoreTone(e) + '">' + e.score + "%</span></button>";
+          }).join("") + "</div></div>";
+      } },
+    { n: 3, title: "Score over time", sum: "A small line chart: each evaluation is a point on its date, against a dashed 85% goal line. The drop to 71% on 13 Oct is the story, and the chart tells it without reading a row.",
+      pro: ["Shows the trend and the outlier at once", "Consistent with the Quality score mini chart"],
+      con: ["Four points is a thin trend; better as evaluations pile up", "IDs and status move into the hover or click"],
+      html: function () {
+        var pts = EVALS.slice().reverse(), W = 600, H = 200, padL = 48, padR = 20, padT = 22, padB = 30, lo = 60, hi = 100;
+        function x(i) { return padL + i * (W - padL - padR) / (pts.length - 1); }
+        function y(v) { return padT + (hi - v) / (hi - lo) * (H - padT - padB); }
+        var line = pts.map(function (e, i) { return (i ? "L" : "M") + x(i) + "," + y(e.score); }).join(" ");
+        var area = line + " L" + x(pts.length - 1) + "," + (H - padB) + " L" + x(0) + "," + (H - padB) + " Z";
+        var grid = [60, 70, 80, 90, 100].map(function (v) { return '<line class="gl" x1="' + padL + '" x2="' + (W - padR) + '" y1="' + y(v) + '" y2="' + y(v) + '"/><text class="xl" x="' + (padL - 22) + '" y="' + (y(v) + 4) + '">' + v + "</text>"; }).join("");
+        var dots = pts.map(function (e, i) {
+          var col = e.score < GOAL ? (e.tone === "err" ? "var(--err)" : "var(--warn)") : "var(--ok)";
+          return '<g class="pt pick" tabindex="0" role="button"' + pickAttrs(e) + ' aria-label="' + e.id + ", " + e.score + '%"><circle class="o" cx="' + x(i) + '" cy="' + y(e.score) + '" r="7" stroke="' + col + '"/><text x="' + x(i) + '" y="' + (y(e.score) - 14) + '" fill="' + col + '">' + e.score + "%</text>" +
+            '<text class="xl" x="' + x(i) + '" y="' + (H - 8) + '">' + short(e) + "</text></g>";
+        }).join("");
+        return head("Last 5 days · Upland · KCM") + '<div class="panel chart"><svg viewBox="0 0 ' + W + " " + H + '" preserveAspectRatio="xMidYMid meet">' + grid +
+          '<line class="goal" x1="' + padL + '" x2="' + (W - padR) + '" y1="' + y(GOAL) + '" y2="' + y(GOAL) + '"/><text class="goal-l" x="' + (W - padR) + '" y="' + (y(GOAL) - 6) + '" text-anchor="end">Your goal 85%</text>' +
+          '<path class="area" d="' + area + '"/><path class="line" d="' + line + '"/>' + dots + "</svg></div>";
+      } },
+    { n: 4, title: "Activity feed", sum: "A timeline that reads like AiMY's briefing: one sentence per evaluation, on its day, with how it sits against your goal. Easy to scan top to bottom, and it explains itself.",
+      pro: ["Sentences say what the numbers mean (\"14 pts under your goal\")", "Matches the voice of 'Since your last visit'"],
+      con: ["Slower to compare scores side by side", "Longer than the table for the same data"],
+      html: function () {
+        return head("Newest first") + '<div class="panel feed">' + EVALS.map(function (e) {
+          var colr = e.tone === "err" ? "var(--err)" : e.score < GOAL ? "var(--warn)" : "var(--ok)";
+          return '<button class="feed-item pick" type="button"' + pickAttrs(e) + '>' +
+            '<span class="feed-day">' + weekday(e) + "<b>" + short(e) + "</b></span>" +
+            '<span class="feed-dot" style="color:' + colr + '"><i></i></span>' +
+            '<span class="feed-text"><b>' + e.id + "</b>, a " + e.type.toLowerCase() + ' evaluation, scored <b class="' + scoreTone(e) + '">' + e.score + "%</b>, " + gap(e) + ".<small>" + e.product + "</small></span>" + chip(e) + "</button>";
+        }).join("") + "</div>";
+      } },
+    { n: 5, title: "Goal bars", sum: "Each evaluation is a bar from 0 to 100 with a tick at your 85% goal, the same visual language as the KPI bars. Above or below the goal reads instantly, in colour and in position.",
+      pro: ["Fast comparison across evaluations", "Reuses the KPI bar pattern people already know"],
+      con: ["Status lives only in colour unless labelled", "Bars for 84% and 88% look close; the tick does the work"],
+      html: function () {
+        return head("Newest first · tick = your 85% goal") + '<div class="panel bars"><div class="bars-scale"><div></div><div><span style="left:0%">0</span><span style="left:50%">50</span><span style="left:85%">85</span><span style="left:100%">100</span></div><div></div></div>' +
+          EVALS.map(function (e) {
+            var col = e.score < GOAL ? (e.tone === "err" ? "var(--err)" : "var(--warn)") : "var(--ok)";
+            return '<button class="bar-row pick" type="button"' + pickAttrs(e) + '><span class="lbl"><b>' + e.id + "</b><span>" + e.type + " · " + short(e) + '</span></span><span class="track"><span class="fill" style="width:' + e.score + "%;background:" + col + '"></span><span class="tick" style="left:calc(' + GOAL + '% - 1px)"></span></span><span class="s ' + scoreTone(e) + '">' + e.score + "%</span></button>";
+          }).join("") + "</div>";
+      } },
+    { n: 6, title: "Digest and pills", sum: "A one-line digest of the period (count, average, how many are under goal, how many need attention), then each evaluation as a compact pill. Small, and the summary does the work a table can't.",
+      pro: ["Answers 'how am I doing overall?' before the detail", "Very compact; wraps naturally on a phone"],
+      con: ["Pills hold less detail; status is a colour on the score", "The digest numbers must stay in sync with the records"],
+      html: function () {
+        return head("Last 5 days") + '<div class="panel digest"><div class="stats">' +
+          '<div class="stat"><b>' + EVALS.length + "</b><span>evaluations</span></div>" +
+          '<div class="stat"><b class="' + (avg < GOAL ? "tone-warn" : "tone-ok") + '">' + avg + "%</b><span>average score</span></div>" +
+          '<div class="stat"><b class="tone-warn">' + below + "</b><span>under your 85% goal</span></div>" +
+          '<div class="stat"><b class="tone-err">' + EVALS.filter(function (e) { return e.tone === "err"; }).length + "</b><span>need attention</span></div></div>" +
+          '<div class="pills">' + EVALS.map(function (e) {
+            return '<button class="pill pick" type="button"' + pickAttrs(e) + '><span class="sc ' + (e.tone === "err" ? "err" : e.score < GOAL ? "warn" : "ok") + '">' + e.score + '%</span><span class="t"><b>' + e.id + "</b><span>" + e.type + " · " + short(e) + "</span></span></button>";
+          }).join("") + "</div></div>";
+      } }
+  ];
+
+  var grid = document.getElementById("grid");
+  V.forEach(function (v) {
+    var art = document.createElement("article");
+    art.className = "v";
+    art.innerHTML = '<div class="v-meta"><span class="v-id">' + v.n + '</span><h2 class="v-title">' + v.title + '</h2><p class="v-sum">' + v.sum + "</p></div>" +
+      '<div class="frame">' + v.html() + '<p class="picked" aria-live="polite"></p></div>' +
+      '<div class="notes"><div><b>Strong</b><ul>' + v.pro.map(function (p) { return "<li>" + p + "</li>"; }).join("") + "</ul></div>" +
+      '<div><b>Weak</b><ul>' + v.con.map(function (p) { return "<li>" + p + "</li>"; }).join("") + "</ul></div></div>";
+    grid.appendChild(art);
+  });
+
+  function pick(el) {
+    var frame = el.closest(".frame"), id = el.getAttribute("data-ev"), e = EVALS.filter(function (x) { return x.id === id; })[0];
+    frame.querySelectorAll(".pick").forEach(function (p) { p.setAttribute("aria-pressed", String(p === el)); });
+    frame.querySelector(".picked").innerHTML = "Opens <b>" + e.id + "</b> in AiMY: the " + e.type.toLowerCase() + " evaluation from " + e.date + " scored " + e.score + "%, with its KPIs and what to change next time.";
+  }
+  document.addEventListener("click", function (ev) { var p = ev.target.closest && ev.target.closest(".pick"); if (p) pick(p); });
+  document.addEventListener("keydown", function (ev) {
+    if (ev.key !== "Enter" && ev.key !== " ") return;
+    var p = ev.target.closest && ev.target.closest(".pick");
+    if (p && p.tagName !== "BUTTON") { ev.preventDefault(); pick(p); }
+  });
+  var themeBtn = document.getElementById("themeBtn");
+  themeBtn.addEventListener("click", function () {
+    var light = document.documentElement.getAttribute("data-theme") !== "light";
+    if (light) document.documentElement.setAttribute("data-theme", "light"); else document.documentElement.removeAttribute("data-theme");
+    themeBtn.setAttribute("aria-pressed", String(light));
+  });
+})();
+</script>
+</body>
+</html>
