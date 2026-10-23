@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Product Insights Options</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* Five ways to bring Product Insights into AiMY QA. Each preview is the live
+   mock in design-strategy/product-insights/: a copy of the real Dashboard or
+   Reviews with the option placed on it (see build.mjs there). */
+:root {
+  --page: #171a1c; --card: #141b24; --card-2: #1c2630; --line: rgba(255,255,255,.07); --line-2: rgba(255,255,255,.12);
+  --ink: #f5f7fb; --ink-2: #c3ceda; --ink-3: #93a2b4;
+  --accent: #3369ff; --accent-ink: #8fb0ff; --accent-bg: rgba(51,105,255,.14);
+  --ok: #4ed6a1; --ok-bg: rgba(78,214,161,.12); --warn: #f7c95c; --err: #ff7282;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --page: #eef1f6; --card: #ffffff; --card-2: #f4f6fa; --line: rgba(16,24,40,.09); --line-2: rgba(16,24,40,.15);
+    --ink: #10151b; --ink-2: #2a3540; --ink-3: #566472;
+    --accent: #2457e6; --accent-ink: #1f4fd1; --accent-bg: rgba(36,87,230,.09);
+    --ok: #0a6b40; --ok-bg: rgba(10,107,64,.08); --warn: #8a5a00; --err: #b42318;
+    color-scheme: light;
+  }
+}
+:root[data-theme="light"] {
+  --page: #eef1f6; --card: #ffffff; --card-2: #f4f6fa; --line: rgba(16,24,40,.09); --line-2: rgba(16,24,40,.15);
+  --ink: #10151b; --ink-2: #2a3540; --ink-3: #566472;
+  --accent: #2457e6; --accent-ink: #1f4fd1; --accent-bg: rgba(36,87,230,.09);
+  --ok: #0a6b40; --ok-bg: rgba(10,107,64,.08); --warn: #8a5a00; --err: #b42318;
+  color-scheme: light;
+}
+* { box-sizing: border-box; margin: 0; }
+body { background: var(--page); color: var(--ink); font-family: "Poppins", system-ui, sans-serif; line-height: 1.55; font-size: 14px; }
+a { color: var(--accent-ink); text-underline-offset: 3px; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+svg.i { width: 16px; height: 16px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+.wrap { max-width: 1180px; margin: 0 auto; padding: 56px max(16px, env(safe-area-inset-left)) 96px; }
+.eyebrow { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--accent-ink); }
+h1 { font-size: clamp(28px, 4.4vw, 42px); font-weight: 800; letter-spacing: -.02em; line-height: 1.1; margin-top: 8px; text-wrap: balance; }
+h2 { font-size: 22px; font-weight: 700; letter-spacing: -.01em; line-height: 1.2; text-wrap: balance; }
+h3 { font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 6px; }
+.lede { max-width: 72ch; margin-top: 12px; color: var(--ink-2); font-size: 15px; }
+
+.decided { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 10px; margin-top: 28px; }
+.dc { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; display: grid; gap: 2px; font-size: 13px; color: var(--ink-2); }
+.dc b { color: var(--ink); font-size: 14px; }
+
+.shared { margin-top: 44px; display: grid; gap: 12px; }
+.shared ul { padding-left: 18px; display: grid; gap: 6px; max-width: 86ch; color: var(--ink-2); }
+.shared li b { color: var(--ink); font-weight: 600; }
+
+.opt { margin-top: 64px; padding-top: 28px; border-top: 1px solid var(--line); display: grid; gap: 16px; }
+.opt-head { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; }
+.opt-id { display: inline-grid; place-items: center; min-width: 34px; height: 30px; padding: 0 9px; border-radius: 8px; background: var(--accent-bg); color: var(--accent-ink); font-weight: 800; font-size: 15px; }
+.tag { font-size: 12px; font-weight: 600; border-radius: 999px; padding: 2px 10px; border: 1px solid currentColor; }
+.tag.rec { color: var(--ok); }
+.opt-sum { color: var(--ink-2); max-width: 80ch; }
+.opt-actions { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; font-size: 13px; }
+.open { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 14px; border-radius: 999px; background: var(--accent); color: #fff; font-weight: 600; text-decoration: none; }
+.open:hover { filter: brightness(1.08); }
+
+/* Live preview: the real page at 1440 x 900, scaled to the column. */
+.pv { position: relative; width: 100%; aspect-ratio: 16 / 10; border-radius: 14px; overflow: hidden; border: 1px solid var(--line-2); background: #0f1215; }
+.pv iframe { position: absolute; top: 0; left: 0; width: 1440px; height: 900px; border: 0; transform-origin: 0 0; }
+.pv-note { font-size: 12px; color: var(--ink-3); }
+
+.cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px 28px; }
+.cols ul { padding-left: 18px; display: grid; gap: 5px; color: var(--ink-2); font-size: 13.5px; }
+.cols .good h3 { color: var(--ok); }
+.cols .cost h3 { color: var(--err); }
+.budget { font-size: 13px; color: var(--ink-2); }
+.budget b { color: var(--ink); }
+
+.table-wrap { margin-top: 64px; display: grid; gap: 12px; }
+.scroll-x { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; }
+table { border-collapse: collapse; width: 100%; min-width: 760px; font-size: 13px; }
+th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--ink-3); background: var(--card); }
+td { background: var(--card); color: var(--ink-2); }
+td:first-child { color: var(--ink); font-weight: 600; white-space: nowrap; }
+tr:last-child td { border-bottom: 0; }
+.y { color: var(--ok); font-weight: 600; } .n { color: var(--err); font-weight: 600; } .m { color: var(--warn); font-weight: 600; }
+
+.callout { margin-top: 56px; background: var(--accent-bg); border-radius: 16px; padding: 24px; display: grid; gap: 10px; }
+.callout p, .callout li { max-width: 82ch; color: var(--ink-2); }
+.callout ol { padding-left: 20px; display: grid; gap: 6px; }
+.callout b { color: var(--ink); }
+.foot { margin-top: 40px; font-size: 12.5px; color: var(--ink-3); display: grid; gap: 6px; }
+code { font-family: ui-monospace, "JetBrains Mono", monospace; font-size: 12px; background: var(--card-2); padding: 1px 6px; border-radius: 6px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="eyebrow">Product Insights</p>
+  <h1>Five ways to bring Product Insights into AiMY QA</h1>
+  <p class="lede">Each option below is placed on the real Dashboard or Reviews page, with the product's own shell, AiMY conversation and components, so you can click through it as a user would. The feature follows the AiMY design system; nothing in the design system was changed to fit it. All figures are illustrative.</p>
+
+  <div class="decided" aria-label="Decisions this sheet assumes">
+    <div class="dc"><b>Every client contract</b>Audit, Evaluation and Audit + Evaluation clients all see it.</div>
+    <div class="dc"><b>Every role</b>QA managers, product owners and knowledge owners.</div>
+    <div class="dc"><b>No "AiMY canvas" badge</b>The conversation opens with the product's own "Based on" line.</div>
+    <div class="dc"><b>Design system first</b>Built from existing components; the few gaps are marked as proposals.</div>
+  </div>
+
+  <section class="shared">
+    <h2>What every option shares</h2>
+    <ul>
+      <li><b>The same AiMY answer:</b> what customers report and what it costs, <b>From your calls</b> (quotes that play the call), <b>Related articles</b> (external ones say so, with source and date) and <b>Suggested next step</b> (what it is based on, and that it is untested).</li>
+      <li><b>The same knowledge draft:</b> a reviewed action in the product's decision zone, Accept, Edit first or Reject. Accepting sends it to the knowledge review queue and the issue moves to <b>Staged</b> everywhere it is listed. Nothing publishes without a Knowledge Manager.</li>
+      <li><b>Ranked by support time, not count:</b> Invoice (97 calls, 18 h) outranks Login (142 calls, 15 h). The bar in each row is its share of support time, in one neutral colour.</li>
+      <li><b>A scope sentence</b> that reads the real filter row, and says when call length does not apply (Interaction: Tickets).</li>
+      <li><b>Typed questions work:</b> asking "what are customers calling about" in the Ask AiMY bar reaches the same answers.</li>
+    </ul>
+  </section>
+
+  <!-- A -->
+  <article class="opt" id="a" aria-labelledby="a-title">
+    <div class="opt-head"><span class="opt-id">A</span><h2 id="a-title">A card on the Dashboard, detail in AiMY</h2><span class="tag rec">Recommended</span></div>
+    <p class="opt-sum">A <b>Product insights</b> card under Audit performance by product, in that card's own anatomy: scope, cost pills, the three costliest issues, AiMY's line, and two action rows. Every row asks AiMY about that issue.</p>
+    <div class="pv" data-src="product-insights/index.html?option=a&amp;focus=card"><iframe title="Option A, live mock" loading="lazy" tabindex="-1"></iframe></div>
+    <div class="opt-actions"><a class="open" href="product-insights/index.html?option=a">Open the live mock</a><span class="pv-note">Try: click "Setup instructions unclear", then "Draft a knowledge article", then Accept.</span></div>
+    <p class="budget"><b>Dashboard blocks: no change.</b> The AiMY Detected strip is removed; its one line repeats what Improvement opportunities already lists. Evaluation clients get the card after their KPI row.</p>
+    <div class="cols">
+      <div class="good"><h3>What works</h3><ul><li>Briefing-to-Canvas as the doctrine describes it: brief on the page, depth in AiMY.</li><li>The cost is visible without asking: 307 h of support, 36% on recurring issues.</li><li>Work state on every row, and it moves when a decision is made.</li></ul></div>
+      <div class="cost"><h3>What it costs</h3><ul><li>The right column becomes longer than the left.</li><li>Customer issues sit next to agent-quality cards; the card's title has to carry the boundary.</li><li>Only three issues on the page; the rest are one question away.</li></ul></div>
+    </div>
+  </article>
+
+  <!-- B -->
+  <article class="opt" id="b" aria-labelledby="b-title">
+    <div class="opt-head"><span class="opt-id">B</span><h2 id="b-title">Folded into blocks that already exist</h2></div>
+    <p class="opt-sum">No new block. Since your last visit gains one sentence and one question, and the costliest issue joins Improvement opportunities as a card.</p>
+    <div class="pv" data-src="product-insights/index.html?option=b"><iframe title="Option B, live mock" loading="lazy" tabindex="-1"></iframe></div>
+    <div class="opt-actions"><a class="open" href="product-insights/index.html?option=b">Open the live mock</a><a href="product-insights/index.html?option=b&amp;focus=insight">Jump to the card</a><span class="pv-note">See the briefing's fourth button and the "Customers: setup instructions unclear" card.</span></div>
+    <p class="budget"><b>Dashboard blocks: no change.</b></p>
+    <div class="cols">
+      <div class="good"><h3>What works</h3><ul><li>Nothing new to learn and no layout change.</li><li>The briefing names the issue the moment the page opens.</li></ul></div>
+      <div class="cost"><h3>What it costs</h3><ul><li>A customer issue ranked among audit KPIs reads as an agent failure, which breaks the audit and evaluation boundary in the README.</li><li>The briefing goes to four buttons.</li><li>One issue is visible; the other eleven and their cost are not.</li></ul></div>
+    </div>
+  </article>
+
+  <!-- C -->
+  <article class="opt" id="c" aria-labelledby="c-title">
+    <div class="opt-head"><span class="opt-id">C</span><h2 id="c-title">AiMY only</h2></div>
+    <p class="opt-sum">Nothing on the Dashboard. A finding in the AiMY insights rail, a nudge above the Ask AiMY bar (the conversation-resume pill's component), and suggested questions when the conversation opens empty.</p>
+    <div class="pv" data-src="product-insights/index.html?option=c"><iframe title="Option C, live mock" loading="lazy" tabindex="-1"></iframe></div>
+    <div class="opt-actions"><a class="open" href="product-insights/index.html?option=c">Open the live mock</a><span class="pv-note">Try: the "New · 12 issues customers keep calling about" pill above the bar.</span></div>
+    <p class="budget"><b>Dashboard blocks: no change.</b></p>
+    <div class="cols">
+      <div class="good"><h3>What works</h3><ul><li>Cheapest to build; no layout risk.</li><li>The conversation carries the full depth, ranked list included.</li></ul></div>
+      <div class="cost"><h3>What it costs</h3><ul><li>Easy to miss: a rail line and a pill compete with everything else.</li><li>Nothing on the page holds the work state, so a drafted fix has nowhere to show it moved.</li><li>The nudge and the "Continue" pill share the same spot.</li></ul></div>
+    </div>
+  </article>
+
+  <!-- D -->
+  <article class="opt" id="d" aria-labelledby="d-title">
+    <div class="opt-head"><span class="opt-id">D</span><h2 id="d-title">A page of its own, with a Dashboard teaser</h2></div>
+    <p class="opt-sum"><b>Customer issues</b> joins the rail after Reviews. Four stat cards, Issues or Knowledge drafts, group by issue, client or product, and an issue list with its detail beside it. The Dashboard gets one line in the Detected strip's component.</p>
+    <div class="pv" data-src="product-insights/customer-issues.html?option=d"><iframe title="Option D, live mock" loading="lazy" tabindex="-1"></iframe></div>
+    <div class="opt-actions"><a class="open" href="product-insights/customer-issues.html?option=d">Open the live mock</a><a href="product-insights/index.html?option=d&amp;focus=teaser">See the Dashboard teaser</a><span class="pv-note">Try: Group by Client, and the Knowledge drafts tab.</span></div>
+    <p class="budget"><b>Dashboard blocks: one more</b> (the teaser line), unless it replaces the Detected strip as in A.</p>
+    <div class="cols">
+      <div class="good"><h3>What works</h3><ul><li>Room to compare many issues, by client or product.</li><li>A real knowledge review queue, the one structured workflow the feature needs.</li><li>Product and knowledge owners get a page that is theirs.</li></ul></div>
+      <div class="cost"><h3>What it costs</h3><ul><li>The doctrine allows a new page only when AiMY or an existing workflow cannot carry it; this has to be argued.</li><li>A seventh rail item.</li><li>The most to build and keep in step with the Dashboard.</li></ul></div>
+    </div>
+  </article>
+
+  <!-- E -->
+  <article class="opt" id="e" aria-labelledby="e-title">
+    <div class="opt-head"><span class="opt-id">E</span><h2 id="e-title">An Issues tab in Reviews</h2></div>
+    <p class="opt-sum">A fifth tab after Calls, Tickets, Disputes and Agents, in Reviews' own table. A row asks AiMY about the issue; the rail's Reviews section gains a finding.</p>
+    <div class="pv" data-src="product-insights/agent-scorecards.html?option=e&amp;view=evals&amp;tbl=issues&amp;focus=issues"><iframe title="Option E, live mock" loading="lazy" tabindex="-1"></iframe></div>
+    <div class="opt-actions"><a class="open" href="product-insights/agent-scorecards.html?option=e&amp;view=evals&amp;tbl=issues">Open the live mock</a><span class="pv-note">Try: a row, then the draft. Reviews' decision handler is HR-only, so the mock resolves the draft itself.</span></div>
+    <p class="budget"><b>Dashboard blocks: no change.</b></p>
+    <div class="cols">
+      <div class="good"><h3>What works</h3><ul><li>A table people already use, next to the calls the quotes come from.</li><li>No Dashboard change.</li></ul></div>
+      <div class="cost"><h3>What it costs</h3><ul><li>Reviews is where agents are judged; customer issues there read as agent problems.</li><li>Reviews' filters (agent, status, sentiment) do not apply to issues.</li><li>Product owners would not look for it in Reviews.</li></ul></div>
+    </div>
+  </article>
+
+  <section class="table-wrap" aria-labelledby="cmp-title">
+    <h2 id="cmp-title">Side by side</h2>
+    <div class="scroll-x">
+      <table>
+        <thead><tr><th scope="col">Option</th><th scope="col">Dashboard blocks</th><th scope="col">Seen without asking</th><th scope="col">Cost on the page</th><th scope="col">Compare many issues</th><th scope="col">Work state visible</th><th scope="col">Build effort</th></tr></thead>
+        <tbody>
+          <tr><td>A · Card</td><td class="y">No change</td><td class="y">Yes</td><td class="y">Yes</td><td class="m">In AiMY</td><td class="y">Yes</td><td class="y">Low</td></tr>
+          <tr><td>B · Folded in</td><td class="y">No change</td><td class="m">One issue</td><td class="m">One issue</td><td class="n">No</td><td class="m">One card</td><td class="y">Lowest</td></tr>
+          <tr><td>C · AiMY only</td><td class="y">No change</td><td class="n">Easy to miss</td><td class="n">No</td><td class="m">In AiMY</td><td class="n">No</td><td class="y">Lowest</td></tr>
+          <tr><td>D · Own page</td><td class="m">One more</td><td class="m">Teaser line</td><td class="y">Yes</td><td class="y">Yes</td><td class="y">Yes</td><td class="n">High</td></tr>
+          <tr><td>E · Reviews tab</td><td class="y">No change</td><td class="n">In Reviews</td><td class="m">In the table</td><td class="y">Yes</td><td class="y">Yes</td><td class="m">Medium</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="callout" aria-labelledby="rec-title">
+    <h2 id="rec-title">Recommendation</h2>
+    <ol>
+      <li><b>Ship A first.</b> It keeps the Dashboard at its block budget, shows the cost without a question, and uses the conversation for depth as the doctrine intends.</li>
+      <li><b>Take two things from D later:</b> the knowledge review queue (a structured workflow AiMY should hand off to) and grouping by client or product. Give them a page only if testing shows managers need to compare many issues at once.</li>
+      <li><b>Avoid B and E.</b> Both put customer issues where agents are judged.</li>
+    </ol>
+  </section>
+
+  <div class="foot">
+    <p><b>Proposed for the design system</b> (marked PROPOSED in <code>product-insights/pi.css</code>): the scope sentence, the section label inside an answer, the customer quote that plays the call, the related-article row, and the issue row's meta line. Everything else is an existing component.</p>
+    <p><b>Rebuild after the product pages change:</b> <code>node design-strategy/product-insights/build.mjs</code>. Switch options inside a mock from Demo controls (bottom right).</p>
+    <p>Builds on the <a href="exports/product-insights-cases.html">Product Insights cases sheet</a>, the research brief and the UI/UX plan. All figures, issues and client names are illustrative.</p>
+  </div>
+</div>
+<script>
+/* Scale each live preview to its column, and load it when it nears view. */
+(function () {
+  var pvs = Array.prototype.slice.call(document.querySelectorAll(".pv"));
+  function fit(pv) { var f = pv.querySelector("iframe"); f.style.transform = "scale(" + (pv.clientWidth / 1440) + ")"; }
+  function load(pv) { var f = pv.querySelector("iframe"); if (!f.src) f.src = pv.getAttribute("data-src"); fit(pv); }
+  if ("IntersectionObserver" in window) {
+    var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { load(e.target); io.unobserve(e.target); } }); }, { rootMargin: "600px 0px" });
+    pvs.forEach(function (pv) { io.observe(pv); });
+  } else pvs.forEach(load);
+  window.addEventListener("resize", function () { pvs.forEach(fit); });
+  pvs.forEach(fit);
+})();
+</script>
+</body>
+</html>
