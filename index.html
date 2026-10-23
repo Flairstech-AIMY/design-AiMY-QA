@@ -7511,6 +7511,157 @@
       @media (max-width: 640px) {
         .ev-feed { --ev-dw: 62px; }
       }
+
+      /* ══ PRODUCT INSIGHTS ═══════════════════════════════════════════════
+         What customers keep calling about, ranked by the support time it
+         costs (option A in design-strategy/product-insights-options.html).
+         The card is the Audit performance by product card's own anatomy;
+         the detail lives in the AiMY conversation. Team-level only: hidden
+         while Only my results is on (data-my-qa="hide").
+         The pieces marked PROPOSED have no design-system entry yet and are
+         to be proposed there: the scope sentence, the issue row's meta line,
+         and the answer's section label, customer quote and article row. */
+      .pi-card { margin-top: 12px; }
+      .pi-card .evidence-row { margin-bottom: 12px; }
+      .pi-card .eval-bar-row { cursor: pointer; }
+      .pi-card .eval-bar-row:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: var(--r-md); }
+      /* Issue names are longer than product names: let the figures drop
+         under the name instead of running past the card on narrow widths. */
+      .pi-card .eval-bar-top,
+      .pi-ans .eval-bar-top { flex-wrap: wrap; row-gap: 2px; }
+      .pi-card .eval-bar-right,
+      .pi-ans .eval-bar-right { margin-left: auto; }
+      /* The bar is share of support time: cost, not failure, so one neutral
+         accent and no severity colour. */
+      .pi-card .eval-bar-fill,
+      .pi-ans .eval-bar-fill { background: rgba(var(--accent-rgb), 0.55); }
+      .pi-card .eval-bar-avg,
+      .pi-ans .eval-bar-avg { color: var(--d50); }
+      /* The section: four .bcard tiles in a row after the KPI row. The
+         recurring-issues tile leads; its bar is split into the issue cards
+         beside it plus the rest, so the bar is their key. PROPOSED pieces:
+         the split bar, the faded preview of the rest, and the +N count. */
+      /* Same 16px the KPI row leaves before the next block, so the right
+         column's first card does not sit flush under the section. */
+      .pi-section { margin: 4px 0 16px; container-type: inline-size; }
+      .pi-section .dashboard-section-head { flex-wrap: wrap; row-gap: 2px; }
+      .pi-section .dashboard-section-head b { color: var(--d300); font-weight: 600; }
+      .pi-mix { display: grid; grid-template-columns: minmax(230px, 1.15fr) repeat(3, minmax(0, 1fr)); gap: 12px; }
+      /* Sized by the section, not the window: the rail and the canvas both
+         change how wide the dashboard column is. */
+      @container (max-width: 960px) { .pi-mix { grid-template-columns: repeat(3, minmax(0, 1fr)); } .pi-lead { grid-column: 1 / -1; } }
+      @container (max-width: 640px) { .pi-mix { grid-template-columns: minmax(0, 1fr); } }
+      .pi-mix .bcard-stat { white-space: nowrap; }
+      .pi-mix .bcard { display: flex; flex-direction: column; }
+      .pi-mix .bcard-body { flex: 1; display: flex; flex-direction: column; }
+      .pi-mix .aimy-done { margin-top: auto; }
+      .pi-mix .bcard:focus-visible { outline: 2px solid var(--qa-accent); outline-offset: 2px; }
+      .pi-lead { border-color: rgba(var(--qa-accent-rgb), 0.24); }
+      .pi-badge { background: rgba(var(--qa-accent-rgb), 0.15); color: var(--qa-accent); border: 1px solid rgba(var(--qa-accent-rgb), 0.24); }
+      .pi-stack { display: flex; gap: 2px; height: 6px; margin-top: 11px; border-radius: 3px; overflow: hidden; background: var(--wash-7); }
+      .pi-stack i { display: block; height: 100%; background: rgba(var(--qa-accent-rgb), var(--o, 0.55)); transition: opacity var(--transition-fast); }
+      .pi-stack i.pi-rest { background: transparent; }
+      .pi-stack.is-lit i:not(.is-on) { opacity: 0.25; }
+      .pi-stack.is-lit i.pi-rest.is-on { background: rgba(var(--qa-accent-rgb), 0.35); }
+      .pi-peek { display: grid; gap: 5px; margin: 7px 0 12px;
+        -webkit-mask-image: linear-gradient(180deg, #000 40%, transparent); mask-image: linear-gradient(180deg, #000 40%, transparent); }
+      .pi-peek > span { display: flex; justify-content: space-between; gap: 10px; font-size: 11.5px; font-weight: 500; color: var(--d200); }
+      .pi-peek > span > span { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+      .pi-peek b { color: var(--d50); font-weight: 600; }
+      .pi-count { display: inline-grid; place-items: center; min-width: 30px; height: 26px; padding: 0 7px; border-radius: 9999px; background: rgba(var(--qa-accent-rgb), 0.15); border: 1px solid rgba(var(--qa-accent-rgb), 0.24); color: var(--qa-accent); font-size: 12px; font-weight: 700; }
+      .pi-ask { display: inline-flex; align-items: center; gap: 5px; }
+      .pi-ask .pi-ask-mark { width: 13px; height: 14px; flex-shrink: 0; }
+      .pi-lead:hover .pi-ask { background: rgba(111, 223, 226, 0.18); }
+      /* Status and client count on one line in every card: the shared
+         footer text asks for 130px, which a wider chip like Recommended
+         leaves no room for. */
+      .pi-issue .aimy-done { flex-wrap: nowrap; }
+      .pi-issue .aimy-done-text { flex: 0 1 auto; white-space: nowrap; }
+      .pi-issue-name { margin: 8px 0 0; font-size: 13px; font-weight: 600; line-height: 1.4; color: var(--d50); }
+      .pi-issue-quote { display: block; margin: 8px 0 12px; padding-left: 10px; border-left: 2px solid rgba(var(--qa-accent-rgb), 0.45); font-size: 11.5px; line-height: 1.5; color: var(--d300); }
+      .pi-section .pi-scope-note { display: inline; margin: 0 0 0 6px; }
+      /* Audit health row: the four cards end on the same footer line. Each
+         footer is pinned to the bottom of its card and laid out the same way,
+         mark and status, then the text (room for two lines), then the action,
+         so status, text and action sit level across the row whatever the
+         card above them says. */
+      .tier-1-grid > .bcard { display: flex; flex-direction: column; }
+      .tier-1-grid > .bcard > .bcard-body { flex: 1; display: flex; flex-direction: column; }
+      .tier-1-grid > .bcard .bcard-stat-line,
+      .tier-1-grid > .bcard .bcard-status { margin-bottom: 12px; }
+      .tier-1-grid > .bcard .bcard-stat-line:has(+ .bcard-status) { margin-bottom: 2px; }
+      .tier-1-grid > .bcard .aimy-done {
+        margin-top: auto; display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 8px;
+      }
+      .tier-1-grid > .bcard .aimy-done > .work-state { justify-self: start; }
+      .tier-1-grid > .bcard .aimy-done > .aimy-done-text { grid-column: 1 / -1; min-height: calc(11px * 1.4 * 2); }
+      .tier-1-grid > .bcard .aimy-done > .aimy-done-actions { grid-column: 1 / -1; }
+      /* PROPOSED: scope sentence */
+      .pi-scope { margin: 0 0 10px; font-size: 11px; line-height: 1.5; color: var(--d400); }
+      .pi-scope b { color: var(--d200); font-weight: 600; }
+      .pi-scope-note { display: block; margin-top: 2px; color: var(--warn); }
+      /* PROPOSED: issue row meta line (work state + who it affects) */
+      .pi-row-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 8px; margin-top: 6px; font-size: 10.5px; color: var(--d400); }
+      .pi-row-meta .work-state { font-size: 9.5px; }
+      /* Inside an AiMY answer */
+      .pi-ans { display: grid; gap: 14px; }
+      .pi-ans-lead { margin: 0; font-size: 13px; line-height: 1.6; color: var(--d100); }
+      .pi-ans-lead strong { color: var(--d50); }
+      .pi-ans .evidence-row { margin: 0; }
+      .pi-ans .eval-bars { display: grid; gap: 4px; }
+      .pi-ans .eval-bar-row { cursor: pointer; }
+      /* PROPOSED: section label inside an answer, the type of .canvas-type-label */
+      .pi-sec { display: grid; gap: 8px; }
+      .pi-sec-label { font-size: 9px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--d500); }
+      .pi-sec p { margin: 0; font-size: 12.5px; line-height: 1.6; color: var(--d200); }
+      .pi-sec p strong { color: var(--d50); }
+      .pi-basis { margin: 0; font-size: 11px; line-height: 1.5; color: var(--d400); }
+      .pi-sec .pi-basis { font-size: 11px; color: var(--d400); }
+      /* PROPOSED: customer quote, which plays the call where it was said */
+      .pi-quote { margin: 0; padding: 8px 10px; border-radius: var(--r-md); background: var(--wash-3); border: 1px solid var(--card-border); display: grid; gap: 4px; }
+      .pi-quote q { font-size: 12.5px; line-height: 1.55; color: var(--d100); }
+      .pi-quote footer { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; font-size: 10.5px; color: var(--d400); }
+      /* PROPOSED: related article row; an external source says so */
+      .pi-art { display: flex; align-items: flex-start; gap: 12px; padding: 8px 10px; border-radius: var(--r-md); border: 1px solid var(--card-border); }
+      .pi-art-main { flex: 1; min-width: 0; display: grid; gap: 2px; }
+      .pi-art-main b { font-size: 12px; font-weight: 700; color: var(--d50); }
+      .pi-art-main small { font-size: 10.5px; color: var(--d400); }
+      .pi-art-main span { font-size: 11.5px; line-height: 1.5; color: var(--d300); }
+      .pi-art .msg-data-ref, .pi-quote .msg-data-ref { font-size: 11px; white-space: nowrap; background: none; border: 0; padding: 0; font-family: inherit; }
+      /* PROPOSED: the issue answer. A Based on row, then three labelled parts
+         (calls, articles, AiMY's suggestion), then follow-up questions. */
+      .pi-issue-ans { gap: 10px; }
+      .overlay-filter-suggestions.is-off { display: none; }
+      .pi-part { display: grid; gap: 8px; padding: 12px 14px; border-radius: var(--r-md); background: rgba(0, 0, 0, 0.2); border: 1px solid var(--card-border); }
+      .pi-part-label { display: flex; align-items: center; gap: 8px; font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--d400); }
+      .pi-part-label i { width: 7px; height: 7px; border-radius: 50%; background: var(--d400); flex-shrink: 0; }
+      .pi-part-calls .pi-part-label i { background: var(--brand); }
+      .pi-part-art .pi-part-label i { background: var(--warn); }
+      .pi-part-sug { background: rgba(0, 102, 255, 0.07); border-color: rgba(0, 102, 255, 0.24); }
+      .pi-part-sug .pi-part-label { color: var(--ai-text); }
+      .pi-part-sug .pi-part-label i { background: var(--ai-text); }
+      .pi-part p { margin: 0; font-size: 13px; line-height: 1.6; color: var(--d100); }
+      .pi-part p strong { color: var(--d50); }
+      .pi-part .pi-basis { font-size: 11px; color: var(--d400); }
+      .pi-part-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 2px; }
+      .pi-link { display: inline-flex; align-items: center; gap: 5px; flex-shrink: 0; font: inherit; font-size: 12px; font-weight: 600; color: var(--teal); background: none; border: 0; padding: 0; cursor: pointer; text-decoration: none; white-space: nowrap; }
+      .pi-link:hover { text-decoration: underline; text-underline-offset: 3px; }
+      .pi-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+      .pi-link svg { width: 14px; height: 14px; }
+      .pi-issue-ans .pi-quote { display: flex; align-items: center; gap: 12px; padding: 0; background: none; border: 0; border-radius: 0; }
+      .pi-issue-ans .pi-quote q { flex: 1; min-width: 0; font-size: 12.5px; color: var(--d300); border-left: 2px solid rgba(var(--qa-accent-rgb), 0.45); padding-left: 10px; }
+      .pi-issue-ans .pi-art { align-items: center; padding: 10px 12px; background: var(--wash-2); }
+      .pi-issue-ans .pi-art-main b { font-size: 13px; }
+      .pi-issue-ans .pi-art-main small { font-size: 11px; }
+      .pi-issue-ans .pi-art-main span { font-size: 12px; }
+      :root[data-theme="light"] .pi-part { background: rgba(16, 24, 40, 0.03); }
+      :root[data-theme="light"] .pi-part-sug { background: rgba(0, 102, 255, 0.06); }
+      /* The knowledge draft inside the reviewed action */
+      .pi-draft { margin-bottom: 12px; padding: 10px 12px; border-radius: var(--r-md); background: rgba(0, 0, 0, 0.18); border: 1px solid var(--card-border); display: grid; gap: 4px; font-size: 12px; line-height: 1.55; color: var(--d200); }
+      .pi-draft b { font-size: 12.5px; color: var(--d50); }
+      .pi-draft ins { text-decoration: none; color: var(--ok); }
+      .pi-draft del { color: var(--err); opacity: 0.8; }
+      :root[data-theme="light"] .pi-draft { background: rgba(16, 24, 40, 0.03); }
 </style>
     <!-- The canvas shell above: full-width geometry and the conversation
          column. Loaded last so it overrides the inline canvas rules, the
@@ -9266,30 +9417,98 @@
 
           </div>
 
-          <!-- AiMY Detected strip, collapsed by default, full detail in canvas -->
-          <div class="aimy-detected-strip" id="aimyDetectedStrip" role="complementary" aria-label="AiMY detection summary">
-            <div class="ads-left">
-              <svg class="ads-logo" width="18" height="20" viewBox="0 0 18 20">
-                <use href="#aimy-logo-small"/>
-              </svg>
-              <span class="ads-label">AiMY</span>
-              <span class="work-state ws-detected" data-work-state="detected"><span class="ws-dot"></span>Detected</span>
-              <span class="ads-state" id="adsStateText" data-my-qa-html="3 of your KPIs sit under the 85% goal · First Response Time dipped in the last 2 weeks">Watching 3 audit KPIs below target · Nov dip open</span>
-              <span class="ads-confidence" id="adsConfidence">high confidence</span>
+          <!-- REMOVED: the AiMY Detected strip ("Watching 3 audit KPIs below
+               target · Show me all 3 audit KPIs"). Improvement opportunities
+               below lists the same KPIs with their actions, so the strip was
+               a second copy of that block. Removing it keeps the briefing at
+               its block budget now that Product insights joins it (§5.3). -->
+
+          <!-- ════ PRODUCT INSIGHTS ════════════════════════════════════════
+               What customers keep calling about, from every analyzed call
+               (not the audited sample), ranked by the support time it costs.
+               Its own section after the KPI row, in both Audit and Evaluation
+               view, so it reads as its own topic rather than more audit data
+               (iteration 7, design-strategy/exports/product-insights-ui-iterations.html).
+
+               The recurring-issues tile leads: the total, and a bar split
+               into the three issue cards beside it plus the rest, so the bar
+               is the cards' key. The rest are previewed under the bar and wait
+               in AiMY. Every tile is a .bcard and asks AiMY about what it
+               shows. Team-level, so hidden while Only my results is on.
+               Answers, scope line and work-state changes are in the Product
+               insights script. Figures are prototype constants. -->
+          <section class="pi-section" id="productInsights" aria-labelledby="productInsightsTitle" data-my-qa="hide">
+            <div class="dashboard-section-head">
+              <h2 id="productInsightsTitle">Product insights</h2>
+              <span data-pi-scope>What customers keep calling about · Based on <b>2,486 analyzed calls</b> · All clients · All products · 1 Jan 2026 – 15 Sep 2026</span>
             </div>
-            <!-- "Explore in canvas" named our architecture and left the user to
-                 invent the question. It is now the question itself. -->
-            <button class="ads-cta"
-                    data-entry-mode="investigate"
-                    data-aimy-topic="goals-off-track"
-                      data-aimy-ask="Show me all 3 audit KPIs below target and what I should do about each."
-                      data-my-qa-ask="Show me my 3 KPIs under the 85% goal and what I should do about each, starting with First Response Time.">
-                    <span data-my-qa-html="Show me my 3 KPIs">Show me all 3 audit KPIs</span>
-              <svg viewBox="0 0 13 13" fill="none" width="11" height="11">
-                <path d="M2 6.5H11M7 2.5L11 6.5L7 10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </button>
-          </div>
+            <div class="pi-mix">
+              <div class="bcard pi-lead" role="button" tabindex="0" data-pi-tile="rest"
+                   data-entry-mode="investigate" data-aimy-topic="pi-all" data-aimy-ask="Which recurring issues keep coming back, beyond the top three?"
+                   aria-label="Recurring issues: 36% of support time, 112 of 307 hours. Open the other 9 in AiMY">
+                <div class="bcard-body">
+                  <div class="bcard-meta">
+                    <span class="type-label">Recurring issues</span>
+                    <span class="priority-badge pi-badge">12 issues</span>
+                  </div>
+                  <div class="bcard-stat-line"><span class="bcard-stat">36%</span><span class="bcard-stat-cap">of support time · <b>112</b> of 307 h</span></div>
+                  <div class="pi-stack" aria-hidden="true">
+                    <i data-seg="setup" style="flex:30;--o:.75"></i><i data-seg="invoice" style="flex:18;--o:.55"></i><i data-seg="login" style="flex:15;--o:.38"></i><i class="pi-rest" data-seg="rest" style="flex:49"></i>
+                  </div>
+                  <div class="pi-peek" aria-hidden="true">
+                    <span><span>Agent could not find the refund policy</span><b>12 h</b></span>
+                    <span><span>Export fails for large files</span><b>10 h</b></span>
+                  </div>
+                  <div class="aimy-done">
+                    <span class="pi-count">+9</span><span class="aimy-done-text">more in AiMY · 49 h</span>
+                    <span class="aimy-done-actions"><span class="aimy-done-link primary pi-ask"><svg class="pi-ask-mark" viewBox="0 0 18 20" aria-hidden="true"><use href="#aimy-logo-small"/></svg>Ask AiMY</span></span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="bcard pi-issue" role="button" tabindex="0" data-pi-issue="setup" data-pi-tile="setup"
+                   data-entry-mode="investigate" data-aimy-topic="pi-issue-setup" data-aimy-ask="Why do customers keep calling about unclear setup instructions?"
+                   aria-label="Setup instructions unclear: 30 hours of support, 184 calls, 6 clients, Upland">
+                <div class="bcard-body">
+                  <div class="bcard-meta"><span class="type-label">Upland · Onboarding</span></div>
+                  <div class="bcard-stat-line"><span class="bcard-stat">30 h</span><span class="bcard-stat-cap">of support · <b>184</b> calls</span></div>
+                  <p class="pi-issue-name">Setup instructions unclear</p>
+                  <q class="pi-issue-quote">I did the first step and then nothing tells me what to do next.</q>
+                  <div class="aimy-done">
+                    <span class="work-state ws-recommended" data-work-state="recommended"><span class="ws-dot"></span>Recommended</span><span class="aimy-done-text"><b>6</b> clients</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="bcard pi-issue" role="button" tabindex="0" data-pi-issue="invoice" data-pi-tile="invoice"
+                   data-entry-mode="investigate" data-aimy-topic="pi-issue-invoice" data-aimy-ask="Why do invoice totals differ from the quote?"
+                   aria-label="Invoice total differs from quote: 18 hours of support, 97 calls, 4 clients, Asteris">
+                <div class="bcard-body">
+                  <div class="bcard-meta"><span class="type-label">Asteris · Billing</span></div>
+                  <div class="bcard-stat-line"><span class="bcard-stat">18 h</span><span class="bcard-stat-cap">of support · <b>97</b> calls</span></div>
+                  <p class="pi-issue-name">Invoice total differs from quote</p>
+                  <q class="pi-issue-quote">The renewal invoice has a usage line nobody mentioned.</q>
+                  <div class="aimy-done">
+                    <span class="work-state ws-detected" data-work-state="detected"><span class="ws-dot"></span>Detected</span><span class="aimy-done-text"><b>4</b> clients</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="bcard pi-issue" role="button" tabindex="0" data-pi-issue="login" data-pi-tile="login"
+                   data-entry-mode="investigate" data-aimy-topic="pi-issue-login" data-aimy-ask="What changed about login codes?"
+                   aria-label="Login code not received: 15 hours of support, 142 calls, 5 clients, Upland">
+                <div class="bcard-body">
+                  <div class="bcard-meta"><span class="type-label">Upland · Access</span></div>
+                  <div class="bcard-stat-line"><span class="bcard-stat">15 h</span><span class="bcard-stat-cap">of support · <b>142</b> calls</span></div>
+                  <p class="pi-issue-name">Login code not received</p>
+                  <q class="pi-issue-quote">The code goes to my old email since we changed domain.</q>
+                  <div class="aimy-done">
+                    <span class="work-state ws-detected" data-work-state="detected"><span class="ws-dot"></span>Detected</span><span class="aimy-done-text"><b>5</b> clients</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
 
           <div class="tier-2-grid audit-only">
             <div class="layout-column">
@@ -15830,6 +16049,534 @@
         window.addEventListener('aimy:results-scope-changed', updateToolbar);
         new MutationObserver(updateToolbar).observe(document.body, { attributes: true, attributeFilter: ['data-interaction-type'] });
         updateToolbar();
+      })();
+    </script>
+    <script>
+      /* ══ PRODUCT INSIGHTS ═══════════════════════════════════════════════
+         Answers for the Product insights card (#productInsights). They
+         register on RESPONSE_BY_TOPIC, so the card's rows reach them through
+         the same data-entry-mode dispatch as every other block. Each issue
+         answer has four labelled parts, so what customers said, outside
+         articles and AiMY's own suggestion never blend. The knowledge draft
+         is a reviewed action in the page's decision zone; accepting it
+         stages the draft in the knowledge review queue (a Knowledge Manager
+         still approves it), so the issue lands on Staged, not Done.
+         Prototype constants; no backend behaviour is implied. */
+      (function () {
+        "use strict";
+        var TOTAL = { calls: "2,486", avg: "7m 24s", hours: 307, recurring: 12, recurringHours: 112, share: 36 };
+        var ISSUES = [
+          { id: "setup", name: "Setup instructions unclear", type: "Onboarding", product: "Upland", calls: 184, clients: 6, med: "9m 40s", hours: 30, state: "recommended",
+            why: "Customers finish the first setup step and nothing tells them what comes next.", q: "Why do customers keep calling about unclear setup instructions?" },
+          { id: "invoice", name: "Invoice total differs from quote", type: "Billing", product: "Asteris", calls: 97, clients: 4, med: "11m 05s", hours: 18, state: "detected",
+            why: "Renewal invoices add a usage line that the quote never mentioned.", q: "Why do invoice totals differ from the quote?" },
+          { id: "login", name: "Login code not received", type: "Access", product: "Upland", calls: 142, clients: 5, med: "6m 15s", hours: 15, state: "detected",
+            why: "Codes go to an old email address after a domain change.", q: "What changed about login codes?" },
+          { id: "refund", name: "Agent could not find the refund policy", type: "Knowledge", product: "SecondStreet", calls: 58, clients: 4, med: "12m 30s", hours: 12, state: "recommended",
+            why: "Two articles disagree on the refund window, so agents put customers on hold to check.", q: "Which article should change for refunds?" },
+          { id: "export", name: "Export fails for large files", type: "Product defect", product: "Upland", calls: 71, clients: 3, med: "8m 20s", hours: 10, state: "drafted",
+            why: "Exports over 2 GB time out without an error message.", q: "Why do large exports fail?" },
+          { id: "sso", name: "SSO setup fails on first try", type: "Access", product: "Asteris", calls: 44, clients: 3, med: "10m 10s", hours: 7, state: "detected",
+            why: "The metadata URL field rejects a trailing slash.", q: "Why does SSO setup fail on the first try?" },
+          { id: "seats", name: "Seat count not updated after upgrade", type: "Billing", product: "Upland", calls: 51, clients: 4, med: "6m 40s", hours: 6, state: "detected",
+            why: "Upgrades apply at the next billing cycle, not straight away.", q: "Why is the seat count not updated after an upgrade?" },
+          { id: "report", name: "Scheduled report arrives empty", type: "Product defect", product: "SecondStreet", calls: 33, clients: 2, med: "7m 50s", hours: 4, state: "detected",
+            why: "Reports scheduled before data sync finishes send with no rows.", q: "Why do scheduled reports arrive empty?" }
+        ];
+        var MORE = TOTAL.recurring - ISSUES.length;
+        var CLIENTS = [
+          { name: "Objectif Lune", calls: 126, issues: 3, top: "Setup" },
+          { name: "RightAnswers", calls: 88, issues: 2, top: "Login" },
+          { name: "Panviva", calls: 61, issues: 2, top: "Setup" },
+          { name: "InterFax", calls: 40, issues: 1, top: "Invoice" }
+        ];
+        var PRODUCTS = [
+          { name: "Upland", calls: 448, share: 64, issues: 5 },
+          { name: "Asteris", calls: 141, share: 20, issues: 4 },
+          { name: "SecondStreet", calls: 91, share: 13, issues: 3 }
+        ];
+        var QUOTES = {
+          setup: [
+            { call: "Call 10442", who: "Objectif Lune", date: "9 Sep", at: "02:14", text: "I did the first step and then nothing tells me what to do next." },
+            { call: "Call 10577", who: "Panviva", date: "14 Sep", at: "04:51", text: "The guide stops at the login page, so I had to call." }
+          ],
+          invoice: [
+            { call: "Call 10611", who: "InterFax", date: "11 Sep", at: "01:38", text: "The renewal invoice has a usage line nobody mentioned." }
+          ],
+          login: [
+            { call: "Call 10593", who: "RightAnswers", date: "12 Sep", at: "00:52", text: "The code goes to my old email since we changed domain." }
+          ]
+        };
+        var ARTICLES = {
+          setup: [
+            { title: "Getting started with Upland", src: "Your knowledge base", date: "updated 2 Mar 2026", why: "Stops at the login page, which is where customers get stuck." },
+            { title: "Guided setup checklist", src: "External · Vendor help center", date: "retrieved 10 Oct 2026", why: "Shows setup as numbered steps with a progress marker." }
+          ]
+        };
+        var STATE_LABEL = { detected: "Detected", recommended: "Recommended", drafted: "Drafted", staged: "Staged", completed: "Done", failed: "Blocked" };
+        var byCost = ISSUES.slice().sort(function (a, b) { return b.hours - a.hours; });
+        var maxHours = byCost[0].hours;
+        function issue(id) { for (var i = 0; i < ISSUES.length; i++) if (ISSUES[i].id === id) return ISSUES[i]; return null; }
+        function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+        function ws(state) { return '<span class="work-state ws-' + state + '" data-work-state="' + state + '"><span class="ws-dot"></span>' + STATE_LABEL[state] + "</span>"; }
+        function em(mode, topic, ask, label) {
+          return '<button class="entry-action em-' + mode + ' ea-sm" type="button" data-entry-mode="' + mode + '" data-aimy-topic="' + topic + '" data-aimy-ask="' + esc(ask) + '">'
+            + '<svg class="em-ico" aria-hidden="true"><use href="#em-ico-' + mode + '"/></svg>' + label + "</button>";
+        }
+        function pill(value, label) { return '<span class="evidence-pill"><span class="ev-value">' + value + "</span>" + label + "</span>"; }
+        function toast(title, sub) { if (typeof window.showToast === "function") window.showToast({ title: title, sub: sub || "" }); }
+        function isMine() { return document.documentElement.classList.contains("is-my-qa"); }
+
+        /* ── Scope sentence: reads the filter row, so it follows the filters.
+              The counts are constants and do not re-filter. ─────────────── */
+        var MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        function fmtDate(iso) { var p = String(iso || "").split("-"); return p.length === 3 ? (+p[2]) + " " + MONTHS[+p[1] - 1] + " " + p[0] : iso; }
+        function filters() {
+          var f = window.AIMY_QA_FILTERS && window.AIMY_QA_FILTERS.get ? window.AIMY_QA_FILTERS.get() : null;
+          return f || { interaction: "all", client: [], product: [], from: "2026-01-01", to: "2026-09-15" };
+        }
+        function named(arr, all) { return !arr || !arr.length ? all : arr.length > 2 ? arr.length + " " + all.replace(/^All /, "").toLowerCase() : arr.join(", "); }
+        function scopeParts() {
+          var f = filters();
+          return [TOTAL.calls + " analyzed calls", named(f.client, "All clients"), named(f.product, "All products"), fmtDate(f.from) + " – " + fmtDate(f.to)];
+        }
+        function paintScope() {
+          var f = filters(), p = scopeParts();
+          var html = "What customers keep calling about · Based on <b>" + p[0] + "</b> · " + p[1] + " · " + p[2] + " · " + p[3]
+            + (f.interaction === "tickets" ? '<span class="pi-scope-note">Call length applies to calls. Tickets are counted, but not timed.</span>' : "");
+          document.querySelectorAll("[data-pi-scope]").forEach(function (n) { n.innerHTML = html; });
+        }
+        ["aimy:client-filter-changed", "aimy:date-range-changed", "aimy:interaction-type-changed", "aimy:scope-changed"].forEach(function (ev) {
+          window.addEventListener(ev, paintScope);
+          document.addEventListener(ev, paintScope);
+        });
+
+        /* ── Rows inside answers: the card's own bar row ─────────────────── */
+        function issueRow(it) {
+          return '<div class="eval-bar-row" data-pi-issue="' + it.id + '" role="button" tabindex="0" data-entry-mode="investigate" data-aimy-topic="pi-issue-' + it.id + '" data-aimy-ask="' + esc(it.q) + '">'
+            + '<div class="eval-bar-top"><span class="eval-bar-label">' + esc(it.name) + '</span><div class="eval-bar-right"><span class="eval-bar-count">' + it.calls + " calls · " + it.med + ' median</span><span class="eval-bar-avg">' + it.hours + " h</span></div></div>"
+            + '<div class="eval-bar-track"><div class="eval-bar-fill" style="width:' + Math.max(6, Math.round(it.hours / maxHours * 100)) + '%"></div></div>'
+            + '<div class="pi-row-meta">' + ws(it.state) + "<span>" + it.clients + " clients · " + it.product + "</span></div></div>";
+        }
+        function plainRow(label, count, right, pct, topic, ask) {
+          return '<div class="eval-bar-row" role="button" tabindex="0" data-entry-mode="investigate" data-aimy-topic="' + topic + '" data-aimy-ask="' + esc(ask) + '">'
+            + '<div class="eval-bar-top"><span class="eval-bar-label">' + esc(label) + '</span><div class="eval-bar-right"><span class="eval-bar-count">' + count + '</span><span class="eval-bar-avg">' + right + "</span></div></div>"
+            + '<div class="eval-bar-track"><div class="eval-bar-fill" style="width:' + pct + '%"></div></div></div>';
+        }
+
+        /* ── Answers ─────────────────────────────────────────────────────── */
+        /* One issue answer: the basis it stands on, then three labelled
+           parts, so what customers said, outside articles and AiMY's own
+           suggestion never blend. */
+        var EXT_ICON = '<svg class="lucide lucide-external-link" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>';
+        function part(kind, label, body) {
+          return '<div class="pi-part pi-part-' + kind + '"><div class="pi-part-label"><i aria-hidden="true"></i>' + label + "</div>" + body + "</div>";
+        }
+        /* What an issue answer stands on, for the shared Based on bar. */
+        function basisList(it) {
+          var arts = ARTICLES[it.id], p = scopeParts();
+          var list = [it.product, p[1], p[3], it.calls + " calls", it.clients + " clients"];
+          if (arts) list.push(arts.length + (arts.length === 1 ? " article" : " articles"));
+          return list;
+        }
+        function quotesHtml(it) {
+          var lead = "<p>" + esc(it.why) + " <strong>" + it.calls + " calls</strong>, " + it.clients + " clients. Median call <strong>" + it.med + "</strong>, about " + it.hours + " hours of support in total.</p>";
+          var qs = QUOTES[it.id];
+          if (!qs) return lead;
+          return lead + qs.map(function (q) {
+            return '<div class="pi-quote"><q>' + esc(q.text) + "</q>"
+              + '<a class="pi-link" href="manual-audit.html" title="' + q.call + " · " + q.who + " · " + q.date + ", plays from " + q.at + '" aria-label="Open ' + q.call + ", " + q.who + ', at ' + q.at + '">Open call</a></div>';
+          }).join("");
+        }
+        function articlesHtml(it) {
+          var arts = ARTICLES[it.id];
+          if (!arts) return "<p><strong>No related articles found for this issue yet.</strong> The suggestion below is based on your calls only.</p>";
+          return arts.map(function (a) {
+            return '<div class="pi-art"><span class="pi-art-main"><b>' + esc(a.title) + "</b><small>" + esc(a.src) + " · " + esc(a.date) + "</small><span>" + esc(a.why) + "</span></span>"
+              + '<button class="pi-link" type="button" data-pi-article="' + esc(a.title) + '" aria-label="Open ' + esc(a.title) + '">Open' + EXT_ICON + "</button></div>";
+          }).join("");
+        }
+        /* The manager is the approver: a draft waits in review until they
+           publish it or send it back. */
+        function articleName(it) { return it.id === "setup" ? "Getting started with Upland" : it.name; }
+        function suggestionHtml(it) {
+          if (it.state === "staged") {
+            return part("sug", "Suggested next step", "<p><strong>The draft is waiting for your approval.</strong> It updates “" + esc(articleName(it)) + "”, based on " + it.calls + " calls. Nothing publishes until you approve it.</p>"
+              + '<div class="pi-part-actions"><button class="btn btn-brand btn-sm" type="button" data-entry-mode="review" data-aimy-topic="pi-publish-' + it.id + '" data-aimy-ask="' + esc("Review and publish the knowledge draft for " + it.name + ".") + '">Review and publish</button></div>');
+          }
+          if (it.state === "completed") {
+            return part("sug", "Suggested next step", "<p><strong>Published.</strong> “" + esc(articleName(it)) + "” now has the numbered steps. AiMY will watch whether calls about this drop over the next 30 days.</p>");
+          }
+          if (it.state === "drafted" && it.sentBack) {
+            return part("sug", "Suggested next step", "<p><strong>You sent the draft back.</strong> “" + esc(it.sentBack) + "”</p>"
+              + '<div class="pi-part-actions"><button class="btn btn-brand btn-sm" type="button" data-entry-mode="review" data-aimy-topic="pi-draft-' + it.id + '" data-aimy-ask="' + esc("Revise the knowledge draft for " + it.name + ".") + '">Revise the draft</button></div>');
+          }
+          if (it.state === "drafted") {
+            return part("sug", "Suggested next step", "<p><strong>AiMY drafted an article for this issue.</strong> It has not been sent for review yet.</p>"
+              + '<div class="pi-part-actions"><button class="btn btn-brand btn-sm" type="button" data-entry-mode="review" data-aimy-topic="pi-draft-' + it.id + '" data-aimy-ask="' + esc("Show the knowledge draft for " + it.name + ".") + '">Review the draft</button></div>');
+          }
+          var arts = ARTICLES[it.id];
+          var text = it.id === "setup" ? "Improve the setup article with numbered steps."
+            : it.id === "refund" ? "Merge the two refund articles into one, with a single refund window."
+            : "Write a knowledge article for “" + esc(it.name) + "” so agents and customers have one answer.";
+          return part("sug", "Suggested next step", "<p><strong>" + text + '</strong></p><p class="pi-basis">Based on ' + it.calls + " calls" + (arts ? " and " + arts.length + " related articles" : " only") + ". Not yet tested with your customers.</p>"
+            + '<div class="pi-part-actions">'
+            + '<button class="btn btn-brand btn-sm" type="button" data-entry-mode="review" data-aimy-topic="pi-draft-' + it.id + '" data-aimy-ask="' + esc("Draft a knowledge article for " + it.name + ".") + '">Draft a knowledge article</button>'
+            + '<button class="btn btn-ghost btn-sm" type="button" data-entry-mode="direct" data-aimy-topic="pi-dismiss-' + it.id + '" data-aimy-ask="Dismiss suggestion">Dismiss</button>'
+            + "</div>");
+        }
+        /* Follow-up questions sit above the input, where the filter
+           suggestions usually are, for as long as the conversation is in this
+           flow. They follow the latest Product insights reply (and, for an
+           issue, its state), and use the filter chips' own component. */
+        function chip(topic, ask, label, mode) {
+          return '<button class="overlay-filter-suggestion" type="button" data-entry-mode="' + (mode || "investigate") + '" data-aimy-topic="' + topic + '" data-aimy-ask="' + esc(ask) + '">' + esc(label) + "</button>";
+        }
+        function followHtml(ctx) {
+          var m = /^(issue|calls|trend|draft|publish):(.+)$/.exec(ctx || ""), it = m && issue(m[2]), setup = issue("setup");
+          var whySetup = chip("pi-issue-setup", setup.q, "Why is setup unclear?");
+          var allIssues = chip("pi-all", "Which issues keep coming back?", "Show all recurring issues");
+          if (ctx === "all") return whySetup + chip("pi-customers", "Which clients keep hitting the same issues?", "Which customers repeat?") + chip("pi-products", "Which products do the recurring issues come from?", "Which products do they come from?");
+          if (ctx === "customers") return chip("pi-issue-setup", "What repeats for Objectif Lune?", "What repeats for Objectif Lune?") + chip("pi-products", "Which products do the recurring issues come from?", "Which products do they come from?") + allIssues;
+          if (ctx === "products") return chip("pi-customers", "Which clients keep hitting the same issues?", "Which customers repeat?") + whySetup + allIssues;
+          if (!it) return "";
+          var customers = chip("pi-customers", "Which clients report " + it.name.toLowerCase() + " most?", "Which customers report this most?");
+          var trend = chip("pi-trend-" + it.id, "Has " + it.name.toLowerCase() + " grown since last month?", it.state === "completed" ? "Did calls drop since it was published?" : "Has this grown since last month?");
+          var calls = chip("pi-calls-" + it.id, "Show all " + it.calls + " calls about " + it.name + ".", "Show all " + it.calls + " calls");
+          var back = chip("pi-issue-" + it.id, it.q, "Back to the issue");
+          if (m[1] === "issue") {
+            if (it.state === "staged") return chip("pi-publish-" + it.id, "Review and publish the knowledge draft for " + it.name + ".", "Review and publish", "review") + trend + calls;
+            if (it.state === "drafted") return chip("pi-draft-" + it.id, "Revise the knowledge draft for " + it.name + ".", "Revise the draft", "review") + customers + calls;
+            return customers + trend + calls;
+          }
+          if (m[1] === "calls") return trend + customers + back;
+          if (m[1] === "trend") return customers + calls + back;
+          /* draft, publish: the next step depends on where the draft is now */
+          if (it.state === "staged" && m[1] === "draft") return chip("pi-publish-" + it.id, "Review and publish the knowledge draft for " + it.name + ".", "Review and publish", "review") + calls + back;
+          if (it.state === "completed") return trend + customers + back;
+          if (it.state === "drafted" && it.sentBack) return chip("pi-draft-" + it.id, "Revise the knowledge draft for " + it.name + ".", "Revise the draft", "review") + calls + back;
+          return calls + customers + back;
+        }
+        function syncFollowups() {
+          var thread = document.getElementById("overlayThread"), filters = document.getElementById("overlayFilterSuggestions");
+          if (!thread || !filters) return;
+          var box = document.getElementById("piFollowups");
+          if (!box) {
+            box = document.createElement("div");
+            box.id = "piFollowups";
+            box.className = "overlay-filter-suggestions is-off";
+            box.setAttribute("aria-label", "Follow-up questions");
+            box.innerHTML = '<div class="overlay-filter-suggestion-list"></div>';
+            filters.parentNode.insertBefore(box, filters);
+          }
+          /* The latest reply from this flow anywhere in the conversation, so a
+             side question does not bring the filters back. A new chat does. */
+          var tagged = thread.querySelectorAll(".chat-msg.aimy [data-pi-ctx]"), latest = tagged[tagged.length - 1];
+          /* Opened with no question (Describe a filter, or the AiMY logo):
+             the filters lead until this flow answers something new. */
+          if (filtersAt != null && tagged.length > filtersAt) filtersAt = null;
+          var html = latest && filtersAt == null ? followHtml(latest.getAttribute("data-pi-ctx")) : "";
+          if (html) box.firstChild.innerHTML = html;
+          box.classList.toggle("is-off", !html);
+          filters.classList.toggle("is-off", !!html);
+        }
+        var filtersAt = null;
+        var threadEl = document.getElementById("overlayThread");
+        if (threadEl && window.MutationObserver) new MutationObserver(syncFollowups).observe(threadEl, { childList: true });
+        /* aimyOpenCanvas() with no question is how Describe a filter and the
+           AiMY logo open the canvas. */
+        if (typeof window.aimyOpenCanvas === "function") {
+          var openCanvasOrig = window.aimyOpenCanvas;
+          window.aimyOpenCanvas = function (q) {
+            if (!q && threadEl) filtersAt = threadEl.querySelectorAll(".chat-msg.aimy [data-pi-ctx]").length;
+            var r = openCanvasOrig.apply(this, arguments);
+            syncFollowups();
+            return r;
+          };
+        }
+        function renderIssue(id) {
+          var it = issue(id);
+          if (!it) return null;
+          return '<div class="canvas-render pi-ans pi-issue-ans" data-pi-answer="' + id + '" data-pi-ctx="issue:' + id + '">'
+            + part("calls", "From your calls", quotesHtml(it))
+            + part("art", "Related articles", articlesHtml(it))
+            + suggestionHtml(it)
+            + "</div>";
+        }
+        function renderAll() {
+          return '<div class="canvas-render pi-ans" data-pi-ctx="all">'
+            + '<div class="canvas-type-label">Product insights · recurring issues</div>'
+            + '<p class="pi-ans-lead"><strong>' + TOTAL.recurring + " issues keep coming back</strong> and take <strong>" + TOTAL.share + "% of support time</strong>, " + TOTAL.recurringHours + " of " + TOTAL.hours + " hours. Setup costs the most; refund calls run longest at 12m 30s.</p>"
+            + '<div class="evidence-row">' + pill(TOTAL.recurring, " recurring issues") + pill(TOTAL.avg, " average call") + pill(TOTAL.hours + " h", " of support") + "</div>"
+            + '<div class="pi-sec"><div class="pi-sec-label">Ranked by support time</div><div class="eval-bars">' + byCost.map(issueRow).join("") + "</div>"
+            + '<p class="pi-basis">' + MORE + " more issues under 4 hours each are not shown.</p></div>"
+            + '<div class="canvas-action-row">'
+            + em("investigate", "pi-customers", "Which clients keep hitting the same issues?", "Which clients repeat")
+            + em("investigate", "pi-products", "Which products do the recurring issues come from?", "By product")
+            + "</div></div>";
+        }
+        function renderCustomers() {
+          var max = CLIENTS[0].calls;
+          return '<div class="canvas-render pi-ans" data-pi-ctx="customers"><div class="canvas-type-label">Product insights · by client</div>'
+            + '<p class="pi-ans-lead"><strong>Four clients</strong> keep hitting the same issues. Objectif Lune repeats the most, mostly on setup.</p>'
+            + '<div class="eval-bars">' + CLIENTS.map(function (c) {
+              return plainRow(c.name, c.calls + " calls · " + c.issues + (c.issues === 1 ? " issue" : " issues"), c.top, Math.round(c.calls / max * 100), "pi-issue-setup", "What repeats for " + c.name + "?");
+            }).join("") + "</div></div>";
+        }
+        function renderProducts() {
+          return '<div class="canvas-render pi-ans" data-pi-ctx="products"><div class="canvas-type-label">Product insights · by product</div>'
+            + '<p class="pi-ans-lead"><strong>Upland</strong> raises ' + PRODUCTS[0].share + "% of recurring calls, mostly about setup and login.</p>"
+            + '<div class="eval-bars">' + PRODUCTS.map(function (p) {
+              return plainRow(p.name, p.calls + " calls · " + p.issues + " issues", p.share + "%", p.share, "pi-all", "Which recurring issues come from " + p.name + "?");
+            }).join("") + "</div></div>";
+        }
+        function renderCalls(id) {
+          var it = issue(id);
+          return '<div class="canvas-render pi-ans" data-pi-ctx="calls:' + id + '"><div class="canvas-type-label">Customer issue · calls</div>'
+            + '<p class="pi-ans-lead">The <strong>' + it.calls + " calls</strong> about " + esc(it.name.toLowerCase()) + " are listed in Reviews, newest first.</p>"
+            + '<div class="canvas-action-row"><a class="msg-action-link" href="agent-scorecards.html?view=evals&amp;tbl=calls">Open the ' + it.calls + " calls in Reviews</a></div></div>";
+        }
+        function renderTrend(id) {
+          var it = issue(id);
+          return '<div class="canvas-render pi-ans" data-pi-ctx="trend:' + id + '"><div class="canvas-type-label">Customer issue · trend</div>'
+            + '<p class="pi-ans-lead"><strong>' + esc(it.name) + "</strong> rose from <strong>38</strong> calls in July to <strong>61</strong> in August, then held at <strong>58</strong> in the first half of September. The rise started the week Upland 4.2 shipped.</p></div>";
+        }
+        function draftTitle(it) { return it.id === "setup" ? "Finish setting up Upland" : it.name + ": what to do"; }
+        function draftBody(it) {
+          return it.id === "setup"
+            ? "<span>1. Sign in and open <b>Settings</b>.</span><ins>2. Complete the three steps on the setup checklist.</ins><ins>3. The “What to do next” panel confirms setup is done.</ins><del>Contact support to finish setup.</del>"
+            : "<span>What customers report: " + esc(it.why) + "</span><ins>What to do: the steps an agent should follow, from " + it.calls + " calls.</ins>";
+        }
+        /* The approver's decision: publish the draft to the live article, or
+           send it back with a reason. */
+        function renderPublish(id) {
+          var it = issue(id);
+          if (!it) return null;
+          if (it.state !== "staged") return renderIssue(id);
+          var title = draftTitle(it);
+          return '<div class="canvas-render" data-pi-ctx="publish:' + id + '">'
+            + '<div class="canvas-type-label">Reviewed action · Publish knowledge article</div>'
+            + '<div style="font-size:12.5px;line-height:1.65;color:var(--d300);margin-bottom:12px">Sent for review at 09:16. Built from <strong>' + it.calls + " calls</strong>"
+            + (QUOTES[id] ? ", " + QUOTES[id].length + " quotes" : "") + (ARTICLES[id] ? " and " + ARTICLES[id].length + " related articles" : "") + ". Green lines are added, red lines are removed.</div>"
+            + '<div class="pi-draft"><b>' + esc(title) + "</b>" + draftBody(it) + "</div>"
+            + '<div class="decision-zone" style="max-width:none" data-dz-topic="pi-publish-' + id + '" data-dz-label="Knowledge article"'
+            + ' data-dz-accepted="Published. “' + esc(articleName(it)) + '” now shows the update."'
+            + ' data-dz-accepted-meta="Approved by Engy Y. · 09:20 · you can roll it back from the article history"'
+            + ' data-dz-audit="Knowledge article published: ' + esc(articleName(it)) + '"'
+            + ' data-dz-rejected="Sent back. Nothing was published."'
+            + ' data-dz-rejected-meta="Sent back by Engy Y. · 09:20 · the draft returns to Drafted with your reason"'
+            + ' data-dz-reject-label="What needs to change before it publishes"'
+            + ' data-dz-edit-fields="Title|' + esc(title) + '||Article|' + esc(articleName(it)) + '"'
+            + ' data-dz-undone="Publish undone. The draft is back in review.">'
+            + '<p class="dz-prompt">Publish this update to “' + esc(articleName(it)) + '”?</p>'
+            + '<div class="dz-consequence"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:2px" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4M12 8h.01"/></svg>'
+            + "<span>Replaces the live article for <strong>every customer and agent</strong> who reads it. The issue moves to <strong>Done</strong>. You can roll it back from the article history.</span></div>"
+            + '<div class="dz-actions"><button class="btn btn-brand btn-sm" type="button" data-hr-decision="accept">Approve and publish</button>'
+            + '<button class="btn btn-ghost btn-sm" type="button" data-hr-decision="edit">Edit first</button>'
+            + '<button class="btn btn-ghost btn-sm" type="button" data-hr-decision="reject">Send back</button>'
+            + '<span class="dz-spacer"></span><span class="work-state ws-staged" data-work-state="staged"><span class="ws-dot"></span>Awaiting you</span></div>'
+            + '<div class="dz-meta"><span>Sent for review · 09:16</span><span>·</span><span>Requires: <strong style="color:var(--d300)">Manager</strong></span><span>·</span><span>Decision is logged</span></div>'
+            + "</div></div>";
+        }
+        function renderDraft(id) {
+          var it = issue(id);
+          if (!it) return null;
+          var title = draftTitle(it);
+          var body = draftBody(it);
+          return '<div class="canvas-render" data-pi-ctx="draft:' + id + '">'
+            + '<div class="canvas-type-label">Reviewed action · Knowledge draft</div>'
+            + '<div style="font-size:12.5px;line-height:1.65;color:var(--d300);margin-bottom:12px">I drafted an update from <strong>' + it.calls + " calls</strong>"
+            + (QUOTES[id] ? ", with " + QUOTES[id].length + " quotes attached" : "") + (ARTICLES[id] ? " and " + ARTICLES[id].length + " related articles" : "") + ".</div>"
+            + '<div class="pi-draft"><b>' + esc(title) + "</b>" + body + "</div>"
+            + '<div class="decision-zone" style="max-width:none" data-dz-topic="pi-draft-' + id + '" data-dz-label="Knowledge draft"'
+            + ' data-dz-accepted="Draft sent to the knowledge review queue."'
+            + ' data-dz-accepted-meta="Sent by Engy Y. · 09:16 · waiting for your approval"'
+            + ' data-dz-audit="Knowledge draft sent for review: ' + esc(title) + '"'
+            + ' data-dz-rejected="Draft discarded. Nothing was sent."'
+            + ' data-dz-rejected-meta="Rejected by Engy Y. · 09:16 · tell AiMY what was wrong and it can write another"'
+            + ' data-dz-reject-label="What was wrong with the draft"'
+            + ' data-dz-edit-fields="Title|' + esc(title) + '||Article|Getting started with Upland"'
+            + ' data-dz-undone="Withdrawn. Back to awaiting your decision.">'
+            + '<p class="dz-prompt">Send this draft to the knowledge review queue?</p>'
+            + '<div class="dz-consequence"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:2px" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4M12 8h.01"/></svg>'
+            + "<span>It waits in review until you approve it. The live article does not change until then.</span></div>"
+            + '<div class="dz-actions"><button class="btn btn-brand btn-sm" type="button" data-hr-decision="accept">Accept</button>'
+            + '<button class="btn btn-ghost btn-sm" type="button" data-hr-decision="edit">Edit first</button>'
+            + '<button class="btn btn-ghost btn-sm" type="button" data-hr-decision="reject">Reject</button>'
+            + '<span class="dz-spacer"></span><span class="work-state ws-staged" data-work-state="staged"><span class="ws-dot"></span>Awaiting you</span></div>'
+            + '<div class="dz-meta"><span>Proposed by AiMY · 09:14</span><span>·</span><span>Requires: <strong style="color:var(--d300)">Manager</strong></span><span>·</span><span>Decision is logged</span></div>'
+            + "</div></div>";
+        }
+
+        var RBT = window.RESPONSE_BY_TOPIC;
+        if (RBT) {
+          ISSUES.forEach(function (it) {
+            RBT["pi-issue-" + it.id] = function () { return renderIssue(it.id); };
+            RBT["pi-draft-" + it.id] = function () { return renderDraft(it.id); };
+            RBT["pi-calls-" + it.id] = function () { return renderCalls(it.id); };
+            RBT["pi-trend-" + it.id] = function () { return renderTrend(it.id); };
+            RBT["pi-publish-" + it.id] = function () { return renderPublish(it.id); };
+          });
+          RBT["pi-all"] = renderAll;
+          RBT["pi-customers"] = renderCustomers;
+          RBT["pi-products"] = renderProducts;
+        }
+
+        /* ── "Based on" names this question's scope, not the page scenario ── */
+        function paintBasis(topic) {
+          var tags = document.getElementById("overlayContextTags");
+          if (!tags) return;
+          var m = /^pi-(issue|draft|calls|trend|publish)-(.+)$/.exec(topic || ""), it = m && issue(m[2]), p = scopeParts();
+          var list = it ? (m[1] === "issue" ? basisList(it) : [it.name, it.calls + " calls", it.clients + " clients", p[3]]) : p;
+          tags.innerHTML = list.map(function (t) { return '<span class="overlay-context-tag">' + esc(t) + "</span>"; }).join("");
+        }
+        if (typeof window.openOverlay === "function") {
+          var openOrig = window.openOverlay;
+          window.openOverlay = function () {
+            var topic = window.__aimyTopic;
+            var r = openOrig.apply(this, arguments);
+            if (topic && /^pi-/.test(topic)) paintBasis(topic);
+            return r;
+          };
+        }
+
+        /* ── Typed questions about customers reach the same answers. Not in
+              Only my results: these are team-level, and the card is hidden. */
+        var WORDS = /\b(customers?|recurring|calling about|contact reasons?|knowledge (article|gap)s?|repeat(ing)? issues?|product insights?)\b/i;
+        function routeTyped(text) {
+          if (!text || isMine() || !WORDS.test(text) || window.__aimyTopic) return;
+          window.__aimyTopic = /client|which customers|customers.*repeat/i.test(text) ? "pi-customers" : /setup/i.test(text) ? "pi-issue-setup" : "pi-all";
+          paintBasis(window.__aimyTopic);
+        }
+        document.addEventListener("keydown", function (e) {
+          if (e.key !== "Enter" || e.shiftKey) return;
+          if (e.target && (e.target.id === "overlayInput" || e.target.id === "aimyFloatInput")) routeTyped(e.target.value);
+        }, true);
+        document.addEventListener("click", function (e) {
+          var send = e.target.closest && e.target.closest("#overlaySend, #aimyFloatSend");
+          if (!send) return;
+          var inp = document.getElementById(send.id === "overlaySend" ? "overlayInput" : "aimyFloatInput");
+          if (inp) routeTyped(inp.value);
+        }, true);
+
+        /* Issue rows are buttons to the keyboard too. */
+        document.addEventListener("keydown", function (e) {
+          if (e.key !== "Enter" && e.key !== " ") return;
+          var row = e.target.closest && e.target.closest('.eval-bar-row[role="button"][data-entry-mode], .pi-mix [role="button"][data-entry-mode]');
+          if (!row || row !== e.target) return;
+          e.preventDefault();
+          row.click();
+        });
+        document.addEventListener("click", function (e) {
+          var a = e.target.closest && e.target.closest("[data-pi-article]");
+          if (a) toast("Opens “" + a.getAttribute("data-pi-article") + "”", "In a new tab, from its source. Illustrative in this prototype.");
+        });
+
+        /* ── Closing the loop: every place that lists the issue moves ────── */
+        function setIssueState(id, state) {
+          var it = issue(id);
+          if (!it) return;
+          it.state = state;
+          document.querySelectorAll('[data-pi-issue="' + id + '"] .work-state, [data-pi-action="' + id + '"] .work-state').forEach(function (b) {
+            b.className = "work-state ws-" + state;
+            b.setAttribute("data-work-state", state);
+            b.innerHTML = '<span class="ws-dot"></span>' + STATE_LABEL[state];
+          });
+          document.querySelectorAll('[data-pi-action="' + id + '"]').forEach(function (row) {
+            var text = row.querySelector(".aimy-done-text"), btn = row.querySelector("[data-entry-mode]");
+            if (state === "staged") {
+              if (text) text.innerHTML = "<b>Setup article draft</b> is waiting for your approval";
+              if (btn) { btn.textContent = "Review and publish"; btn.setAttribute("data-entry-mode", "review"); btn.setAttribute("data-aimy-topic", "pi-publish-" + id); btn.setAttribute("data-aimy-ask", "Review and publish the knowledge draft for " + it.name + "."); }
+            } else if (state === "completed") {
+              if (text) text.innerHTML = "<b>Setup article</b> published with numbered steps";
+              if (btn) { btn.textContent = "See the update"; btn.setAttribute("data-entry-mode", "investigate"); btn.setAttribute("data-aimy-topic", "pi-issue-" + id); btn.setAttribute("data-aimy-ask", it.q); }
+            } else if (state === "drafted") {
+              if (text) text.innerHTML = "<b>Setup article draft</b> was sent back for changes";
+              if (btn) { btn.textContent = "Revise the draft"; btn.setAttribute("data-entry-mode", "investigate"); btn.setAttribute("data-aimy-topic", "pi-issue-" + id); btn.setAttribute("data-aimy-ask", it.q); }
+            } else {
+              if (text) text.innerHTML = "<b>Setup article</b> needs numbered steps";
+              /* Opens the issue answer, whose next step drafts the article. */
+              if (btn) { btn.textContent = "Draft the article update"; btn.setAttribute("data-entry-mode", "investigate"); btn.setAttribute("data-aimy-topic", "pi-issue-" + id); btn.setAttribute("data-aimy-ask", it.q); }
+            }
+          });
+        }
+        /* Answers already in the thread follow the issue, so an earlier
+           "Draft a knowledge article" does not stay on screen after it is sent. */
+        function refreshAnswers(id) {
+          document.querySelectorAll('.pi-issue-ans[data-pi-answer="' + id + '"]').forEach(function (n) {
+            var html = renderIssue(id);
+            if (html) n.outerHTML = html;
+          });
+          syncFollowups(); /* the chips follow the issue's state too */
+        }
+        var prevState = {};
+        if (typeof window.applyOutcome === "function") {
+          var applyOrig = window.applyOutcome;
+          window.applyOutcome = function (env) {
+            var m = env && /^pi-(draft|dismiss|publish)-(.+)$/.exec(env.topic || "");
+            if (!m) return applyOrig.apply(this, arguments);
+            var id = m[2], it = issue(id);
+            if (!it) return;
+            prevState[id] = it.state;
+            if (m[1] === "draft") {
+              it.sentBack = null;
+              setIssueState(id, "staged");
+              refreshAnswers(id);
+              toast("Draft sent for review", it.name + " is now Staged, waiting for your approval");
+            } else if (m[1] === "publish") {
+              setIssueState(id, "completed");
+              refreshAnswers(id);
+              toast("Article published", "“" + articleName(it) + "” is live. " + it.name + " is Done.");
+            } else {
+              setIssueState(id, "detected");
+              if (env.el) { env.el.textContent = "Dismissed"; env.el.disabled = true; }
+              toast("Suggestion dismissed", it.name + " stays Detected.");
+            }
+          };
+        }
+        /* Undo in the decision zone puts the issue back where it was. */
+        document.addEventListener("click", function (e) {
+          var u = e.target.closest && e.target.closest('[data-hr-decision="undo"]');
+          var render = u && u.closest(".canvas-render");
+          var zone = render && render.querySelector('[data-dz-topic^="pi-draft-"], [data-dz-topic^="pi-publish-"]');
+          if (!zone) return;
+          var publish = /^pi-publish-/.test(zone.getAttribute("data-dz-topic"));
+          var id = zone.getAttribute("data-dz-topic").replace(/^pi-(draft|publish)-/, "");
+          setIssueState(id, publish ? "staged" : (prevState[id] || "recommended"));
+          refreshAnswers(id);
+        }, true); /* capture: the decision zone replaces the Undo button as it handles it */
+        /* Send back needs a reason, and the reason travels with the draft.
+           Read in the capture phase, before the decision zone clears the field. */
+        document.addEventListener("click", function (e) {
+          var b = e.target.closest && e.target.closest('[data-hr-decision="reject"]');
+          var zone = b && b.closest('[data-dz-topic^="pi-publish-"]');
+          if (!zone) return;
+          var field = zone.querySelector("#hrRejectWhy"), why = field ? field.value.trim() : "";
+          if (!why) return;
+          var id = zone.getAttribute("data-dz-topic").replace("pi-publish-", ""), it = issue(id);
+          setTimeout(function () {
+            if (!it || !zone.querySelector(".ws-failed")) return;
+            it.sentBack = why;
+            setIssueState(id, "drafted");
+            refreshAnswers(id);
+            toast("Draft sent back", it.name + " is back to Drafted with your reason");
+          }, 0);
+        }, true);
+
+        /* ── A tile and its share of the bar light up together ─────────────── */
+        function lightSeg(tile, on) {
+          var stack = document.querySelector("#productInsights .pi-stack"), id = tile.getAttribute("data-pi-tile");
+          if (!stack) return;
+          stack.classList.toggle("is-lit", on);
+          stack.querySelectorAll("i").forEach(function (i) { i.classList.toggle("is-on", on && i.getAttribute("data-seg") === id); });
+        }
+        ["mouseover", "focusin"].forEach(function (ev) {
+          document.addEventListener(ev, function (e) { var t = e.target.closest && e.target.closest(".pi-mix [data-pi-tile]"); if (t) lightSeg(t, true); });
+        });
+        ["mouseout", "focusout"].forEach(function (ev) {
+          document.addEventListener(ev, function (e) { var t = e.target.closest && e.target.closest(".pi-mix [data-pi-tile]"); if (t && !t.contains(e.relatedTarget)) lightSeg(t, false); });
+        });
+        paintScope();
       })();
     </script>
     <script src="assets/aimy-scroll.js?v=3"></script>
