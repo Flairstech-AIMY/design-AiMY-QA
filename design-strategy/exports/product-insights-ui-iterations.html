@@ -1,0 +1,521 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Product Insights Iterations</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* Six UI iterations for the Dashboard's Product insights card, each paired
+   with a placement on the Dashboard. Figures are the Dashboard's own
+   prototype constants (index.html, Product insights block). */
+:root {
+  --qa: #8b4ff4; --qa-rgb: 139, 79, 244; --mine: #b99bff;
+  --brand: #3369ff; --ai: #61adf1; --teal: #45d3e6;
+  --page: #171a1c; --card: #141b24; --card-2: #1c2630; --line: rgba(255,255,255,.07); --line-2: rgba(255,255,255,.13); --line-hover: rgba(255,255,255,.14); --track: rgba(255,255,255,.07);
+  --cap: #a8b5c5; --cap-strong: #dee5ed; --qa-ink: #8b4ff4;
+  --ink: #f5f7fb; --ink-2: #c3ceda; --ink-3: #93a2b4;
+  --ok: #4ed6a1; --ok-bg: rgba(78,214,161,.12); --warn: #f7c95c; --warn-bg: rgba(247,201,92,.13); --err: #ff7282;
+  --det: #7ea7ff; --det-bg: rgba(126,167,255,.12); --rec-bg: rgba(139,79,244,.15);
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  color-scheme: dark;
+}
+:root[data-theme="light"] {
+  --mine: #5b2bbf; --ai: #1f6fc4; --teal: #0a7f92;
+  --page: #eef1f6; --card: #ffffff; --card-2: #f3f5f9; --line: rgba(16,24,40,.09); --line-2: rgba(16,24,40,.16);
+  --ink: #10151b; --ink-2: #2a3540; --ink-3: #566472;
+  --ok: #0a6b40; --ok-bg: rgba(10,107,64,.08); --warn: #8a5a00; --warn-bg: rgba(138,90,0,.09); --err: #b42318;
+  --det: #05628f; --det-bg: rgba(5,98,143,.08); --rec-bg: rgba(91,43,191,.09);
+  --line-hover: rgba(16,24,40,.18); --track: rgba(16,24,40,.08); --cap: #475467; --cap-strong: #1d2939; --qa-ink: #5b2bbf;
+  color-scheme: light;
+}
+* { box-sizing: border-box; margin: 0; }
+body { background: var(--page); color: var(--ink); font-family: "Poppins", system-ui, sans-serif; line-height: 1.5; }
+::selection { background: rgba(var(--qa-rgb), .35); }
+button { font: inherit; color: inherit; }
+button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--mine); outline-offset: 2px; }
+svg.i { width: 16px; height: 16px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.num { font-variant-numeric: tabular-nums; }
+
+.wrap { max-width: 1180px; margin: 0 auto; padding: 56px 24px 96px; }
+.top { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 20px; margin-bottom: 32px; }
+.eyebrow { margin-bottom: 8px; color: var(--mine); font-size: 12.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+h1 { font-size: clamp(28px, 4vw, 40px); font-weight: 800; letter-spacing: -0.02em; line-height: 1.1; }
+.lede { max-width: 76ch; margin-top: 10px; color: var(--ink-2); font-size: 15px; }
+.ctl { min-height: 36px; padding: 0 14px; border: 0; border-radius: 9999px; background: var(--card-2); font-size: 13px; font-weight: 700; cursor: pointer; }
+.ctl:hover { background: rgba(var(--qa-rgb), .22); }
+.ctl[aria-pressed="true"] { background: var(--qa); color: #fff; }
+
+/* Recommendation + placement overview */
+.rec { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 28px; align-items: start; padding: 24px; margin-bottom: 44px; border-radius: 18px; background: var(--card); border: 1px solid var(--line); }
+.rec h2 { font-size: 20px; font-weight: 800; letter-spacing: -0.01em; margin-bottom: 8px; }
+.rec p { color: var(--ink-2); font-size: 14px; max-width: 62ch; }
+.rec p + p { margin-top: 8px; }
+.rec b { color: var(--ink); }
+.slots { display: grid; gap: 6px; margin-top: 16px; }
+.slot-row { display: grid; grid-template-columns: 26px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 8px 10px; border-radius: 10px; background: var(--card-2); font-size: 13px; color: var(--ink-2); }
+.slot-row b { color: var(--ink); font-weight: 700; }
+.slot-row.best { outline: 1.5px solid rgba(var(--qa-rgb), .55); }
+.sl { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 7px; background: rgba(var(--qa-rgb), .22); color: var(--mine); font-size: 12px; font-weight: 800; }
+.score { font-weight: 800; font-size: 13px; }
+.score small { color: var(--ink-3); font-weight: 600; }
+
+/* The mini Dashboard used for every placement */
+.map { --g: 5px; display: grid; gap: var(--g); padding: 10px; border-radius: 12px; background: var(--page); border: 1px solid var(--line); font-size: 9px; font-weight: 700; color: var(--ink-3); letter-spacing: .02em; }
+.map .r { display: grid; gap: var(--g); }
+.map .b { min-height: 22px; padding: 4px 6px; border-radius: 5px; background: var(--card-2); border: 1px solid var(--line); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.map .h { padding: 0 2px; min-height: 0; background: none; border: 0; text-transform: uppercase; letter-spacing: .06em; }
+.map .on { background: rgba(var(--qa-rgb), .28); border: 1.5px solid var(--qa); color: var(--ink); }
+.map .slot-tag { display: inline-grid; place-items: center; width: 14px; height: 14px; margin-right: 4px; border-radius: 4px; background: var(--qa); color: #fff; font-size: 8.5px; vertical-align: -2px; }
+.map.big { --g: 7px; padding: 14px; font-size: 10.5px; }
+.map.big .b { min-height: 28px; padding: 6px 8px; }
+
+/* Iteration blocks */
+.grid { display: grid; gap: 56px; }
+.v-meta { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+.v-id { display: inline-grid; place-items: center; min-width: 34px; height: 28px; padding: 0 8px; border-radius: 8px; background: rgba(var(--qa-rgb), .2); color: var(--mine); font-weight: 800; font-size: 13px; }
+h2.v-title { font-size: 20px; font-weight: 800; letter-spacing: -0.01em; }
+.where { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 9999px; background: var(--card-2); color: var(--ink-2); font-size: 12px; font-weight: 700; }
+.where .sl { width: 18px; height: 18px; font-size: 10px; border-radius: 5px; }
+.v-sum { flex-basis: 100%; max-width: 86ch; color: var(--ink-2); font-size: 14px; }
+.frame { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 24px; align-items: start; padding: 22px; border-radius: 18px; border: 1px solid var(--line);
+  background: radial-gradient(70% 120% at 50% 0%, rgba(var(--qa-rgb), .07), transparent 70%), var(--page); }
+.frame.wide { grid-template-columns: minmax(0, 1fr); }
+.frame.wide .map { max-width: 360px; }
+.stage { min-width: 0; }
+.stage.col { max-width: 430px; }
+.picked { margin-top: 12px; min-height: 20px; color: var(--ink-3); font-size: 12.5px; }
+.picked b { color: var(--mine); font-weight: 700; }
+.notes { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 8px 28px; margin-top: 14px; font-size: 13.5px; color: var(--ink-2); }
+.notes b { display: block; color: var(--ink); font-size: 13px; margin-bottom: 2px; }
+.notes ul { padding-left: 18px; }
+
+/* Product pieces, in the Dashboard's own vocabulary */
+.card { padding: 18px 20px; border-radius: 16px; background: var(--card); border: 1px solid var(--line); }
+.c-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+.c-head h3 { font-size: 19px; font-weight: 800; letter-spacing: -0.01em; }
+.c-head .sub { color: var(--ink-3); font-size: 12.5px; font-weight: 600; }
+.c-head .more { margin-left: auto; display: inline-flex; align-items: center; gap: 4px; border: 0; background: none; padding: 2px 0; color: var(--teal); font-size: 12.5px; font-weight: 700; cursor: pointer; }
+.scope { color: var(--ink-3); font-size: 11.5px; margin-bottom: 10px; }
+.scope b { color: var(--ink-2); }
+.pills { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+.pill { padding: 3px 10px; border-radius: 9999px; border: 1px solid var(--line-2); color: var(--ink-3); font-size: 11.5px; font-weight: 600; }
+.pill b { color: var(--ink); font-weight: 800; margin-right: 3px; }
+.lab { display: flex; justify-content: space-between; color: var(--ink-3); font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 4px; }
+.ws { display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px 3px 7px; border-radius: 9999px; font-size: 9px; font-weight: 500; letter-spacing: .54px; text-transform: uppercase; white-space: nowrap; }
+.ws::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.ws.ws-rec { background: var(--rec-bg); color: var(--qa-ink); border: 1px solid rgba(var(--qa-rgb), .24); }
+.ws.ws-det { background: var(--det-bg); color: var(--det); border: 1px solid rgba(14,165,233,.22); }
+.ws.ws-det::before { background: transparent; border: 1.5px solid currentColor; }
+.ws.ws-dft { background: var(--warn-bg); color: var(--warn); border: 1px solid rgba(247,201,92,.3); }
+.bar { height: 5px; border-radius: 9999px; background: var(--line-2); overflow: hidden; }
+.bar i { display: block; height: 100%; border-radius: inherit; background: var(--qa); }
+.pick { cursor: pointer; transition: background-color 150ms var(--ease), border-color 150ms var(--ease); }
+.pick:hover { background-color: var(--card-2); }
+.pick[aria-pressed="true"] { background-color: rgba(var(--qa-rgb), .12) !important; }
+.btn { display: inline-flex; align-items: center; gap: 6px; min-height: 30px; padding: 5px 12px; border-radius: 8px; border: 1px solid var(--line-2); background: var(--card-2); font-size: 12.5px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+.btn.pri { background: var(--brand); border-color: var(--brand); color: #fff; }
+.btn.ask { background: rgba(var(--qa-rgb), .14); border-color: rgba(var(--qa-rgb), .4); color: var(--mine); }
+.aimy { display: flex; gap: 10px; align-items: flex-start; }
+.aimy .mk { display: grid; place-items: center; width: 26px; height: 26px; flex: none; border-radius: 8px; background: linear-gradient(135deg, #0066ff, var(--qa)); color: #fff; }
+.aimy .mk svg { width: 14px; height: 14px; }
+
+/* 1 Ranked cost bars */
+.rows { display: grid; gap: 2px; }
+.irow { display: grid; gap: 5px; padding: 9px 8px; margin: 0 -8px; border: 0; border-radius: 10px; background: none; text-align: left; width: calc(100% + 16px); }
+.irow .t { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: baseline; gap: 4px 10px; }
+.irow .t b { font-size: 14px; font-weight: 700; }
+.irow .t span { color: var(--ink-2); font-size: 12px; white-space: nowrap; }
+.irow .t em { font-style: normal; font-weight: 800; font-size: 13px; min-width: 34px; text-align: right; }
+.irow .m { display: flex; align-items: center; gap: 8px; color: var(--ink-3); font-size: 11.5px; }
+.c-foot { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; padding-top: 12px; margin-top: 8px; border-top: 1px solid var(--line); }
+.c-foot .note { color: var(--ink-3); font-size: 11.5px; margin-right: auto; }
+
+/* 2 Headline + top 3 */
+.head2 { font-size: 15px; font-weight: 600; color: var(--ink-2); line-height: 1.55; }
+.head2 b { color: var(--ink); font-weight: 800; }
+.head2 .hl { color: var(--warn); font-weight: 800; }
+.top3 { display: grid; margin-top: 14px; border-top: 1px solid var(--line); }
+.t3 { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 10px; align-items: center; padding: 10px 8px; margin: 0 -8px; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; background: none; text-align: left; }
+.t3 b { font-size: 13.5px; font-weight: 700; display: block; }
+.t3 small { color: var(--ink-3); font-size: 11.5px; }
+.t3 .h { font-weight: 800; font-size: 14px; }
+
+/* 3 Cost table */
+.tbl { width: 100%; border-collapse: collapse; font-size: 13px; }
+.tbl th { padding: 8px 10px; color: var(--ink-3); font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; text-align: left; border-bottom: 1px solid var(--line-2); white-space: nowrap; }
+.tbl th.r, .tbl td.r { text-align: right; }
+.tbl td { padding: 10px; border-bottom: 1px solid var(--line); color: var(--ink-2); white-space: nowrap; }
+.tbl td:first-child { color: var(--ink); font-weight: 700; white-space: normal; }
+.tbl tr.pick td:first-child { border-radius: 8px 0 0 8px; }
+.tbl .cost { display: grid; grid-template-columns: 34px 110px; gap: 8px; align-items: center; justify-content: end; font-weight: 800; color: var(--ink); }
+.tblwrap { overflow-x: auto; }
+
+/* 4 Issue cards */
+.cards4 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(150px, .7fr); gap: 12px; }
+.icard { display: grid; gap: 8px; align-content: start; padding: 14px; border-radius: 14px; border: 1px solid var(--line); background: var(--card); text-align: left; }
+.icard .hh { font-size: 26px; font-weight: 800; letter-spacing: -0.02em; line-height: 1; }
+.icard .hh small { font-size: 12px; font-weight: 700; color: var(--ink-3); letter-spacing: 0; margin-left: 4px; }
+.icard b { font-size: 14px; font-weight: 700; }
+.icard .m { color: var(--ink-3); font-size: 11.5px; }
+.icard q { display: block; padding-left: 9px; border-left: 2px solid rgba(var(--qa-rgb), .5); color: var(--ink-2); font-size: 12px; line-height: 1.45; }
+.icard .act { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+.icard.rest { place-content: center; text-align: center; background: var(--card-2); border-style: dashed; }
+.sec-h { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+.sec-h h3 { font-size: 15px; font-weight: 800; }
+.sec-h span { color: var(--ink-3); font-size: 12.5px; }
+
+/* 5 Briefing line */
+.brief { padding: 18px 20px; border-radius: 16px; background: linear-gradient(135deg, rgba(51,105,255,.1), rgba(var(--qa-rgb), .06)), var(--card); border: 1px solid var(--line); }
+.brief .bh { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; font-size: 14px; font-weight: 800; }
+.brief .bh small { margin-left: auto; color: var(--ink-3); font-size: 11.5px; font-weight: 600; }
+.brief p { color: var(--ink-2); font-size: 14px; line-height: 1.6; }
+.brief p b { color: var(--ink); }
+.brief .new { margin-top: 12px; padding-top: 12px; border-top: 1px dashed rgba(var(--qa-rgb), .45); }
+.brief .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+.brief .old { opacity: .55; }
+.tagnew { display: inline-block; margin-right: 6px; padding: 1px 7px; border-radius: 9999px; background: var(--qa); color: #fff; font-size: 9.5px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; vertical-align: 1px; }
+
+/* 6 KPI tile */
+.kpis { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+.kpi { padding: 14px; border-radius: 14px; background: var(--card); border: 1px solid var(--line); min-width: 0; }
+.kpi.ghost { opacity: .45; }
+.kpi .k { color: var(--ink-3); font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.kpi .v { font-size: 26px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.1; margin-top: 6px; }
+.kpi .v small { font-size: 12px; font-weight: 700; color: var(--ink-2); letter-spacing: 0; margin-left: 4px; }
+.kpi .s { color: var(--ink-3); font-size: 11.5px; margin-top: 4px; }
+.kpi.on { border-color: rgba(var(--qa-rgb), .5); text-align: left; width: 100%; }
+.stack { display: flex; height: 7px; gap: 2px; margin-top: 10px; border-radius: 9999px; overflow: hidden; }
+.stack i { display: block; height: 100%; background: var(--qa); }
+.stack i:nth-child(2) { opacity: .75; } .stack i:nth-child(3) { opacity: .55; } .stack i:nth-child(4) { opacity: .4; } .stack i:last-child { background: var(--line-2); opacity: 1; }
+
+/* 7 Mix: the recurring-issues tile leads the issue cards. Each bar segment
+   is one card, so the bar doubles as their key. */
+/* The cards are the Dashboard's own .bcard, measured from index.html:
+   surface, border, 16px radius and padding, the hover lift, .type-label,
+   .bcard-stat at 32px/500, .bcard-stat-cap, and the .aimy-done footer row. */
+.mix { display: grid; grid-template-columns: minmax(240px, 1.15fr) repeat(3, minmax(0, 1fr)); gap: 12px; }
+/* The rest, previewed: the next issues fade out under the bar, and the
+   footer says where the other nine are, in AiMY. */
+.qc-peek { position: relative; display: grid; gap: 5px; margin-top: 7px;
+  -webkit-mask-image: linear-gradient(180deg, #000 40%, transparent); mask-image: linear-gradient(180deg, #000 40%, transparent); }
+.qc-peek-row { display: flex; justify-content: space-between; gap: 10px; color: var(--ink-2); font-size: 11.5px; font-weight: 500; }
+.qc-peek-row span:first-child { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.qc-peek-row b { color: var(--ink); font-weight: 600; }
+.qc-more { display: inline-flex; align-items: center; gap: 8px; color: var(--ink-2); font-size: 11px; font-weight: 500; }
+.qc-count { display: inline-grid; place-items: center; min-width: 30px; height: 26px; padding: 0 7px; border-radius: 9999px; background: rgba(var(--qa-rgb), .15); border: 1px solid rgba(var(--qa-rgb), .24); color: var(--qa-ink); font-size: 12px; font-weight: 600; }
+.qc-link svg { width: 12px; height: 12px; }
+.qc-link { display: inline-flex; align-items: center; gap: 5px; }
+.qc-lead:hover .qc-link, .qc-lead:focus-visible .qc-link { background: rgba(111,223,226,.18); }
+.qc { display: flex; flex-direction: column; min-width: 0; padding: 16px; border-radius: 16px; text-align: left; cursor: pointer;
+  background: var(--card); border: 1px solid var(--line); box-shadow: 0 4px 24px rgba(0,0,0,.2);
+  transition: transform 200ms var(--ease), border-color 200ms var(--ease), box-shadow 200ms var(--ease); }
+.qc:hover, .qc.is-hot { transform: translateY(-2px); border-color: var(--line-hover); box-shadow: 0 8px 32px rgba(0,0,0,.3); }
+:root[data-theme="light"] .qc { box-shadow: 0 4px 24px rgba(16,24,40,.06); }
+:root[data-theme="light"] .qc:hover, :root[data-theme="light"] .qc.is-hot { box-shadow: 0 8px 32px rgba(16,24,40,.09); }
+.mix .qc.pick:hover { background-color: var(--card); }
+.mix .qc.pick[aria-pressed="true"] { background-color: var(--card) !important; border-color: rgba(var(--qa-rgb), .5); }
+.qc-lead { border-color: rgba(var(--qa-rgb), .24); }
+.qc-meta { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 20px; }
+.qc-label { color: var(--ink-3); font-size: 10px; font-weight: 500; letter-spacing: .5px; text-transform: uppercase; }
+.qc-badge { padding: 3px 8px; border-radius: 9999px; background: rgba(var(--qa-rgb), .15); color: var(--qa-ink); font-size: 9px; font-weight: 500; letter-spacing: .45px; text-transform: uppercase; white-space: nowrap; }
+.qc-stat-line { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 9px; margin-top: 10px; }
+.qc-stat { font-size: 32px; font-weight: 500; letter-spacing: -1.12px; line-height: 1.1; color: var(--ink); }
+.qc-cap { color: var(--cap); font-size: 11px; font-weight: 500; }
+.qc-cap b { color: var(--cap-strong); font-weight: 600; }
+.qc-name { margin-top: 8px; color: var(--ink); font-size: 13px; font-weight: 600; line-height: 1.4; }
+.qc-quote { display: block; margin-top: 8px; padding-left: 10px; border-left: 2px solid rgba(var(--qa-rgb), .45); color: var(--ink-2); font-size: 11.5px; line-height: 1.5; }
+.qc-stack { display: flex; gap: 2px; height: 6px; margin-top: 11px; border-radius: 2px; overflow: hidden; background: var(--track); }
+.qc-stack i { display: block; height: 100%; background: rgba(var(--qa-rgb), var(--o, .55)); transition: opacity 150ms var(--ease); }
+.qc-stack i.rest { background: transparent; }
+.qc-stack.hot i:not(.is-hot) { opacity: .25; }
+.qc-stack.hot i.rest.is-hot { background: rgba(var(--qa-rgb), .35); }
+.qc-foot { display: flex; align-items: center; flex-wrap: wrap; gap: 9px; margin-top: auto; padding-top: 12px; border-top: 1px solid var(--line); }
+.qc-body { flex: 1; display: flex; flex-direction: column; padding-bottom: 12px; }
+.qc-foot-text { color: var(--ink-2); font-size: 11px; font-weight: 500; }
+.qc-foot-text b { color: var(--ink); font-weight: 600; }
+.qc-link { margin-left: auto; padding: 4px 11px; border-radius: 20px; background: rgba(111,223,226,.1); border: 1px solid rgba(111,223,226,.28); color: var(--teal); font-size: 10px; font-weight: 600; white-space: nowrap; }
+
+@media (max-width: 900px) {
+  .mix { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .mix .qc-lead { grid-column: 1 / -1; }
+  .rec { grid-template-columns: minmax(0, 1fr); }
+  .frame { grid-template-columns: minmax(0, 1fr); }
+  .frame .map { max-width: 320px; }
+  .cards4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .kpi.ghost:nth-child(n+3) { display: none; }
+}
+@media (max-width: 560px) {
+  .wrap { padding: 36px 16px 64px; }
+  .frame { padding: 14px; }
+  .cards4, .mix { grid-template-columns: minmax(0, 1fr); }
+  .irow .t { grid-template-columns: minmax(0, 1fr) auto; }
+  .irow .t span { grid-column: 1 / -1; grid-row: 2; }
+}
+@media print {
+  @page { size: A4 landscape; margin: 10mm; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; zoom: .78; }
+  .ctl, .picked { display: none; }
+  .wrap { max-width: none; padding: 0; }
+  .v { break-inside: avoid; }
+  .v + .v { break-before: page; }
+}
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div>
+      <h1>Product insights: six iterations, one mix, and where each goes</h1>
+      <p class="lede">For the AiMY QA Dashboard: six ways to draw the Product insights card, each paired with a place on the Dashboard, and a seventh that mixes the recurring-issues tile (6) with the issue cards (4). They all use the Dashboard's own figures: 2,486 analyzed calls, 12 recurring issues taking 112 of 307 support hours (36%), led by Setup instructions unclear at 30 h. Click any issue to see what it would open in AiMY, and switch themes to check both.</p>
+    </div>
+    <button class="ctl" type="button" id="themeBtn" aria-pressed="false">Light theme</button>
+  </div>
+
+  <section class="rec" aria-labelledby="recTitle">
+    <div>
+      <h2 id="recTitle">Recommended: iteration 2 in the left column, with iteration 5 as the way in</h2>
+      <p><b>Built:</b> iteration 7, the mix, is what the Dashboard now ships, as its own section after the KPI row (slot D).</p>
+      <p>Today the card sits under <b>Audit performance by product</b>, so it reads as more audit data, and the right column runs far longer than the left. Product insights answers a different question, <b>what customers keep calling about</b>, and its action is a knowledge fix.</p>
+      <p>Placing it under <b>Improvement opportunities</b> makes the left column "what to fix": agents above, knowledge below. It also evens out the two columns. Iteration 2 is short enough for that slot and leads with the one decision that matters. Adding iteration 5's line to <b>Since your last visit</b> puts the costliest issue in front of the manager without moving the card up.</p>
+      <div class="slots" id="slots"></div>
+    </div>
+    <div id="mapAll"></div>
+  </section>
+
+  <div class="grid" id="grid"></div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var TOTAL = { calls: "2,486", avg: "7m 24s", hours: 307, recurring: 12, recurringHours: 112, share: 36 };
+  var ISSUES = [
+    { id: "setup", name: "Setup instructions unclear", product: "Upland", calls: 184, clients: 6, med: "9m 40s", hours: 30, state: "rec", q: "Why do customers keep calling about unclear setup instructions?", quote: "I did the first step and then nothing tells me what to do next." },
+    { id: "invoice", name: "Invoice total differs from quote", product: "Asteris", calls: 97, clients: 4, med: "11m 05s", hours: 18, state: "det", q: "Why do invoice totals differ from the quote?", quote: "The renewal invoice has a usage line nobody mentioned." },
+    { id: "login", name: "Login code not received", product: "Upland", calls: 142, clients: 5, med: "6m 15s", hours: 15, state: "det", q: "What changed about login codes?", quote: "The code goes to my old email since we changed domain." },
+    { id: "refund", name: "Agent could not find the refund policy", product: "SecondStreet", calls: 58, clients: 4, med: "12m 30s", hours: 12, state: "rec", q: "Which article should change for refunds?", quote: "Let me put you on hold while I check the refund window." },
+    { id: "export", name: "Export fails for large files", product: "Upland", calls: 71, clients: 3, med: "8m 20s", hours: 10, state: "dft", q: "Why do large exports fail?", quote: "It just spins and never gives me the file." },
+    { id: "sso", name: "SSO setup fails on first try", product: "Asteris", calls: 44, clients: 3, med: "10m 10s", hours: 7, state: "det", q: "Why does SSO setup fail on the first try?", quote: "" }
+  ];
+  var STATE = { rec: "Recommended", det: "Detected", dft: "Drafted" };
+  var MAX = ISSUES[0].hours;
+
+  function svg(p) { return '<svg class="i" viewBox="0 0 24 24" aria-hidden="true">' + p + "</svg>"; }
+  var I = {
+    sparkles: svg('<path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"/><path d="M20 2v4"/><path d="M22 4h-4"/><circle cx="4" cy="20" r="2"/>'),
+    chev: svg('<path d="m9 18 6-6-6-6"/>'),
+    trend: svg('<path d="M16 7h6v6"/><path d="m22 7-8.5 8.5-5-5L2 17"/>')
+  };
+  function ws(s) { return '<span class="ws ws-' + s + '">' + STATE[s] + "</span>"; }
+  function pickAttrs(it) { return ' data-issue="' + it.id + '" aria-pressed="false"'; }
+  function bar(it) { return '<div class="bar" aria-hidden="true"><i style="width:' + Math.max(6, Math.round(it.hours / MAX * 100)) + '%"></i></div>'; }
+  function head(sub, more) {
+    return '<div class="c-head"><h3>Product insights</h3><span class="sub">' + sub + "</span>" +
+      (more ? '<button class="more" type="button" data-more>' + more + I.chev + "</button>" : "") + "</div>";
+  }
+  function scope() { return '<p class="scope">Based on <b>' + TOTAL.calls + " analyzed calls</b> · All clients · All products · 1 Jan – 15 Sep 2026</p>"; }
+
+  /* The Dashboard, reduced to its blocks. `on` is the slot this option uses. */
+  var SLOT = {
+    A: { name: "Where it is today", where: "Right column, under Audit performance by product", score: 5.5 },
+    B: { name: "Left column", where: "Under Improvement opportunities", score: 8.5 },
+    C: { name: "Full-width row", where: "After the two columns", score: 7 },
+    D: { name: "Its own section", where: "Between Audit health and the two columns", score: 7.5 },
+    E: { name: "Since your last visit", where: "One line in the briefing", score: 6.5 },
+    F: { name: "Audit health row", where: "A fifth KPI tile", score: 5 }
+  };
+  function tag(k) { return '<span class="slot-tag">' + k + "</span>"; }
+  function map(on, big) {
+    function b(k, label, extra) { return '<div class="b' + (on === k ? " on" : "") + (extra ? " " + extra : "") + '">' + (on === k || on === "all" ? tag(k) : "") + label + "</div>"; }
+    var all = on === "all";
+    return '<div class="map' + (big ? " big" : "") + '" aria-label="Dashboard layout' + (all ? "" : ", slot " + on) + '">' +
+      '<div class="r" style="grid-template-columns:1.6fr 1fr">' + (all || on === "E" ? b("E", "Since your last visit") : '<div class="b">Since your last visit</div>') + '<div class="b">Quality score</div></div>' +
+      '<div class="b h">Audit health</div>' +
+      '<div class="r" style="grid-template-columns:repeat(' + (all || on === "F" ? 5 : 4) + ',1fr)"><div class="b">Audits</div><div class="b">Fail rate</div><div class="b">Sentiment</div><div class="b">CSAT</div>' + (all || on === "F" ? b("F", "Issues") : "") + "</div>" +
+      (all || on === "D" ? b("D", "Product insights · its own section") : "") +
+      '<div class="r" style="grid-template-columns:1fr 1fr;align-items:start">' +
+        '<div class="r"><div class="b" style="min-height:' + (big ? 74 : 54) + 'px">Improvement opportunities</div>' + (all || on === "B" ? b("B", "Product insights", "") : "") + "</div>" +
+        '<div class="r"><div class="b" style="min-height:' + (big ? 74 : 54) + 'px">Audit performance by product</div>' + (all || on === "A" ? b("A", "Product insights", "") : "") + "</div>" +
+      "</div>" +
+      (all || on === "C" ? b("C", "Product insights · full width") : "") +
+    "</div>";
+  }
+
+  var V = [
+    { n: "1", slot: "A", title: "Ranked cost bars", wide: false,
+      sum: "Today's card, tightened. The top five issues ranked by support hours, each with its calls, median call, a cost bar, its work state and who it hits. The scope line and three totals sit above the list, and a footer says how much is not shown.",
+      pro: ["Answers 'what costs us most' at a glance; the bar is cost, not failure, so one neutral colour", "Work state on every row shows what is already moving"],
+      con: ["Five rows plus totals make a tall card, which is why it overruns the right column today", "Every row looks equally important, so the one with a ready fix does not stand out"],
+      html: function () {
+        return '<div class="card">' + head("what customers keep calling about") + scope() +
+          '<div class="pills"><span class="pill"><b>' + TOTAL.recurring + "</b>recurring issues</span><span class=\"pill\"><b>" + TOTAL.avg + '</b>average call</span><span class="pill"><b>' + TOTAL.hours + " h</b>of support</span></div>" +
+          '<div class="lab"><span>Costliest recurring issues</span><span>Support time</span></div><div class="rows">' +
+          ISSUES.slice(0, 5).map(function (it) {
+            return '<button class="irow pick" type="button"' + pickAttrs(it) + '><span class="t"><b>' + it.name + '</b><span class="num">' + it.calls + " calls · " + it.med + ' median</span><em class="num">' + it.hours + " h</em></span>" + bar(it) +
+              '<span class="m">' + ws(it.state) + "<span>" + it.clients + " clients · " + it.product + "</span></span></button>";
+          }).join("") + "</div>" +
+          '<div class="c-foot"><span class="note">7 more issues under 10 h each</span><button class="btn" type="button" data-more>See all ' + TOTAL.recurring + "</button></div></div>";
+      } },
+    { n: "2", slot: "B", title: "AiMY headline and the top three", wide: false,
+      sum: "AiMY says the finding in one sentence, then the three costliest issues as compact rows, then the one action that is ready. Everything else is one click away in the conversation. It is half the height of iteration 1, which is what lets it sit in the left column.",
+      pro: ["Leads with the conclusion and the next step, like Since your last visit does", "Short enough to balance the two columns; the ready fix is the primary button"],
+      con: ["Ranks only three; the rest need a click", "The sentence has to be written well every time, or the card loses its point"],
+      html: function () {
+        var top = ISSUES.slice(0, 3);
+        return '<div class="card">' + head("what customers keep calling about", "See all " + TOTAL.recurring) +
+          '<div class="aimy"><span class="mk">' + I.sparkles + '</span><p class="head2"><b>' + TOTAL.recurring + ' issues</b> keep coming back and take <span class="hl">' + TOTAL.share + "% of support time</span>. <b>Setup instructions unclear</b> costs the most, " + ISSUES[0].hours + " h from " + ISSUES[0].calls + " calls, and the article fix is ready.</p></div>" +
+          '<div class="top3">' + top.map(function (it) {
+            return '<button class="t3 pick" type="button"' + pickAttrs(it) + "><span><b>" + it.name + "</b><small>" + it.calls + " calls · " + it.clients + " clients · " + it.product + "</small></span>" + ws(it.state) + '<span class="h num">' + it.hours + " h</span></button>";
+          }).join("") + "</div>" +
+          '<div class="c-foot"><span class="note">Based on ' + TOTAL.calls + ' calls · 1 Jan – 15 Sep</span><button class="btn pri" type="button" data-issue="setup" data-act="draft">Draft the setup article update</button></div></div>';
+      } },
+    { n: "3", slot: "C", title: "Cost table", wide: true,
+      sum: "A full-width table under both columns: every column the issue has, ranked by support time, with the cost bar in the last column. It is the dense view for a manager who wants to compare issues across products and clients without opening AiMY.",
+      pro: ["Room for every figure side by side: calls, median, hours, clients, product, state", "Full width keeps it apart from the audit cards, so it is clearly its own topic"],
+      con: ["A table at the bottom of the Dashboard is easy to never scroll to", "Density over guidance: it shows everything and recommends nothing"],
+      html: function () {
+        return '<div class="card">' + head("what customers keep calling about · ranked by support time", "Open in AiMY") + scope() +
+          '<div class="tblwrap"><table class="tbl"><thead><tr><th>Issue</th><th class="r">Calls</th><th class="r">Median call</th><th>Clients</th><th>Product</th><th>Status</th><th class="r">Support time</th></tr></thead><tbody>' +
+          ISSUES.map(function (it) {
+            return '<tr class="pick" tabindex="0" role="button"' + pickAttrs(it) + "><td>" + it.name + '</td><td class="r num">' + it.calls + '</td><td class="r num">' + it.med + "</td><td class=\"num\">" + it.clients + "</td><td>" + it.product + "</td><td>" + ws(it.state) +
+              '</td><td class="r"><span class="cost num">' + it.hours + " h" + bar(it) + "</span></td></tr>";
+          }).join("") + "</tbody></table></div>" +
+          '<div class="c-foot"><span class="note">Showing 6 of ' + TOTAL.recurring + " · " + TOTAL.recurringHours + " of " + TOTAL.hours + ' support hours</span><button class="btn" type="button" data-more>See all ' + TOTAL.recurring + "</button></div></div>";
+      } },
+    { n: "4", slot: "D", title: "Issue cards in their own section", wide: true,
+      sum: "A section of its own with a header, like Audit health, and the three costliest issues as cards. Each card leads with its hours, names the issue, quotes a customer, and shows its work state; the card opens the issue in AiMY. A fourth tile rolls up the rest.",
+      pro: ["A section header makes Product insights a first-class topic, not a card among audit cards", "The quote makes the issue real in a way a number does not"],
+      con: ["Pushes the two columns further down the page", "Three cards and a roll-up are wide; on smaller screens they wrap into two rows"],
+      html: function () {
+        return '<div class="sec-h"><h3>Product insights</h3><span>What customers keep calling about · ' + TOTAL.recurring + " recurring issues · " + TOTAL.share + "% of support time</span></div>" +
+          '<div class="cards4">' + ISSUES.slice(0, 3).map(function (it) {
+            return '<button class="icard pick" type="button"' + pickAttrs(it) + '><span class="hh num">' + it.hours + " h<small>support</small></span><b>" + it.name + '</b><span class="m">' + it.calls + " calls · " + it.clients + " clients · " + it.product + "</span>" +
+              (it.quote ? "<q>" + it.quote + "</q>" : "") + '<span class="act">' + ws(it.state) + "</span></button>";
+          }).join("") +
+          '<button class="icard rest" type="button" data-more><span class="hh num">+9</span><span class="m">more issues · 49 h</span><span class="btn" style="justify-self:center">See all ' + TOTAL.recurring + "</span></button></div>";
+      } },
+    { n: "5", slot: "E", title: "A line in Since your last visit", wide: false,
+      sum: "No card at all: AiMY adds one paragraph to the briefing it already writes, naming the costliest issue and the longest calls, with a question for each as a chip. It is the way in, not the home; the full list opens in the conversation.",
+      pro: ["The top of the page, where the manager already reads AiMY's summary", "Costs almost no space and only speaks when there is something new"],
+      con: ["No ranking on the page, so it cannot answer 'what are the top issues' by itself", "Competes with the audit findings already in the briefing"],
+      html: function () {
+        return '<div class="brief"><div class="bh"><span class="aimy"><span class="mk">' + I.sparkles + "</span></span>Since your last visit<small>last seen yesterday, 5:40pm</small></div>" +
+          '<p class="old">I ran <b>2,847 audited interactions</b> overnight. Three things need you: a response-time fix for <b>8 agents</b> is staged, <b>6 coaching plans</b> are drafted, and <b>2 dispute replies</b> are waiting to send.</p>' +
+          '<div class="new"><p><span class="tagnew">Customers</span><b>12 issues keep coming back</b> and take 36% of support time. <b>Setup instructions unclear</b> costs the most at 30 h, and <b>refund calls</b> run longest at 12m 30s because two articles disagree.</p>' +
+          '<div class="chips"><button class="btn ask pick" type="button"' + pickAttrs(ISSUES[0]) + ">" + I.sparkles + 'Why is setup unclear?</button><button class="btn ask pick" type="button"' + pickAttrs(ISSUES[3]) + ">" + I.sparkles + 'Which refund article should change?</button><button class="btn" type="button" data-more>See all 12 issues</button></div></div></div>';
+      } },
+    { n: "6", slot: "F", title: "A KPI tile in Audit health", wide: true,
+      sum: "Product insights shrinks to a fifth tile in the Audit health row: the share of support time recurring issues take, with a stacked bar of the top four. The tile opens the conversation with the ranked list.",
+      pro: ["Puts the headline number next to the other health numbers the manager checks first", "Smallest possible footprint"],
+      con: ["Customer issues are not an audit KPI, so the row mixes two kinds of number", "The tile cannot name an issue or show a fix; everything needs a click"],
+      html: function () {
+        var top = ISSUES.slice(0, 4), rest = TOTAL.recurringHours - top.reduce(function (a, it) { return a + it.hours; }, 0);
+        return '<div class="kpis">' +
+          '<div class="kpi ghost"><div class="k">Total audits</div><div class="v num">396<small>of 550</small></div></div>' +
+          '<div class="kpi ghost"><div class="k">Fail rate</div><div class="v num">7.3%</div></div>' +
+          '<div class="kpi ghost"><div class="k">Sentiment</div><div class="v">Positive</div></div>' +
+          '<div class="kpi ghost"><div class="k">CSAT</div><div class="v num">50%</div></div>' +
+          '<button class="kpi on pick" type="button" data-issue="all" aria-pressed="false"><div class="k">Recurring issues</div><div class="v num">' + TOTAL.share + "%<small>of support time</small></div>" +
+          '<div class="s num">' + TOTAL.recurringHours + " of " + TOTAL.hours + " h · " + TOTAL.recurring + " issues · setup leads</div>" +
+          '<div class="stack" aria-hidden="true">' + top.map(function (it) { return '<i style="flex:' + it.hours + '"></i>'; }).join("") + '<i style="flex:' + rest + '"></i></div></button></div>';
+      } },
+    { n: "7", slot: "D", title: "Mix: the recurring-issues tile leads the issue cards", wide: true,
+      sum: "Iteration 4's cards and iteration 6's tile in one section. The three costliest issues come first; the tile closes the row with the total, 36% of support time, and a bar split into those three cards plus the other nine, so the bar is the cards' key. Under the bar the next issues fade out, and a +9 counter with Ask AiMY says the rest are waiting in the conversation. Hovering a card or the tile lights its share of the bar.",
+      pro: ["Headline number and the issues behind it read in one row: how big, then what", "The bar ties the cards to the total, so each card's share is visible without a percentage"],
+      con: ["Still a full-width section, so the two columns move down", "Below 900px the tile takes the first row on its own and the cards pair up; on a phone they stack"],
+      html: function () {
+        var top = ISSUES.slice(0, 3), restH = TOTAL.recurringHours - top.reduce(function (a, it) { return a + it.hours; }, 0);
+        var SEG = [.75, .55, .38], TYPE = { setup: "Onboarding", invoice: "Billing", login: "Access" };
+        var restN = TOTAL.recurring - top.length, peek = ISSUES.slice(3, 5);
+        var lead = '<button class="qc qc-lead pick" type="button" data-issue="rest" aria-pressed="false" aria-label="Open the other ' + restN + ' recurring issues in AiMY"><span class="qc-body">' +
+              '<span class="qc-meta"><span class="qc-label">Recurring issues</span><span class="qc-badge">' + TOTAL.recurring + " issues</span></span>" +
+              '<span class="qc-stat-line"><span class="qc-stat num">' + TOTAL.share + '%</span><span class="qc-cap num">of support time · <b>' + TOTAL.recurringHours + "</b> of " + TOTAL.hours + " h</span></span>" +
+              '<span class="qc-stack" aria-hidden="true">' + top.map(function (it, i) { return '<i data-seg="' + it.id + '" style="flex:' + it.hours + ";--o:" + SEG[i] + '"></i>'; }).join("") + '<i class="rest" data-seg="rest" style="flex:' + restH + '"></i></span>' +
+              '<span class="qc-peek" aria-hidden="true">' + peek.map(function (it) {
+                return '<span class="qc-peek-row"><span>' + it.name + '</span><b class="num">' + it.hours + " h</b></span>";
+              }).join("") + "</span></span>" +
+              '<span class="qc-foot"><span class="qc-more"><span class="qc-count num">+' + restN + "</span>more in AiMY · " + restH + ' h</span><span class="qc-link">' + I.sparkles + "Ask AiMY</span></span></button>";
+        return '<div class="sec-h"><h3>Product insights</h3><span>What customers keep calling about · ' + TOTAL.calls + " analyzed calls · 1 Jan – 15 Sep 2026</span></div>" +
+          '<div class="mix">' + lead +
+            top.map(function (it) {
+              return '<button class="qc qc-issue pick" type="button"' + pickAttrs(it) + '><span class="qc-body">' +
+                '<span class="qc-meta"><span class="qc-label">' + it.product + " · " + TYPE[it.id] + "</span></span>" +
+                '<span class="qc-stat-line"><span class="qc-stat num">' + it.hours + ' h</span><span class="qc-cap num">of support · <b>' + it.calls + "</b> calls</span></span>" +
+                '<span class="qc-name">' + it.name + "</span>" +
+                (it.quote ? '<q class="qc-quote">' + it.quote + "</q>" : "") + "</span>" +
+                '<span class="qc-foot">' + ws(it.state) + '<span class="qc-foot-text num"><b>' + it.clients + "</b> clients</span></span></button>";
+            }).join("") +
+          "</div>";
+      } }
+  ];
+
+  /* Overview */
+  document.getElementById("mapAll").innerHTML = map("all", true);
+  document.getElementById("slots").innerHTML = Object.keys(SLOT).map(function (k) {
+    var s = SLOT[k], v = V.filter(function (x) { return x.slot === k; })[0];
+    return '<div class="slot-row' + (k === "B" ? " best" : "") + '"><span class="sl">' + k + "</span><span><b>" + s.name + "</b> · " + s.where + " · iteration " + V.filter(function (x) { return x.slot === k; }).map(function (x) { return x.n; }).join(" and ") + '</span><span class="score num">' + s.score + "<small>/10</small></span></div>";
+  }).join("");
+
+  /* Iterations */
+  var grid = document.getElementById("grid");
+  V.forEach(function (v) {
+    var s = SLOT[v.slot];
+    var art = document.createElement("article");
+    art.className = "v";
+    art.innerHTML = '<div class="v-meta"><span class="v-id">' + v.n + '</span><h2 class="v-title">' + v.title + '</h2><span class="where"><span class="sl">' + v.slot + "</span>" + s.name + " · " + s.score + '/10</span><p class="v-sum">' + v.sum + "</p></div>" +
+      '<div class="frame' + (v.wide ? " wide" : "") + '">' + map(v.slot) + '<div class="stage' + (v.wide ? "" : " col") + '">' + v.html() + '<p class="picked" aria-live="polite"></p></div></div>' +
+      '<div class="notes"><div><b>Strong</b><ul>' + v.pro.map(function (p) { return "<li>" + p + "</li>"; }).join("") + "</ul></div>" +
+      '<div><b>Weak</b><ul>' + v.con.map(function (p) { return "<li>" + p + "</li>"; }).join("") + "</ul></div>" +
+      '<div><b>Placement</b><ul><li>' + s.where + ".</li></ul></div></div>";
+    grid.appendChild(art);
+  });
+
+  /* What a click would open. Illustrative: in the product it opens AiMY. */
+  function say(el) {
+    var stage = el.closest(".stage"), out = stage && stage.querySelector(".picked");
+    if (!out) return;
+    stage.querySelectorAll(".pick").forEach(function (p) { p.setAttribute("aria-pressed", String(p === el)); });
+    var id = el.getAttribute("data-issue"), it = ISSUES.filter(function (x) { return x.id === id; })[0];
+    if (id === "rest") { out.innerHTML = "Opens AiMY with <b>the other " + (TOTAL.recurring - 3) + " recurring issues</b>, ranked by support time, starting with “" + ISSUES[3].name + "”."; return; }
+    if (el.hasAttribute("data-more") || id === "all") { out.innerHTML = "Opens AiMY with <b>all " + TOTAL.recurring + " recurring issues</b>, ranked by support time."; return; }
+    if (el.getAttribute("data-act") === "draft") { out.innerHTML = "Opens AiMY on <b>Setup instructions unclear</b>, where Draft a knowledge article is the next step."; return; }
+    if (it) out.innerHTML = "Opens AiMY asking <b>“" + it.q + "”</b>: the calls, related articles and the suggested next step.";
+  }
+  document.addEventListener("click", function (e) {
+    var el = e.target.closest && e.target.closest(".pick, [data-more], [data-act]");
+    if (el) say(el);
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key !== "Enter" && e.key !== " ") return;
+    var el = e.target.closest && e.target.closest('tr.pick');
+    if (el) { e.preventDefault(); say(el); }
+  });
+  /* Iteration 7: a card and its share of the bar light up together. */
+  function hot(card, on) {
+    var mix = card.closest(".mix"), id = card.getAttribute("data-issue"), stack = mix && mix.querySelector(".qc-stack");
+    if (!stack) return;
+    stack.classList.toggle("hot", on);
+    stack.querySelectorAll("i").forEach(function (i) { i.classList.toggle("is-hot", on && i.getAttribute("data-seg") === id); });
+    card.classList.toggle("is-hot", on);
+  }
+  ["mouseover", "focusin"].forEach(function (ev) {
+    document.addEventListener(ev, function (e) { var c = e.target.closest && e.target.closest(".mix .qc"); if (c) hot(c, true); });
+  });
+  ["mouseout", "focusout"].forEach(function (ev) {
+    document.addEventListener(ev, function (e) { var c = e.target.closest && e.target.closest(".mix .qc"); if (c && !c.contains(e.relatedTarget)) hot(c, false); });
+  });
+
+  var themeBtn = document.getElementById("themeBtn");
+  themeBtn.addEventListener("click", function () {
+    var light = document.documentElement.getAttribute("data-theme") !== "light";
+    if (light) document.documentElement.setAttribute("data-theme", "light"); else document.documentElement.removeAttribute("data-theme");
+    themeBtn.setAttribute("aria-pressed", String(light));
+  });
+})();
+</script>
+</body>
+</html>
