@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Evaluation Feed Round 3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* Round 3 of "Your evaluations" (Dashboard, Only my results): six more
+   feed-style takes in the spirit of 4A–4C from
+   my-evaluations-feed-bars-variants.html, all from the same four records. */
+:root {
+  --qa: #8b4ff4; --qa-rgb: 139, 79, 244; --mine: #b99bff;
+  --page: #171a1c; --card: #141b24; --card-2: #1c2630; --line: rgba(255,255,255,.07); --line-2: rgba(255,255,255,.12);
+  --ink: #f5f7fb; --ink-2: #c3ceda; --ink-3: #93a2b4;
+  --err: #ff7282; --err-bg: rgba(255,114,130,.12); --ok: #4ed6a1; --ok-bg: rgba(78,214,161,.12); --warn: #f7c95c; --warn-bg: rgba(247,201,92,.13);
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  color-scheme: dark;
+}
+:root[data-theme="light"] {
+  --mine: #5b2bbf;
+  --page: #eef1f6; --card: #ffffff; --card-2: #f4f6fa; --line: rgba(16,24,40,.09); --line-2: rgba(16,24,40,.15);
+  --ink: #10151b; --ink-2: #2a3540; --ink-3: #566472;
+  --err: #b42318; --err-bg: rgba(180,35,24,.08); --ok: #0a6b40; --ok-bg: rgba(10,107,64,.08); --warn: #8a5a00; --warn-bg: rgba(138,90,0,.09);
+  color-scheme: light;
+}
+* { box-sizing: border-box; margin: 0; }
+body { background: var(--page); color: var(--ink); font-family: "Poppins", system-ui, sans-serif; line-height: 1.5; }
+::selection { background: rgba(var(--qa-rgb), .35); }
+button { font: inherit; color: inherit; }
+button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--mine); outline-offset: 2px; }
+svg.i { width: 16px; height: 16px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+.wrap { max-width: 1040px; margin: 0 auto; padding: 56px 24px 96px; }
+.top { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 20px; margin-bottom: 36px; }
+h1 { font-size: clamp(28px, 4vw, 40px); font-weight: 800; letter-spacing: -0.02em; line-height: 1.1; }
+.lede { max-width: 68ch; margin-top: 10px; color: var(--ink-2); font-size: 15px; }
+.ctl { min-height: 36px; padding: 0 14px; border: 0; border-radius: 9999px; background: var(--card-2); font-size: 13px; font-weight: 600; cursor: pointer; }
+.ctl:hover { background: rgba(var(--qa-rgb), .22); }
+.ctl[aria-pressed="true"] { background: var(--qa); color: #fff; }
+
+.grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 36px; }
+.v { min-width: 0; }
+.v-meta { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+.v-id { display: inline-grid; place-items: center; min-width: 34px; height: 28px; padding: 0 8px; border-radius: 8px; background: rgba(var(--qa-rgb), .2); color: var(--mine); font-weight: 800; font-size: 13px; }
+h2.v-title { font-size: 18px; font-weight: 700; }
+.v-sum { flex-basis: 100%; max-width: 80ch; color: var(--ink-2); font-size: 13.5px; }
+
+.frame { padding: 22px; border-radius: 18px; background: radial-gradient(70% 120% at 50% 0%, rgba(var(--qa-rgb), .08), transparent 70%), var(--page); border: 1px solid var(--line); }
+.sec-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 14px; }
+.sec-head h3 { font-size: 20px; font-weight: 700; letter-spacing: -0.01em; white-space: nowrap; }
+.sec-head .sub { color: var(--ink-3); font-size: 12.5px; }
+.sec-head .exp { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border: 0; border-radius: 8px; background: transparent; color: var(--ink-2); font-size: 13px; font-weight: 600; white-space: nowrap; cursor: pointer; }
+.sec-head .exp:hover { background: var(--card-2); color: var(--ink); }
+.panel { background: var(--card); border: 1px solid var(--line); border-radius: 16px; }
+.picked { margin-top: 10px; min-height: 20px; color: var(--ink-3); font-size: 12.5px; }
+.picked b { color: var(--mine); font-weight: 600; }
+
+.notes { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 8px 28px; margin-top: 12px; font-size: 13px; color: var(--ink-2); }
+.notes b { display: block; color: var(--ink); font-size: 12.5px; margin-bottom: 2px; }
+.notes ul { padding-left: 18px; }
+
+.tone-err { color: var(--err); } .tone-ok { color: var(--ok); } .tone-warn { color: var(--warn); }
+.chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px; border-radius: 9999px; font-size: 10.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; white-space: nowrap; }
+.chip::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.chip.err { background: var(--err-bg); color: var(--err); } .chip.ok { background: var(--ok-bg); color: var(--ok); }
+.ask { display: inline-flex; align-items: center; gap: 6px; padding: 6px 11px; border: 1px solid rgba(var(--qa-rgb), .35); border-radius: 9px; background: rgba(var(--qa-rgb), .14); color: var(--mine); font-size: 12.5px; font-weight: 600; white-space: nowrap; cursor: pointer; }
+.ask:hover { background: rgba(var(--qa-rgb), .24); }
+.pick { cursor: pointer; transition: background-color 150ms var(--ease), border-color 150ms var(--ease); }
+.pick:hover { background-color: var(--card-2); }
+.pick[aria-pressed="true"] { background-color: rgba(var(--qa-rgb), .1); }
+.num { font-variant-numeric: tabular-nums; }
+.row-btn { display: block; width: 100%; border: 0; background: none; text-align: left; }
+
+/* 4D Briefing, then the feed */
+.brief { display: flex; gap: 14px; padding: 18px 20px; border-bottom: 1px solid var(--line); }
+.brief .mark { display: grid; place-items: center; width: 34px; height: 34px; flex: none; border-radius: 10px; background: rgba(var(--qa-rgb), .18); color: var(--mine); }
+.brief p { font-size: 15px; color: var(--ink-2); max-width: 70ch; }
+.brief p b { color: var(--ink); }
+.bfeed { padding: 6px 12px 10px; }
+.bline { display: grid; grid-template-columns: 92px minmax(0, 1fr) auto; gap: 14px; align-items: center; padding: 10px 10px; border-radius: 10px; font-size: 14px; color: var(--ink-2); }
+.bline .d { color: var(--ink-3); font-size: 12.5px; font-weight: 600; }
+.bline b { color: var(--ink); }
+
+/* 4E Score on the rail */
+.srail { padding: 8px 18px; }
+.snode-row { position: relative; display: grid; grid-template-columns: 70px 52px minmax(0, 1fr) auto; gap: 14px; align-items: center; padding: 12px 10px; border-radius: 12px; }
+.snode-row::before { content: ""; position: absolute; left: calc(10px + 70px + 14px + 25px); top: 0; bottom: 0; width: 2px; background: var(--ink-3); opacity: .35; }
+.snode-row:first-child::before { top: 50%; } .snode-row:last-child::before { bottom: 50%; }
+.snode-row .d { color: var(--ink-3); font-size: 12px; font-weight: 600; line-height: 1.25; text-align: right; }
+.snode-row .d b { display: block; color: var(--ink); font-size: 15px; font-weight: 800; }
+.snode { position: relative; z-index: 1; display: grid; place-items: center; width: 52px; height: 52px; border-radius: 50%; background: var(--card); border: 3px solid currentColor; font-size: 15px; font-weight: 800; }
+.snode-row .t { font-size: 14px; color: var(--ink-2); }
+.snode-row .t b { color: var(--ink); }
+.snode-row .t small { display: block; color: var(--ink-3); font-size: 12px; }
+
+/* 4F AiMY messages */
+.msgs { display: grid; gap: 14px; padding: 18px; }
+.msg { display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 12px; }
+.msg .av { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: rgba(var(--qa-rgb), .2); color: var(--mine); }
+.bubble { padding: 12px 14px; border: 1px solid var(--line); border-radius: 4px 14px 14px 14px; background: var(--card-2); font-size: 14px; color: var(--ink-2); }
+.bubble.err { border-color: rgba(255,114,130,.3); background: linear-gradient(var(--err-bg), var(--err-bg)), var(--card-2); }
+.bubble b { color: var(--ink); }
+.bubble .meta { display: block; margin-bottom: 4px; color: var(--ink-3); font-size: 11.5px; font-weight: 600; }
+.replies { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.reply { padding: 5px 11px; border: 1px solid var(--line-2); border-radius: 9999px; background: var(--card); color: var(--ink-2); font-size: 12.5px; font-weight: 600; cursor: pointer; }
+.reply:hover { border-color: rgba(var(--qa-rgb), .45); color: var(--mine); }
+.reply.primary { border-color: rgba(var(--qa-rgb), .4); background: rgba(var(--qa-rgb), .14); color: var(--mine); }
+
+/* 4G Week strip, then the feed */
+.week { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; padding: 14px; border-bottom: 1px solid var(--line); }
+.wday { display: grid; justify-items: center; gap: 2px; padding: 10px 4px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); }
+.wday .n { color: var(--ink-3); font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.wday .dd { font-size: 18px; font-weight: 800; }
+.wday .sc { margin-top: 4px; padding: 1px 8px; border-radius: 9999px; font-size: 12px; font-weight: 800; }
+.wday .sc.err { background: var(--err-bg); color: var(--err); } .wday .sc.warn { background: var(--warn-bg); color: var(--warn); } .wday .sc.ok { background: var(--ok-bg); color: var(--ok); }
+.wday.empty { border-style: dashed; background: transparent; }
+.wday.empty .dd { color: var(--ink-3); }
+.wday.empty .sc { color: var(--ink-3); font-weight: 600; }
+.wday[aria-pressed="true"] { border-color: rgba(var(--qa-rgb), .55); }
+.wfeed { padding: 6px 12px 10px; }
+.wline { display: grid; grid-template-columns: 10px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 11px 10px; border-radius: 10px; font-size: 14px; color: var(--ink-2); }
+.wline .dot { width: 10px; height: 10px; border-radius: 50%; }
+.wline b { color: var(--ink); }
+
+/* 4H What happened / what it means */
+.read { padding: 4px 18px; }
+.rrow { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 20px; padding: 14px 10px; margin: 0 -10px; border-radius: 12px; border-bottom: 1px solid var(--line); }
+.rrow:last-child { border-bottom: 0; }
+.rrow .what { font-size: 14px; color: var(--ink-2); }
+.rrow .what b { color: var(--ink); }
+.rrow .what small { display: block; color: var(--ink-3); font-size: 12px; }
+.rrow .means { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; color: var(--ink); }
+.rrow .means svg { margin-top: 3px; color: var(--mine); }
+.read-h { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 20px; padding: 12px 0 4px; color: var(--ink-3); font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+
+/* 4I One line each */
+.dense { padding: 6px; }
+.dline { position: relative; display: grid; grid-template-columns: 74px 72px minmax(0, 1fr) 48px; gap: 12px; align-items: center; padding: 9px 12px 9px 16px; border-radius: 8px; font-size: 13.5px; color: var(--ink-2); }
+.dline::before { content: ""; position: absolute; left: 4px; top: 8px; bottom: 8px; width: 3px; border-radius: 3px; background: var(--c); }
+.dline .d { color: var(--ink-3); font-size: 12.5px; }
+.dline .id { color: var(--ink); font-weight: 700; }
+.dline .s { text-align: right; font-weight: 800; }
+.dline .t { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+@media (max-width: 760px) {
+  .wrap { padding: 36px 16px 64px; }
+  .frame { padding: 14px; }
+  .sec-head { flex-wrap: wrap; row-gap: 2px; }
+  .sec-head h3 { font-size: 18px; }
+  .sec-head .sub { order: 3; flex-basis: 100%; }
+  .sec-head .exp { padding: 6px 4px; }
+  .brief { padding: 14px; } .brief .mark { display: none; } .brief p { font-size: 14px; }
+  .bline { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  .bline .chip { justify-self: start; }
+  .srail { padding: 6px 8px; }
+  .snode-row { grid-template-columns: 50px 44px minmax(0, 1fr); gap: 10px; padding: 12px 6px; }
+  .snode-row .d b { font-size: 13px; white-space: nowrap; }
+  .snode-row::before { left: calc(6px + 50px + 10px + 21px); }
+  .snode { width: 44px; height: 44px; font-size: 13px; }
+  .snode-row .chip { grid-column: 3; justify-self: start; }
+  .msgs { padding: 12px; } .msg { grid-template-columns: 28px minmax(0, 1fr); gap: 8px; } .msg .av { width: 28px; height: 28px; }
+  .week { gap: 5px; padding: 10px; } .wday { padding: 8px 2px; } .wday .dd { font-size: 15px; } .wday .sc { padding: 0 5px; font-size: 11px; }
+  .wline { grid-template-columns: 10px minmax(0, 1fr); } .wline .chip { grid-column: 2; justify-self: start; }
+  .read-h { display: none; }
+  .rrow { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  .dline { grid-template-columns: auto minmax(0, 1fr) 40px; gap: 10px; }
+  .dline .d { white-space: nowrap; }
+  .dline .t { grid-column: 1 / -1; grid-row: 2; white-space: normal; }
+  .dline .d { font-size: 12px; }
+}
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div>
+      <h1>Your evaluations as a feed, round 3</h1>
+      <p class="lede">Six more takes in the spirit of 4A–4C: sentences on a timeline that explain what each evaluation means. Same four evaluations: EV-0541 (71%, needs attention), EV-0538 (88%), EV-0533 (93%, a call), EV-0529 (84%), all Upland · KCM, against your 85% goal. Click any evaluation to see what it would open.</p>
+    </div>
+    <button class="ctl" type="button" id="themeBtn" aria-pressed="false">Light theme</button>
+  </div>
+  <div class="grid" id="grid"></div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var GOAL = 85, TODAY = Date.UTC(2026, 9, 21);
+  var EVALS = [
+    { id: "EV-0541", date: "2026-10-13", product: "Upland · KCM", type: "Ticket", score: 71, status: "Needs attention", tone: "err" },
+    { id: "EV-0538", date: "2026-10-12", product: "Upland · KCM", type: "Ticket", score: 88, status: "Completed", tone: "ok" },
+    { id: "EV-0533", date: "2026-10-10", product: "Upland · KCM", type: "Call", score: 93, status: "Completed", tone: "ok" },
+    { id: "EV-0529", date: "2026-10-09", product: "Upland · KCM", type: "Ticket", score: 84, status: "Completed", tone: "ok" }
+  ];
+  function svg(p) { return '<svg class="i" viewBox="0 0 24 24" aria-hidden="true">' + p + "</svg>"; }
+  var I = {
+    download: svg('<path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/>'),
+    sparkles: svg('<path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"/><path d="M20 2v4"/><path d="M22 4h-4"/><circle cx="4" cy="20" r="2"/>')
+  };
+  var MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  var DAYS = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+  function ts(e) { var p = e.date.split("-"); return Date.UTC(+p[0], +p[1] - 1, +p[2]); }
+  function short(e) { var x = new Date(ts(e)); return x.getUTCDate() + " " + MONTHS[x.getUTCMonth()]; }
+  function weekday(e) { return DAYS[new Date(ts(e)).getUTCDay()]; }
+  function ago(e) { var n = Math.round((TODAY - ts(e)) / 864e5); return n === 0 ? "today" : n === 1 ? "yesterday" : n + " days ago"; }
+  function gapN(e) { return e.score - GOAL; }
+  function gapText(e) { var g = gapN(e); var n = Math.abs(g), u = n === 1 ? " pt" : " pts"; return g < 0 ? n + u + " under your goal" : g === 0 ? "at your goal" : n + u + " over your goal"; }
+  function tone(e) { return e.tone === "err" ? "err" : e.score < GOAL ? "warn" : "ok"; }
+  function col(e) { return "var(--" + tone(e) + ")"; }
+  function a(e) { return e.type === "Call" ? "a call" : "a ticket"; }
+  function chip(e) { return '<span class="chip ' + e.tone + '">' + e.status + "</span>"; }
+  function pickAttrs(e) { return ' data-ev="' + e.id + '" aria-pressed="false"'; }
+  function head(sub) { return '<div class="sec-head"><h3>Your evaluations</h3><span class="sub">' + sub + '</span><button class="exp" type="button">' + I.download + "Export CSV</button></div>"; }
+  function chrono() { return EVALS.slice().sort(function (x, y) { return ts(x) - ts(y); }); }
+  function prevOf(e) { var c = chrono(), i = c.indexOf(e); return i > 0 ? c[i - 1] : null; }
+  var avg = Math.round(EVALS.reduce(function (s, e) { return s + e.score; }, 0) / EVALS.length);
+  var best = EVALS.reduce(function (m, e) { return e.score > m.score ? e : m; });
+  var worst = EVALS.reduce(function (m, e) { return e.score < m.score ? e : m; });
+  var first = chrono()[0], last = chrono()[EVALS.length - 1];
+
+  // What an evaluation means, derived only from the four records.
+  function reading(e) {
+    var p = prevOf(e), g = gapN(e);
+    if (e === worst) return "Your lowest this period" + (p ? ", " + (p.score - e.score) + " pts down from " + p.id : "") + ". It's the one to look at first.";
+    if (e === best) return "Your best this period, and your only call.";
+    if (g < 0) return "Just under your goal, by " + -g + " pt" + (g === -1 ? "" : "s") + ". A small fix would have passed it.";
+    return "Over your goal by " + g + " pts" + (p && p.score > e.score ? ", though " + (p.score - e.score) + " down from " + p.id : "") + ".";
+  }
+
+  var V = [
+    { n: "4D", title: "AiMY's briefing, then the feed", sum: "AiMY sums up the period in two sentences written from the four records (count, average, best, the one that needs you), then the evaluations follow as short dated lines. The summary is the answer; the lines are the evidence.",
+      pro: ["Answers 'how did I do?' before you read any row", "Same voice as AiMY's 'Since your last visit' briefing"],
+      con: ["The summary must be regenerated whenever records change", "Two places say similar things"],
+      html: function () {
+        var under = EVALS.filter(function (e) { return e.score < GOAL; }).length;
+        return head("9–13 Oct") + '<div class="panel"><div class="brief"><span class="mark">' + I.sparkles + "</span><p>Between " + short(first) + " and " + short(last) + " you had <b>" + EVALS.length + " evaluations averaging " + avg + "%</b>, " + Math.abs(avg - GOAL) + " pt " + (avg < GOAL ? "under" : "over") + " your goal. Your best was the call <b>" + best.id + " at " + best.score + "%</b>. <b class=\"tone-err\">" + worst.id + " dropped to " + worst.score + "%</b> and needs your attention; " + (under - 1) + " other was just under goal.</p></div>" +
+          '<div class="bfeed">' + EVALS.map(function (e) {
+            return '<button class="row-btn bline pick" type="button"' + pickAttrs(e) + '><span class="d">' + weekday(e) + " " + short(e) + "</span><span><b>" + e.id + "</b>, " + a(e) + ', scored <b class="num tone-' + tone(e) + '">' + e.score + "%</b>, " + gapText(e) + ".</span>" + (e.tone === "err" ? chip(e) : "<span></span>") + "</button>";
+          }).join("") + "</div></div>";
+      } },
+    { n: "4E", title: "Score on the rail", sum: "The timeline's dots become the scores themselves: a ring on the rail, coloured by where it sits against your goal. The sentence beside it says what happened; the date sits on the other side of the rail.",
+      pro: ["The timeline and the scores read in one vertical pass", "Colour and number together, so status isn't colour-only"],
+      con: ["Big nodes make each row tall", "Rail breaks visually when one day has several evaluations"],
+      html: function () {
+        return head("Newest first") + '<div class="panel srail">' + EVALS.map(function (e) {
+          return '<button class="row-btn snode-row pick" type="button"' + pickAttrs(e) + '><span class="d">' + weekday(e) + "<b>" + short(e) + '</b></span><span class="snode num" style="color:' + col(e) + '">' + e.score + "</span>" +
+            '<span class="t"><b>' + e.id + "</b>, " + a(e) + ", " + gapText(e) + ".<small>" + e.product + " · " + ago(e) + "</small></span>" + (e.tone === "err" ? chip(e) : "") + "</button>";
+        }).join("") + "</div>";
+      } },
+    { n: "4F", title: "AiMY tells you", sum: "Each evaluation is a short message from AiMY, with replies you can tap that become the question in the chat. The one that needs attention leads with 'What should I change?'. It's the feed turned into the start of a conversation.",
+      pro: ["The next step is already written for you", "Feels continuous with the Ask AiMY chat"],
+      con: ["Chat styling for records can feel informal on a dashboard", "Replies repeat on every message"],
+      html: function () {
+        return head("Newest first") + '<div class="panel msgs">' + EVALS.map(function (e) {
+          var replies = e.tone === "err" ? '<button class="reply primary" type="button" data-ev="' + e.id + '">What should I change?</button><button class="reply" type="button" data-ev="' + e.id + '">Show the KPIs</button>' :
+            '<button class="reply" type="button" data-ev="' + e.id + '">Show the KPIs</button>';
+          return '<div class="msg"><span class="av">' + I.sparkles + '</span><div class="bubble' + (e.tone === "err" ? " err" : "") + '"><span class="meta">' + weekday(e) + " " + short(e) + " · " + e.product + "</span>Your " + e.type.toLowerCase() + " evaluation <b>" + e.id + '</b> scored <b class="num tone-' + tone(e) + '">' + e.score + "%</b>, " + gapText(e) + "." + (e.tone === "err" ? " It needs your attention." : "") + '<div class="replies">' + replies + "</div></div></div>";
+        }).join("") + "</div>";
+      } },
+    { n: "4G", title: "Your week, then the feed", sum: "A strip of the days 9–13 Oct sits on top: each day shows its score, and Sunday shows that nothing happened. Tap a day to find its line in the feed below. The rhythm of the week is visible before any sentence.",
+      pro: ["Shows gaps (Sunday) that a list hides", "Days and lines are linked, so the strip is navigation too"],
+      con: ["Only works for short periods; a month needs a different strip", "Two views of the same four items"],
+      html: function () {
+        var days = [], t = ts(first);
+        for (; t <= ts(last); t += 864e5) days.push(t);
+        var strip = days.map(function (d) {
+          var x = new Date(d), e = EVALS.filter(function (r) { return ts(r) === d; })[0];
+          var inner = '<span class="n">' + DAYS[x.getUTCDay()] + '</span><span class="dd">' + x.getUTCDate() + "</span>";
+          return e ? '<button class="wday pick" type="button"' + pickAttrs(e) + ">" + inner + '<span class="sc num ' + tone(e) + '">' + e.score + "%</span></button>" :
+            '<div class="wday empty">' + inner + '<span class="sc">None</span></div>';
+        }).join("");
+        return head("9–13 Oct") + '<div class="panel"><div class="week">' + strip + '</div><div class="wfeed">' + EVALS.map(function (e) {
+          return '<button class="row-btn wline pick" type="button"' + pickAttrs(e) + '><span class="dot" style="background:' + col(e) + '"></span><span><b>' + weekday(e) + " " + short(e) + "</b> · " + e.id + ", " + a(e) + ', <b class="num tone-' + tone(e) + '">' + e.score + "%</b>, " + gapText(e) + ".</span>" + (e.tone === "err" ? chip(e) : "<span></span>") + "</button>";
+        }).join("") + "</div></div>";
+      } },
+    { n: "4H", title: "What happened, what it means", sum: "Each row has two halves: the facts on the left (ID, type, date, score) and AiMY's read on the right, worked out from the four records: your lowest, your best, just under goal, over goal but down from the last one.",
+      pro: ["Interpretation is separate from the facts, so both stay clear", "Each read is specific: 'A small fix would have passed it'"],
+      con: ["Reads depend on the other evaluations, so they change as new ones arrive", "Needs width; stacks on a phone"],
+      html: function () {
+        return head("Newest first") + '<div class="panel read"><div class="read-h"><span>What happened</span><span>What it means</span></div>' + EVALS.map(function (e) {
+          return '<button class="row-btn rrow pick" type="button"' + pickAttrs(e) + '><span class="what"><b>' + e.id + '</b> · <b class="num tone-' + tone(e) + '">' + e.score + "%</b><small>" + e.type + " · " + weekday(e) + " " + short(e) + " · " + e.product + "</small></span>" +
+            '<span class="means">' + I.sparkles + "<span>" + reading(e) + "</span></span></button>";
+        }).join("") + "</div>";
+      } },
+    { n: "4I", title: "One line each", sum: "The feed at its densest: one line per evaluation with a colour edge, date, ID, a short phrase and the score. It keeps the feed's sentences but at table height, for when the list grows.",
+      pro: ["Fits many evaluations without scrolling", "The colour edge gives status at a glance"],
+      con: ["Sentences shrink to phrases, losing some of the feed's clarity", "Status chip is gone; the edge and score carry it"],
+      html: function () {
+        return head("Newest first") + '<div class="panel dense">' + EVALS.map(function (e) {
+          return '<button class="row-btn dline pick" type="button"' + pickAttrs(e) + ' style="--c:' + col(e) + '"><span class="d">' + weekday(e) + " " + short(e) + '</span><span class="id">' + e.id + '</span><span class="t">' + e.type + ", " + gapText(e).replace("your goal", "goal") + (e.tone === "err" ? " · needs attention" : "") + '</span><span class="s num tone-' + tone(e) + '">' + e.score + "%</span></button>";
+        }).join("") + "</div>";
+      } }
+  ];
+
+  var grid = document.getElementById("grid");
+  V.forEach(function (v) {
+    var art = document.createElement("article");
+    art.className = "v";
+    art.innerHTML = '<div class="v-meta"><span class="v-id">' + v.n + '</span><h2 class="v-title">' + v.title + '</h2><p class="v-sum">' + v.sum + "</p></div>" +
+      '<div class="frame">' + v.html() + '<p class="picked" aria-live="polite"></p></div>' +
+      '<div class="notes"><div><b>Strong</b><ul>' + v.pro.map(function (p) { return "<li>" + p + "</li>"; }).join("") + "</ul></div>" +
+      '<div><b>Weak</b><ul>' + v.con.map(function (p) { return "<li>" + p + "</li>"; }).join("") + "</ul></div></div>";
+    grid.appendChild(art);
+  });
+
+  function find(id) { return EVALS.filter(function (x) { return x.id === id; })[0]; }
+  function say(el, id, q) {
+    var e = find(id);
+    el.closest(".frame").querySelector(".picked").innerHTML = q ?
+      "Asks AiMY about <b>" + e.id + "</b>: “" + q + "”" :
+      "Opens <b>" + e.id + "</b> in AiMY: the " + e.type.toLowerCase() + " evaluation from " + e.date + " scored " + e.score + "%, with its KPIs and what to change next time.";
+  }
+  document.addEventListener("click", function (ev) {
+    var t = ev.target;
+    var reply = t.closest && t.closest(".reply");
+    if (reply) { say(reply, reply.getAttribute("data-ev"), reply.textContent); return; }
+    var p = t.closest && t.closest(".pick");
+    if (!p) return;
+    var frame = p.closest(".frame"), id = p.getAttribute("data-ev");
+    frame.querySelectorAll(".pick").forEach(function (x) { x.setAttribute("aria-pressed", String(x.getAttribute("data-ev") === id)); });
+    say(p, id);
+  });
+  var themeBtn = document.getElementById("themeBtn");
+  themeBtn.addEventListener("click", function () {
+    var light = document.documentElement.getAttribute("data-theme") !== "light";
+    if (light) document.documentElement.setAttribute("data-theme", "light"); else document.documentElement.removeAttribute("data-theme");
+    themeBtn.setAttribute("aria-pressed", String(light));
+  });
+})();
+</script>
+</body>
+</html>

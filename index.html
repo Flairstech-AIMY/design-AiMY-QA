@@ -1132,6 +1132,11 @@
         gap: 16px;
         align-items: start; /* Prevents cards from stretching vertically */
       }
+      /* Narrow screens: one column, so the halves stack instead of pushing
+         the dashboard into a sideways scroll. */
+      @media (max-width: 720px) {
+        .tier-2-grid { grid-template-columns: minmax(0, 1fr); }
+      }
       .layout-column {
         display: flex;
         flex-direction: column;
@@ -2874,16 +2879,19 @@
       }
       .ai-insight:focus-within { outline: 2px solid var(--brand); outline-offset: 2px; }
 
-      /* Glass surface (DS: glass 85%) with a soft semantic tint (DS: tint 12%). */
+      /* Glass surface (DS: glass 85%) with a semantic tint that fades out at
+         the card's percentage, so a higher percentage reads as a longer and
+         stronger band. */
       .ai-insight[data-severity="critical"] { --ins-tone: var(--err); }
       .ai-insight[data-severity="warning"]  { --ins-tone: var(--warn); }
       .ai-insight[data-severity="positive"] { --ins-tone: var(--ok); }
       .ai-insight[data-severity] {
+        --ins-strength: max(5%, calc((var(--pct, 0) - 20) * 0.42%));
         background:
-          linear-gradient(90deg, color-mix(in srgb, var(--ins-tone) 17%, transparent) 0%, color-mix(in srgb, var(--ins-tone) 7%, transparent) calc(var(--pct, 0) * 1%), transparent calc(var(--pct, 0) * 1% + 14%)),
+          linear-gradient(90deg, color-mix(in srgb, var(--ins-tone) var(--ins-strength), transparent) 0%, color-mix(in srgb, var(--ins-tone) calc(var(--ins-strength) * 0.65), transparent) calc(var(--pct, 0) * 0.6%), color-mix(in srgb, var(--ins-tone) calc(var(--ins-strength) * 0.2), transparent) calc(var(--pct, 0) * 0.9%), transparent calc(var(--pct, 0) * 1%)),
           linear-gradient(180deg, var(--wash-2) 0%, transparent 55%),
           color-mix(in srgb, var(--card-bg) 85%, transparent);
-        box-shadow: inset 0 1px 0 var(--wash-4);
+        box-shadow: inset 0 0 0 1px var(--wash-4);
         backdrop-filter: blur(18px) saturate(1.2);
         -webkit-backdrop-filter: blur(18px) saturate(1.2);
       }
@@ -7370,36 +7378,35 @@
 
       /* Improvement opportunities, one person in scope: KPIs ranked by
          points under the 85% goal. Same slot as the team pattern cards. */
-      .io-kpi, .ev-panel {
+      .io-kpi {
         background: var(--card-bg);
         border: 1px solid var(--card-border);
         border-radius: 16px;
         box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
         overflow-x: auto;
       }
-      :root[data-theme="light"] .io-kpi,
-      :root[data-theme="light"] .ev-panel { box-shadow: 0 4px 24px rgba(16, 24, 40, 0.06); }
+      :root[data-theme="light"] .io-kpi { box-shadow: 0 4px 24px rgba(16, 24, 40, 0.06); }
       .io-kpi { padding-bottom: 12px; }
-      .io-kpi-table, .ev-table {
+      .io-kpi-table {
         width: 100%;
         border-collapse: collapse;
         font-variant-numeric: tabular-nums;
       }
-      .io-kpi-table thead th, .ev-table thead th {
+      .io-kpi-table thead th {
         padding: 12px 10px 9px;
         font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
         color: var(--d400); text-align: left; white-space: nowrap;
         border-bottom: 1px solid var(--wash-5);
       }
-      .io-kpi-table tbody > tr > *, .ev-table tbody > tr > * {
+      .io-kpi-table tbody > tr > * {
         padding: 12px 10px;
         text-align: left; vertical-align: middle;
         border-bottom: 1px solid var(--wash-3);
       }
-      .io-kpi-table tbody > tr:last-child > *, .ev-table tbody > tr:last-child > * { border-bottom: 0; }
-      .io-kpi-table tr > :first-child, .ev-table tr > :first-child { padding-left: 16px; }
-      .io-kpi-table tr > :last-child, .ev-table tr > :last-child { padding-right: 16px; }
-      .io-kpi-table .num, .ev-table .num { text-align: right; }
+      .io-kpi-table tbody > tr:last-child > * { border-bottom: 0; }
+      .io-kpi-table tr > :first-child { padding-left: 16px; }
+      .io-kpi-table tr > :last-child { padding-right: 16px; }
+      .io-kpi-table .num { text-align: right; }
 
       .io-kpi-row.is-worst { background: color-mix(in srgb, var(--err) 7%, transparent); }
       .io-kpi-name { display: block; font-size: 13px; font-weight: 700; line-height: 1.3; color: var(--d50); }
@@ -7428,27 +7435,81 @@
       .io-kpi-act { text-align: right; }
       .io-kpi-foot { margin: 10px 16px 0; font-size: 11px; color: var(--d400); }
 
-      /* Your evaluations (component 7): the person's own list, by
-         product, shown only while View my QA is ticked. */
-      .ev-records { margin-top: 8px; }
-      .ev-records .dashboard-section-head { align-items: center; }
-      .ev-export { margin-left: auto; }
-      .ev-table tbody th { font-weight: 400; }
-      .ev-table td { font-size: 12.5px; font-weight: 600; color: var(--d200); white-space: nowrap; }
+      /* Your evaluations (component 7): the person's own evaluations, shown
+         only while View my QA is ticked. It is a card in the right column of
+         tier 2, under Audit performance by product, and borrows that card's
+         shell (.eval-panel, .eval-header, .eval-bars-section-label) so the two
+         read as a pair. Rows are compact, sized like the product rows: the
+         score sits in a small ring on a timeline rail (option 4E in
+         design-strategy/my-evaluations-shortlist.html), coloured against the
+         85% goal. The rows share one column grid (subgrid), so the rings line
+         up into one rail; the ID button stretches over its row to open it. The
+         evaluation that needs attention gets the card's action row, as
+         Audit performance by product does, rather than a column of its own. */
+      .ev-records .eval-title { margin: 0; font-family: inherit; line-height: 1.2; }
+      .ev-export {
+        display: inline-grid; place-items: center; flex: none;
+        width: 30px; height: 30px; padding: 0;
+        border: 1px solid var(--wash-5); border-radius: 8px; background: none;
+        color: var(--d300); cursor: pointer;
+        transition: background-color var(--transition-fast), color var(--transition-fast);
+      }
+      .ev-export svg { width: 18px; height: 18px; }
+      .ev-export:hover { background: var(--wash-3); color: var(--d50); }
+      .ev-export:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+      .ev-feed {
+        --ev-dw: 70px; --ev-nw: 30px; --ev-gap: 10px;
+        display: grid;
+        grid-template-columns: var(--ev-dw) var(--ev-nw) minmax(0, 1fr);
+        column-gap: var(--ev-gap);
+        margin: 0; padding: 0 0 8px; list-style: none;
+      }
+      .ev-row {
+        position: relative;
+        display: grid; grid-column: 1 / -1; grid-template-columns: subgrid;
+        align-items: center;
+        padding: 5px 6px;
+        border-radius: 8px;
+        transition: background-color var(--transition-fast);
+      }
+      /* The rail runs through the ring column and stops at the first and last
+         ring. The row is a subgrid, so its tracks start at its edge; its
+         padding does not shift them and stays out of this sum. */
+      .ev-row::before {
+        content: ""; position: absolute; top: 0; bottom: 0;
+        left: calc(var(--ev-dw) + var(--ev-gap) + var(--ev-nw) / 2 - 1px);
+        width: 2px; background: var(--d400); opacity: .3;
+      }
+      .ev-row:first-child::before { top: 50%; }
+      .ev-row:last-child::before { bottom: 50%; }
+      .ev-row:only-child::before { display: none; }
+      .ev-row[data-tone="err"]  { --ev-tone: var(--err); }
+      .ev-row[data-tone="warn"] { --ev-tone: var(--warn); }
+      .ev-row[data-tone="ok"]   { --ev-tone: var(--ok); }
+      .ev-when { font-size: 11px; font-weight: 600; color: var(--d400); text-align: right; white-space: nowrap; }
+      .ev-when b { font-size: 12px; font-weight: 700; color: var(--d50); }
+      .ev-node {
+        position: relative; z-index: 1;
+        display: grid; place-items: center; width: var(--ev-nw); height: var(--ev-nw);
+        border: 2px solid var(--ev-tone); border-radius: 50%; background: var(--card-bg);
+        color: var(--ev-tone); font-size: 11.5px; font-weight: 800; font-variant-numeric: tabular-nums;
+      }
+      .ev-line { min-width: 0; margin: 0; font-size: 12px; font-weight: 600; line-height: 1.4; color: var(--d300); }
       .ev-id {
         padding: 0; border: 0; background: none; cursor: pointer;
-        font-family: inherit; font-size: 12.5px; font-weight: 700; color: var(--d50);
+        font-family: inherit; font-size: 12px; font-weight: 700; color: var(--d50);
         border-radius: 4px;
         transition: color var(--transition-fast);
       }
-      .ev-id:hover { color: rgb(var(--qa-accent-rgb)); text-decoration: underline; text-underline-offset: 3px; }
-      .ev-id:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
-      .ev-score { font-weight: 800; color: var(--d50); }
-      .ev-score[data-tone="err"] { color: var(--err); }
-      .ev-score[data-tone="ok"] { color: var(--ok); }
-      .ev-table tbody tr { transition: background var(--transition-fast); }
+      .ev-id::after { content: ""; position: absolute; inset: 0; z-index: 1; }
+      .ev-id:focus-visible { outline: none; }
+      .ev-id:focus-visible::after { outline: 2px solid var(--brand); outline-offset: -2px; border-radius: 8px; }
       @media (hover: hover) and (pointer: fine) {
-        .ev-table tbody tr:hover { background: var(--wash-2); }
+        .ev-row:hover { background: var(--wash-3); }
+        .ev-row:hover .ev-id { color: rgb(var(--qa-accent-rgb)); }
+      }
+      @media (max-width: 640px) {
+        .ev-feed { --ev-dw: 62px; }
       }
 </style>
     <!-- The canvas shell above: full-width geometry and the conversation
@@ -7463,7 +7524,7 @@
          the same order aimy-canvas.css has over this page's inline block. -->
     <link rel="stylesheet" href="assets/aimy-responsive.css?v=7" />
     <link rel="stylesheet" href="assets/aimy-scroll.css?v=1" />
-    <link rel="stylesheet" href="assets/aimy-rail.css?v=8" />
+    <link rel="stylesheet" href="assets/aimy-rail.css?v=9" />
     <link rel="stylesheet" href="assets/aimy-user-menu.css?v=26" />
     <link rel="stylesheet" href="assets/aimy-typography.css?v=1" />
     <script src="assets/aimy-viewport.js?v=7"></script>
@@ -9236,49 +9297,87 @@
                 <h2>Improvement opportunities</h2>
                 <span data-my-qa-html="Your KPIs, ranked by points under the 85% goal">Patterns, risks, and recommended actions from your audited interactions</span>
               </div>
-              <!-- View my QA: one person in scope, so the same slot ranks
-                   their KPIs by points under the 85% goal instead of showing
-                   team patterns. Decided by the scope, not a second widget. -->
-              <div class="io-kpi" data-my-qa="only">
-                <table class="io-kpi-table">
-                  <caption class="sr-only">Your KPIs, ranked by points under the 85% goal</caption>
-                  <thead>
-                    <tr><th scope="col">KPI</th><th scope="col" class="num">Pass rate</th><th scope="col" class="num">Change</th><th scope="col"><span class="sr-only">Action</span></th></tr>
-                  </thead>
-                  <tbody>
-                    <tr class="io-kpi-row is-worst" data-tone="err">
-                      <th scope="row"><span class="io-kpi-name">First Response Time</span><span class="io-kpi-note">High priority tickets answered after the 4-hour SLA · 8 of 13 passed, 4 of 5 fails in the last two weeks</span></th>
-                      <td class="num io-kpi-rate">62%<span class="io-kpi-bar" style="--pct:62"><i></i><em></em></span></td>
-                      <td class="num"><span class="io-kpi-delta is-down">&#8595; 9</span></td>
-                      <td class="io-kpi-act"><button class="aimy-done-link primary" type="button" data-entry-mode="investigate" data-aimy-topic="goal-frt" data-aimy-review="Tell me more about First Response Time for my results: 8 of 13 passed (62%), 9 points down, 4 of the 5 fails in the last two weeks.">Ask AiMY</button></td>
-                    </tr>
-                    <tr class="io-kpi-row" data-tone="warn">
-                      <th scope="row"><span class="io-kpi-name">Resolution summary quality</span><span class="io-kpi-note">Closing notes name the fix, not the cause · 19 of 23 passed</span></th>
-                      <td class="num io-kpi-rate">83%<span class="io-kpi-bar" style="--pct:83"><i></i><em></em></span></td>
-                      <td class="num"><span class="io-kpi-delta is-down">&#8595; 3</span></td>
-                      <td class="io-kpi-act"><button class="aimy-done-link" type="button" data-entry-mode="investigate" data-aimy-topic="my-results" data-aimy-review="Tell me more about Resolution summary quality for my results: 19 of 23 passed (83%), 3 points down.">Ask AiMY</button></td>
-                    </tr>
-                    <tr class="io-kpi-row" data-tone="warn">
-                      <th scope="row"><span class="io-kpi-name">Time between updates</span><span class="io-kpi-note">Tickets left over a weekend without a holding note · 26 of 31 passed</span></th>
-                      <td class="num io-kpi-rate">84%<span class="io-kpi-bar" style="--pct:84"><i></i><em></em></span></td>
-                      <td class="num"><span class="io-kpi-delta">0</span></td>
-                      <td class="io-kpi-act"><button class="aimy-done-link" type="button" data-entry-mode="investigate" data-aimy-topic="my-results" data-aimy-review="Tell me more about Time between updates for my results: 26 of 31 passed (84%), unchanged.">Ask AiMY</button></td>
-                    </tr>
-                    <tr class="io-kpi-row" data-tone="ok">
-                      <th scope="row"><span class="io-kpi-name">Customer name formatting</span><span class="io-kpi-note">39 of 41 passed</span></th>
-                      <td class="num io-kpi-rate">95%<span class="io-kpi-bar" style="--pct:95"><i></i><em></em></span></td>
-                      <td class="num"><span class="io-kpi-delta is-up">&#8593; 4</span></td>
-                      <td class="io-kpi-act"><button class="aimy-done-link" type="button" data-entry-mode="investigate" data-aimy-topic="my-results" data-aimy-review="Tell me more about Customer name formatting for my results: 39 of 41 passed (95%), up 4.">Ask AiMY</button></td>
-                    </tr>
-                    <tr class="io-kpi-row" data-tone="ok">
-                      <th scope="row"><span class="io-kpi-name">Grammar and sentence structure</span><span class="io-kpi-note">41 of 41 passed</span></th>
-                      <td class="num io-kpi-rate">100%<span class="io-kpi-bar" style="--pct:100"><i></i><em></em></span></td>
-                      <td class="num"><span class="io-kpi-delta">0</span></td>
-                      <td class="io-kpi-act"></td>
-                    </tr>
-                  </tbody>
-                </table>
-                <p class="io-kpi-foot">Ranked by points under the 85% goal. The mark on each bar is the goal.</p>
+              <!-- View my QA: one person in scope, so the same slot shows the
+                   person's own KPIs in the team view's card design, ranked by
+                   points under their 85% goal. AiMY has not acted on these, so
+                   each card is "Detected" with a suggested fix, not a drafted one. -->
+              <div class="ai-insights" data-my-qa="only">
+                <article class="ai-insight" data-classification="highest-impact" data-severity="critical" data-rank="1" tabindex="0" style="--pct:62" aria-labelledby="my-insight-frt-name">
+                  <div class="ai-insight__row">
+                    <h3 class="ai-insight__name" id="my-insight-frt-name">First Response Time</h3>
+                    <span class="ai-insight__metric ai-insight__metric--err">62%<small>of 13</small></span>
+                  </div>
+                  <p class="ai-insight__problem">High-priority tickets answered after the 4-hour SLA, <b>9 pts down</b>. 4 of your 5 fails landed in the last two weeks.</p>
+                  <p class="ai-insight__solution">
+                    <svg viewBox="0 0 18 20" aria-hidden="true"><use href="#aimy-logo-small"/></svg>
+                    Reply to high-priority tickets inside the 4-hour SLA, even with a holding note.
+                    <span class="work-state ws-detected" data-work-state="detected"><span class="ws-dot"></span>Detected</span>
+                  </p>
+                  <div class="ai-insight__actions">
+                    <button class="entry-action em-investigate ea-sm"
+                            data-entry-mode="investigate"
+                            data-aimy-topic="goal-frt"
+                            data-aimy-review="Tell me more about First Response Time for my results: 8 of 13 passed (62%), 9 points down, 4 of the 5 fails in the last two weeks.">
+                      <svg class="em-ico" aria-hidden="true"><use href="#em-ico-review"/></svg>
+                      Review first response time
+                    </button>
+                  </div>
+                </article>
+
+                <article class="ai-insight" data-classification="persistent-gap" data-severity="warning" data-rank="2" tabindex="0" style="--pct:83" aria-labelledby="my-insight-summary-name">
+                  <div class="ai-insight__row">
+                    <h3 class="ai-insight__name" id="my-insight-summary-name">Resolution summary quality</h3>
+                    <span class="ai-insight__metric ai-insight__metric--warn">83%<small>of 23</small></span>
+                  </div>
+                  <p class="ai-insight__problem">Closing notes name the fix, not the cause, <b>3 pts down</b>.</p>
+                  <p class="ai-insight__solution">
+                    <svg viewBox="0 0 18 20" aria-hidden="true"><use href="#aimy-logo-small"/></svg>
+                    Name the cause in each closing note, then the fix.
+                    <span class="work-state ws-detected" data-work-state="detected"><span class="ws-dot"></span>Detected</span>
+                  </p>
+                  <div class="ai-insight__actions">
+                    <button class="entry-action em-investigate ea-sm"
+                            data-entry-mode="investigate"
+                            data-aimy-topic="my-results"
+                            data-aimy-review="Tell me more about Resolution summary quality for my results: 19 of 23 passed (83%), 3 points down.">
+                      <svg class="em-ico" aria-hidden="true"><use href="#em-ico-review"/></svg>
+                      Review resolution summaries
+                    </button>
+                  </div>
+                </article>
+
+                <article class="ai-insight" data-classification="persistent-gap" data-severity="warning" data-rank="3" tabindex="0" style="--pct:84" aria-labelledby="my-insight-updates-name">
+                  <div class="ai-insight__row">
+                    <h3 class="ai-insight__name" id="my-insight-updates-name">Time between updates</h3>
+                    <span class="ai-insight__metric ai-insight__metric--warn">84%<small>of 31</small></span>
+                  </div>
+                  <p class="ai-insight__problem">Tickets left over a weekend without a holding note, <b>unchanged</b>.</p>
+                  <p class="ai-insight__solution">
+                    <svg viewBox="0 0 18 20" aria-hidden="true"><use href="#aimy-logo-small"/></svg>
+                    Leave a holding note on open tickets before the weekend.
+                    <span class="work-state ws-detected" data-work-state="detected"><span class="ws-dot"></span>Detected</span>
+                  </p>
+                  <div class="ai-insight__actions">
+                    <button class="entry-action em-investigate ea-sm"
+                            data-entry-mode="investigate"
+                            data-aimy-topic="my-results"
+                            data-aimy-review="Tell me more about Time between updates for my results: 26 of 31 passed (84%), unchanged.">
+                      <svg class="em-ico" aria-hidden="true"><use href="#em-ico-review"/></svg>
+                      Review time between updates
+                    </button>
+                  </div>
+                </article>
+
+                <div class="ai-insights-ontrack" data-aimy-item="my-goals-on-track">
+                  <span class="work-state ws-detected" data-work-state="detected"><span class="ws-dot"></span>On target</span>
+                  <p><b>2 KPIs on target</b> &mdash; customer name formatting (95%, up 4), grammar and sentence structure (100%).</p>
+                  <button class="entry-action em-prompt ea-sm"
+                          data-entry-mode="prompt"
+                          data-aimy-topic="my-results"
+                          data-aimy-ask="What am I doing in customer name formatting and grammar that I'm not doing in first response time?">
+                    <svg class="em-ico" aria-hidden="true"><use href="#em-ico-prompt"/></svg>Ask what&#8217;s working
+                  </button>
+                </div>
               </div>
               <div class="ai-insights" data-my-qa="hide">
                 <article class="ai-insight" data-classification="highest-impact" data-severity="critical" data-rank="1" tabindex="0" style="--pct:71" aria-labelledby="ai-insight-status-name">
@@ -9527,74 +9626,68 @@
 
               </div>
               <!-- /eval-panel -->
+              <!-- ════ YOUR EVALUATIONS (component 7) ═════════════════════════
+                   The person's own evaluations, newest first, inside the
+                   dashboard. Shown only while View my QA is ticked; the team
+                   dashboard has no records list. A card under Audit
+                   performance by product with the same shell, so the right
+                   column ends level with Improvement opportunities. Each
+                   score is a small ring on a timeline rail (option 4E in
+                   design-strategy/my-evaluations-shortlist.html), coloured
+                   against the 85% goal; the red ring marks the evaluation
+                   that needs attention, which alone carries Ask AiMY.
+                   Export downloads the rows on screen, nothing else. -->
+              <section class="eval-panel ev-records audit-only" id="myEvaluations" aria-labelledby="evRecordsTitle" data-my-qa="only">
+                <div class="eval-header">
+                  <div class="eval-header-left">
+                    <h2 class="eval-title" id="evRecordsTitle">Your evaluations</h2>
+                    <span class="eval-header-sub">newest first · goal 85%</span>
+                  </div>
+                  <button class="ev-export" type="button" id="evExportBtn" aria-label="Export CSV" title="Export CSV">
+                    <svg class="lucide lucide-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3"></path><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><path d="m7 10 5 5 5-5"></path></svg>
+                  </button>
+                </div>
+                <div class="eval-products-section">
+                  <div class="eval-bars-section-label"><span>Latest 4 · Upland · KCM</span></div>
+                  <ol class="ev-feed" id="evFeed">
+                    <li class="ev-row" data-tone="err" data-ev-id="EV-0541" data-date="2026-10-13" data-product="Upland · KCM" data-type="Ticket" data-score="71" data-status="Needs attention">
+                      <time class="ev-when" datetime="2026-10-13">Tue <b>13 Oct</b></time>
+                      <span class="ev-node" aria-hidden="true">71</span>
+                      <p class="ev-line"><button class="ev-id" type="button" data-entry-mode="investigate" data-aimy-topic="evaluation" data-aimy-review="Open EV-0541, the ticket evaluation from 2026-10-13 scored 71%. Show the KPIs, the lines behind each decision, and what to change next time.">EV-0541</button> · Ticket · <span class="sr-only">scored 71%, needs attention, </span>14 pts under</p>
+                    </li>
+                    <li class="ev-row" data-tone="ok" data-ev-id="EV-0538" data-date="2026-10-12" data-product="Upland · KCM" data-type="Ticket" data-score="88" data-status="Completed">
+                      <time class="ev-when" datetime="2026-10-12">Mon <b>12 Oct</b></time>
+                      <span class="ev-node" aria-hidden="true">88</span>
+                      <p class="ev-line"><button class="ev-id" type="button" data-entry-mode="investigate" data-aimy-topic="evaluation" data-aimy-review="Open EV-0538, the ticket evaluation from 2026-10-12 scored 88%. Show the KPIs, the lines behind each decision, and what to change next time.">EV-0538</button> · Ticket · <span class="sr-only">scored 88%, </span>3 pts over</p>
+                    </li>
+                    <li class="ev-row" data-tone="ok" data-ev-id="EV-0533" data-date="2026-10-10" data-product="Upland · KCM" data-type="Call" data-score="93" data-status="Completed">
+                      <time class="ev-when" datetime="2026-10-10">Sat <b>10 Oct</b></time>
+                      <span class="ev-node" aria-hidden="true">93</span>
+                      <p class="ev-line"><button class="ev-id" type="button" data-entry-mode="investigate" data-aimy-topic="evaluation" data-aimy-review="Open EV-0533, the call evaluation from 2026-10-10 scored 93%. Show the KPIs, the lines behind each decision, and what to change next time.">EV-0533</button> · Call · <span class="sr-only">scored 93%, </span>8 pts over</p>
+                    </li>
+                    <li class="ev-row" data-tone="warn" data-ev-id="EV-0529" data-date="2026-10-09" data-product="Upland · KCM" data-type="Ticket" data-score="84" data-status="Completed">
+                      <time class="ev-when" datetime="2026-10-09">Fri <b>9 Oct</b></time>
+                      <span class="ev-node" aria-hidden="true">84</span>
+                      <p class="ev-line"><button class="ev-id" type="button" data-entry-mode="investigate" data-aimy-topic="evaluation" data-aimy-review="Open EV-0529, the ticket evaluation from 2026-10-09 scored 84%. Show the KPIs, the lines behind each decision, and what to change next time.">EV-0529</button> · Ticket · <span class="sr-only">scored 84%, </span>1 pt under</p>
+                    </li>
+                  </ol>
+                </div>
+                <!-- The one evaluation that needs attention, as the card above
+                     shows its own: work state, the fact, one action. -->
+                <div class="eval-action-row">
+                  <div class="aimy-done" style="width:100%;border-top:none;padding-top:0;margin-top:0">
+                    <span class="work-state ws-failed" data-work-state="failed"><span class="ws-dot"></span>Needs attention</span><span class="aimy-done-text"><b>EV-0541</b> scored 71%, 14 pts under your goal</span>
+                    <span class="aimy-done-actions">
+                      <button data-entry-mode="investigate" class="aimy-done-link primary" data-aimy-topic="evaluation" data-aimy-review="Why did EV-0541, my ticket evaluation from 2026-10-13, score 71%, 14 points under my 85% goal? Show the KPIs I missed, the lines behind each decision, and what to change next time.">Ask AiMY why</button>
+                    </span>
+                  </div>
+                </div>
+              </section>
             </div>
             <!-- /layout-column right -->
           </div>
           <!-- /tier-2-grid -->
 
-          <!-- ════ YOUR EVALUATIONS (component 7) ═════════════════════════════
-               The person's own evaluation records and their CSV, inside the
-               dashboard. Shown only while View my QA is ticked; the team
-               dashboard has no records table. Export downloads the rows on
-               screen, nothing else. -->
-          <section class="ev-records audit-only" id="myEvaluations" aria-labelledby="evRecordsTitle" data-my-qa="only">
-            <div class="dashboard-section-head">
-              <h2 id="evRecordsTitle">Your evaluations</h2>
-              <span>Newest first</span>
-              <button class="gps-export-btn ev-export" type="button" id="evExportBtn">
-                <svg class="lucide lucide-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3"></path><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><path d="m7 10 5 5 5-5"></path></svg>
-                Export CSV
-              </button>
-            </div>
-            <div class="ev-panel">
-              <table class="ev-table" id="evTable">
-                <thead>
-                  <tr>
-                    <th scope="col">Review</th>
-                    <th scope="col" class="num">Date</th>
-                    <th scope="col">Product</th>
-                    <th scope="col">Type</th>
-                    <th scope="col" class="num">Score</th>
-                    <th scope="col">Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <th scope="row"><button class="ev-id" type="button" data-entry-mode="investigate" data-aimy-topic="evaluation" data-aimy-review="Open EV-0541, the ticket evaluation from 2026-10-13 scored 71%. Show the KPIs, the lines behind each decision, and what to change next time.">EV-0541</button></th>
-                    <td class="num">2026-10-13</td>
-                    <td>Upland · KCM</td>
-                    <td>Ticket</td>
-                    <td class="num ev-score" data-tone="err">71%</td>
-                    <td><span class="work-state ws-failed"><span class="ws-dot"></span>Needs attention</span></td>
-                  </tr>
-                  <tr>
-                    <th scope="row"><button class="ev-id" type="button" data-entry-mode="investigate" data-aimy-topic="evaluation" data-aimy-review="Open EV-0538, the ticket evaluation from 2026-10-12 scored 88%. Show the KPIs, the lines behind each decision, and what to change next time.">EV-0538</button></th>
-                    <td class="num">2026-10-12</td>
-                    <td>Upland · KCM</td>
-                    <td>Ticket</td>
-                    <td class="num ev-score" data-tone="ok">88%</td>
-                    <td><span class="work-state ws-completed"><span class="ws-dot"></span>Completed</span></td>
-                  </tr>
-                  <tr>
-                    <th scope="row"><button class="ev-id" type="button" data-entry-mode="investigate" data-aimy-topic="evaluation" data-aimy-review="Open EV-0533, the call evaluation from 2026-10-10 scored 93%. Show the KPIs, the lines behind each decision, and what to change next time.">EV-0533</button></th>
-                    <td class="num">2026-10-10</td>
-                    <td>Upland · KCM</td>
-                    <td>Call</td>
-                    <td class="num ev-score" data-tone="ok">93%</td>
-                    <td><span class="work-state ws-completed"><span class="ws-dot"></span>Completed</span></td>
-                  </tr>
-                  <tr>
-                    <th scope="row"><button class="ev-id" type="button" data-entry-mode="investigate" data-aimy-topic="evaluation" data-aimy-review="Open EV-0529, the ticket evaluation from 2026-10-09 scored 84%. Show the KPIs, the lines behind each decision, and what to change next time.">EV-0529</button></th>
-                    <td class="num">2026-10-09</td>
-                    <td>Upland · KCM</td>
-                    <td>Ticket</td>
-                    <td class="num ev-score" data-tone="ok">84%</td>
-                    <td><span class="work-state ws-completed"><span class="ws-dot"></span>Completed</span></td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </section>
                   </div><!-- /viewManager -->
           <div class="dash-view" id="viewDirector" hidden>
             <!-- Director opener, the same component, re-prioritised by role.
@@ -15814,11 +15907,16 @@
         /* Export CSV: the rows on screen, in the scope on screen. */
         var exportBtn = document.getElementById("evExportBtn");
         if (exportBtn) exportBtn.addEventListener("click", function () {
-          var table = document.getElementById("evTable");
-          if (!table) return;
-          var lines = Array.prototype.map.call(table.rows, function (row) {
-            return Array.prototype.map.call(row.cells, function (cell) {
-              return '"' + cell.textContent.trim().replace(/\s+/g, " ").replace(/"/g, '""') + '"';
+          var feed = document.getElementById("evFeed");
+          if (!feed) return;
+          var rows = [["Review", "Date", "Product", "Type", "Score", "Status"]];
+          Array.prototype.forEach.call(feed.querySelectorAll(".ev-row"), function (row) {
+            var d = row.dataset;
+            rows.push([d.evId, d.date, d.product, d.type, d.score + "%", d.status]);
+          });
+          var lines = rows.map(function (cells) {
+            return cells.map(function (cell) {
+              return '"' + String(cell).replace(/"/g, '""') + '"';
             }).join(",");
           });
           var url = URL.createObjectURL(new Blob([lines.join("\r\n")], { type: "text/csv;charset=utf-8" }));
