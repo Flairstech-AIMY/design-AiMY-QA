@@ -20,10 +20,18 @@
 (function () {
   "use strict";
 
-  /* Which of the six pages this is. `location.pathname` ends in '/' when the
-     server serves a directory index, which is the same page as index.html. */
-  var PAGE = (location.pathname.split("/").pop() || "index.html");
-  if (PAGE.indexOf(".html") < 0) PAGE = "index.html";
+  /* Which of the six pages this is, derived much as aimy-rail.js `pageKey`
+     derives it: basename with any extension removed, lowercased, empty
+     meaning index. Cloudflare's asset handling serves `/agent-scorecards`
+     without ".html", so keying off the extension filed every deployed page's
+     thread under the Dashboard. Unlike `pageKey` a trailing slash is kept as
+     empty: it is a directory index, the same page as index.html. Mapped back
+     to `<name>.html` because that is what stored threads, PAGE_NAME and the
+     cross-page `location.href` already use. `?tab=` stays surface state. */
+  var PAGE = (function () {
+    var last = location.pathname.split("/").pop().replace(/\.[a-z0-9]+$/i, "");
+    return (last ? last.toLowerCase() : "index") + ".html";
+  })();
 
   /* What a page thread is called in the column. A page names itself, the same
      way a record does in Sales — a name taken from the thing is better than

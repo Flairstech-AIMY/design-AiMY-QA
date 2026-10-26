@@ -174,6 +174,7 @@ The expected Node version is `v24.20.0`. The package manifest also declares the 
 - **Product insights gets its own tab** (option D with option C's AiMY touches): stat cards, Issues or Knowledge drafts, group by issue, client or product, and the issue list with its detail beside it. Its rail entry reports 12 recurring customer issues; Home shows a nudge above the Ask AiMY bar; an empty conversation suggests questions for the tab you are on.
 - **Customer insights is new**, as its own tab: client health, sentiment, CSAT, what each client calls about (linked to Product insights) and a reviewed note to the account lead.
 - **Home shows a brief of each** in an Insights section, in place of the full Product insights section; each card opens its tab.
+- **AiMY conversations on the deployed site** stay with the page they were had on. The site serves pages without ".html" (`/agent-scorecards`), and every page took itself for the Dashboard: all page threads were stored as the Dashboard's, and picking a conversation from another page did not open that page. Each page now recognises itself with or without ".html", and conversations stored before the fix still open.
 
 ### 2026-10-23
 
