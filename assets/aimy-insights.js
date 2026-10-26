@@ -7,9 +7,10 @@
      home               The dashboard, with an Insights brief: one card per
                         tab, the headline and top three, linking to the tab.
      product-insights   Option D of design-strategy/product-insights (a page of
-                        its own): four stat cards, Issues or Knowledge drafts,
-                        group by issue, client or product, and the issue list
-                        with its detail beside it. Plus option C's touches: a
+                        its own), led by the tiles the Dashboard carried
+                        before Home, then Issues or Knowledge drafts, group
+                        by issue, client or product, and the issue list with
+                        its detail beside it. Plus option C's touches: a
                         nudge above the Ask AiMY bar on Home, a rail finding,
                         and suggested questions when the conversation opens
                         empty.
@@ -49,7 +50,6 @@
     window.AimyChat.sync();
   }
   var ARROW = '<svg class="lucide lucide-arrow-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></svg>';
-  var MARK = '<svg class="aimy-done-mark" viewBox="0 0 18 20" aria-hidden="true"><use href="#aimy-logo-small"/></svg>';
 
   /* ═══ CLIENTS (illustrative) ═════════════════════════════════════════════
      The 2,486 analyzed calls behind Product insights, split by client.
@@ -92,7 +92,6 @@
       next: "Nothing new. The scheduled-report issue is tracked in Product insights." }
   ];
   var HEALTH = { attention: "Needs attention", watch: "Watch", healthy: "Healthy" };
-  var HEALTH_CLS = { attention: "err", watch: "warn", healthy: "ok" };
   var SENT_CLS = { Negative: "err", Neutral: "warn", Positive: "ok" };
   var SHOW = { all: "All", attention: "Needs attention", watch: "Watch", healthy: "Healthy" };
   var ORDER = { attention: 0, watch: 1, healthy: 2 };
@@ -115,19 +114,6 @@
   }
 
   /* ═══ SHARED PIECES ══════════════════════════════════════════════════════ */
-  function statCard(type, badge, value, valueCls, cap, status, statusCls, action) {
-    return '<div class="bcard p2" role="region" tabindex="0" aria-label="' + esc(type) + '"><div class="bcard-accent"></div><div class="bcard-body">'
-      + '<div class="bcard-meta"><span class="type-label">' + type + '</span><span class="priority-badge">' + badge + "</span></div>"
-      + '<div class="bcard-stat-line"><span class="bcard-stat' + (valueCls ? " " + valueCls : "") + '">' + value + '</span><span class="bcard-stat-cap">' + cap + "</span></div>"
-      + '<div class="bcard-status' + (statusCls ? " " + statusCls : "") + '">' + status + "</div>" + (action || "") + "</div></div>";
-  }
-  function doneRow(stateName, text, btn) {
-    return '<div class="aimy-done">' + MARK + (stateName ? ws(stateName) : "")
-      + '<span class="aimy-done-text">' + text + '</span><span class="aimy-done-actions">' + btn + "</span></div>";
-  }
-  function aimyBtn(mode, topic, ask, label) {
-    return '<button type="button" class="aimy-done-link primary" data-entry-mode="' + mode + '" data-aimy-topic="' + topic + '" data-aimy-ask="' + esc(ask) + '">' + label + "</button>";
-  }
   function seg(label, key, options, current) {
     return '<div class="content-view-toggle ins-seg" role="tablist" aria-label="' + esc(label) + '">'
       + Object.keys(options).map(function (k) {
@@ -202,19 +188,52 @@
       + '<span class="eval-header-sub">drafts from customer issues · nothing publishes until you approve it</span></div></div>'
       + '<div class="eval-products-section">' + body + "</div></section>";
   }
-  function piStats() {
-    var T = PI.TOTAL, top = PI.byCost[0], n = drafts().length, worst = ranked[0];
-    return '<div class="tier-1-grid ins-stats">'
-      + statCard("Recurring issues", "3 new", T.recurring, "", "issues · <b>676</b> calls", "&#8593; 3 since last month", "warn",
-          doneRow(top.state, "<b>" + esc(top.name.split(" ")[0]) + "</b> costs the most", aimyBtn("investigate", "pi-issue-" + top.id, top.q, "Investigate " + top.name.split(" ")[0].toLowerCase())))
-      + statCard("Support time", "Cost", T.hours + " h", "", "average call <b>" + T.avg + "</b>", T.share + "% on recurring issues", "plain",
-          doneRow("", "<b>" + T.recurringHours + " h</b> on " + T.recurring + " issues", aimyBtn("investigate", "pi-all", "Which recurring issues cost the most support time?", "See where it goes")))
-      + statCard("Clients affected", "Watch", PI.CLIENTS.length, "", "repeat the same issues", esc(worst.name) + " repeats most", "plain",
-          doneRow("", "<b>" + PI.CLIENTS[0].calls + "</b> calls from " + esc(PI.CLIENTS[0].name), '<a class="aimy-done-link primary" href="' + tabHref("customer-insights") + '">Customer insights</a>'))
-      + statCard("Knowledge drafts", "Review", n, "", n === 1 ? "draft waiting" : "drafts waiting", "You approve each one before it publishes", "plain",
-          doneRow(n ? "staged" : "", "Nothing publishes on its own", '<button type="button" class="aimy-done-link primary" data-ins-piview="drafts">Open the queue</button>'))
-      + "</div>";
+  /* The tiles the Dashboard carried before Home: the recurring-issues tile,
+     then the three costliest issues. Each tile asks AiMY about what it
+     shows; the list below is where an issue is picked. */
+  var OPACITY = [0.75, 0.55, 0.38];
+  function piTiles() {
+    var T = PI.TOTAL, top = PI.byCost.slice(0, 3), peek = PI.byCost.slice(3, 5);
+    var rest = T.recurringHours - top.reduce(function (n, it) { return n + it.hours; }, 0);
+    var more = T.recurring - top.length;
+    var lead = '<div class="bcard pi-lead" role="button" tabindex="0" data-pi-tile="rest" data-entry-mode="investigate" data-aimy-topic="pi-all"'
+      + ' data-aimy-ask="Which recurring issues keep coming back, beyond the top three?"'
+      + ' aria-label="Recurring issues: ' + T.share + "% of support time, " + T.recurringHours + " of " + T.hours + " hours. Open the other " + more + ' in AiMY">'
+      + '<div class="bcard-body"><div class="bcard-meta"><span class="type-label">Recurring issues</span><span class="priority-badge pi-badge">' + T.recurring + " issues</span></div>"
+      + '<div class="bcard-stat-line"><span class="bcard-stat">' + T.share + '%</span><span class="bcard-stat-cap">of support time · <b>' + T.recurringHours + "</b> of " + T.hours + " h</span></div>"
+      + '<div class="pi-stack" aria-hidden="true">'
+      + top.map(function (it, i) { return '<i data-seg="' + it.id + '" style="flex:' + it.hours + ";--o:" + OPACITY[i] + '"></i>'; }).join("")
+      + '<i class="pi-rest" data-seg="rest" style="flex:' + rest + '"></i></div>'
+      + '<div class="pi-peek" aria-hidden="true">' + peek.map(function (it) { return "<span><span>" + esc(it.name) + "</span><b>" + it.hours + " h</b></span>"; }).join("") + "</div>"
+      + '<div class="aimy-done"><span class="pi-count">+' + more + '</span><span class="aimy-done-text">more in AiMY · ' + rest + " h</span>"
+      + '<span class="aimy-done-actions"><span class="aimy-done-link primary pi-ask"><svg class="pi-ask-mark" viewBox="0 0 18 20" aria-hidden="true"><use href="#aimy-logo-small"/></svg>Ask AiMY</span></span></div>'
+      + "</div></div>";
+    var issues = top.map(function (it) {
+      var q = PI.QUOTES[it.id] ? PI.QUOTES[it.id][0].text : it.why;
+      return '<div class="bcard pi-tile-issue" role="button" tabindex="0" data-pi-issue="' + it.id + '" data-pi-tile="' + it.id + '" data-entry-mode="investigate" data-aimy-topic="pi-issue-' + it.id + '" data-aimy-ask="' + esc(it.q) + '"'
+        + ' aria-label="' + esc(it.name + ": " + it.hours + " hours of support, " + it.calls + " calls, " + it.clients + " clients, " + it.product) + '">'
+        + '<div class="bcard-body"><div class="bcard-meta"><span class="type-label">' + esc(it.product + " · " + it.type) + "</span></div>"
+        + '<div class="bcard-stat-line"><span class="bcard-stat">' + it.hours + ' h</span><span class="bcard-stat-cap">of support · <b>' + it.calls + "</b> calls</span></div>"
+        + '<p class="pi-issue-name">' + esc(it.name) + "</p>"
+        + '<q class="pi-issue-quote">' + esc(q) + "</q>"
+        + '<div class="aimy-done">' + ws(it.state) + '<span class="aimy-done-text"><b>' + it.clients + "</b> clients</span></div>"
+        + "</div></div>";
+    }).join("");
+    return '<div class="pi-tiles"><div class="pi-mix">' + lead + issues + "</div></div>";
   }
+  /* A tile and its share of the bar light up together. */
+  function lightSeg(tile, on) {
+    var mix = tile.closest(".pi-mix"), stack = mix && $(".pi-stack", mix), id = tile.getAttribute("data-pi-tile");
+    if (!stack) return;
+    stack.classList.toggle("is-lit", on);
+    $$("i", stack).forEach(function (i) { i.classList.toggle("is-on", on && i.getAttribute("data-seg") === id); });
+  }
+  ["mouseover", "focusin"].forEach(function (ev) {
+    document.addEventListener(ev, function (e) { var t = e.target.closest && e.target.closest(".pi-mix [data-pi-tile]"); if (t) lightSeg(t, true); });
+  });
+  ["mouseout", "focusout"].forEach(function (ev) {
+    document.addEventListener(ev, function (e) { var t = e.target.closest && e.target.closest(".pi-mix [data-pi-tile]"); if (t && !t.contains(e.relatedTarget)) lightSeg(t, false); });
+  });
   function renderPI(part) {
     var host = $("#viewProductInsights");
     if (!host) return;
@@ -226,7 +245,7 @@
       PI.paintScope();
       part = "all";
     }
-    if (part !== "body") $('[data-ins-part="stats"]', host).innerHTML = piStats();
+    if (part !== "body") $('[data-ins-part="stats"]', host).innerHTML = piTiles();
     if (part === "stats") return;
     var n = drafts().length;
     var toolbar = '<div class="pi-toolbar">'
@@ -250,7 +269,10 @@
   }
 
   /* ═══ CUSTOMER INSIGHTS TAB ══════════════════════════════════════════════ */
-  function healthPill(c) { return '<span class="ins-health-pill ' + HEALTH_CLS[c.health] + '">' + HEALTH[c.health] + "</span>"; }
+  /* Client health wears the work-state chip, as every tag in Product insights
+     does. It is not a work state, so it carries no data-work-state. */
+  var HEALTH_WS = { attention: "ws-failed", watch: "ws-staged", healthy: "ws-completed" };
+  function healthPill(c) { return '<span class="work-state ' + HEALTH_WS[c.health] + '"><span class="ws-dot"></span>' + HEALTH[c.health] + "</span>"; }
   function clientRow(c) {
     var on = c.id === state.ciClient;
     return '<div class="eval-bar-row" data-ins-client="' + c.id + '" role="option" tabindex="0" aria-selected="' + on + '"'
@@ -299,33 +321,50 @@
       + '<div class="evidence-row ins-evidence">' + pill(c.calls, " calls") + pill('<span class="ins-sent ' + SENT_CLS[c.sentiment] + '">' + c.sentiment + "</span>", " · " + c.negative + " negative") + pill("CSAT " + c.csat + "%", " · " + delta(c.csatDelta)) + pill(c.quality, " audit quality") + "</div>"
       + clientAnswer(c) + "</div></section>";
   }
-  function ciStats() {
-    var att = ranked.filter(function (c) { return c.health === "attention"; }), worst = att[0] || ranked[0];
-    var neg = CLIENTS.filter(function (c) { return c.sentiment === "Negative"; });
-    var lowest = CLIENTS.slice().sort(function (a, b) { return a.csat - b.csat; })[0];
-    return '<div class="tier-1-grid ins-stats">'
-      + statCard("Clients", "YTD", CLIENTS.length, "", "with analyzed calls · <b>2,486</b> calls", count("healthy") + " healthy · " + count("watch") + " to watch", "plain",
-          doneRow("", "Ranked by need for attention", aimyBtn("investigate", "ci-all", "How are my clients doing?", "Ask about all clients")))
-      + statCard("Need attention", "P1", att.length, "err", att.map(function (c) { return "<b>" + esc(c.name) + "</b>"; }).join(", "), "CSAT falling or sentiment negative", "err",
-          doneRow("detected", "<b>" + esc(worst.name) + "</b> CSAT " + delta(worst.csatDelta).replace("&#8595; ", "down "), aimyBtn("investigate", "ci-client-" + worst.id, "How is " + worst.name + " doing, and what should I do next?", "Investigate " + worst.name)))
-      + statCard("Sentiment", "Mostly positive", "Positive", "ok", "for " + CLIENTS.filter(function (c) { return c.sentiment === "Positive"; }).length + " of " + CLIENTS.length + " clients", neg.length + " negative · " + esc(neg.map(function (c) { return c.name; }).join(", ")), "err",
-          doneRow("", "<b>" + neg.reduce(function (n, c) { return n + c.negative; }, 0) + "</b> negative calls from " + esc(neg[0].name), aimyBtn("investigate", "ci-client-" + neg[0].id, "Why is " + neg[0].name + "'s sentiment negative?", "Why negative?")))
-      + statCard("CSAT", "Average", avgCsat() + "%", avgCsat() >= 80 ? "" : "warn", "average outcome across clients", "Lowest: " + esc(lowest.name) + " at " + lowest.csat + "%", "warn",
-          doneRow("", "<b>" + CLIENTS.reduce(function (n, c) { return n + c.surveys; }, 0) + "</b> surveys", aimyBtn("investigate", "ci-all", "Which clients have the lowest CSAT, and why?", "Lowest CSAT")))
-      + "</div>";
+  /* The same tiles as Product insights: a Client health tile leads, its bar
+     split by analyzed calls into the three client tiles beside it plus the
+     rest, then the three clients to look at first. Each tile asks AiMY. */
+  function ciTiles() {
+    var top = ranked.slice(0, 3), peek = ranked.slice(3, 5), others = ranked.slice(3);
+    var rest = others.reduce(function (n, c) { return n + c.calls; }, 0);
+    var att = count("attention");
+    var lead = '<div class="bcard pi-lead" role="button" tabindex="0" data-pi-tile="rest" data-entry-mode="investigate" data-aimy-topic="ci-all"'
+      + ' data-aimy-ask="How are my clients doing, and which need attention?"'
+      + ' aria-label="Client health: ' + att + " of " + CLIENTS.length + " clients need attention, CSAT " + avgCsat() + '% average. Ask AiMY about all clients">'
+      + '<div class="bcard-body"><div class="bcard-meta"><span class="type-label">Client health</span><span class="priority-badge pi-badge">' + CLIENTS.length + " clients</span></div>"
+      + '<div class="bcard-stat-line"><span class="bcard-stat">' + att + '</span><span class="bcard-stat-cap">need attention · CSAT <b>' + avgCsat() + "%</b> average</span></div>"
+      + '<div class="pi-stack" aria-hidden="true">'
+      + top.map(function (c, i) { return '<i data-seg="' + c.id + '" style="flex:' + c.calls + ";--o:" + OPACITY[i] + '"></i>'; }).join("")
+      + '<i class="pi-rest" data-seg="rest" style="flex:' + rest + '"></i></div>'
+      + '<div class="pi-peek" aria-hidden="true">' + peek.map(function (c) { return "<span><span>" + esc(c.name) + "</span><b>CSAT " + c.csat + "%</b></span>"; }).join("") + "</div>"
+      + '<div class="aimy-done"><span class="pi-count">+' + others.length + '</span><span class="aimy-done-text">more clients · ' + rest.toLocaleString("en-US") + " calls</span>"
+      + '<span class="aimy-done-actions"><span class="aimy-done-link primary pi-ask"><svg class="pi-ask-mark" viewBox="0 0 18 20" aria-hidden="true"><use href="#aimy-logo-small"/></svg>Ask AiMY</span></span></div>'
+      + "</div></div>";
+    var tiles = top.map(function (c) {
+      return '<div class="bcard pi-tile-issue" role="button" tabindex="0" data-pi-tile="' + c.id + '" data-entry-mode="investigate" data-aimy-topic="ci-client-' + c.id + '"'
+        + ' data-aimy-ask="' + esc("How is " + c.name + " doing, and what should I do next?") + '"'
+        + ' aria-label="' + esc(c.name + ": " + HEALTH[c.health] + ", CSAT " + c.csat + "%, " + c.sentiment + " sentiment, " + c.calls + " calls") + '">'
+        + '<div class="bcard-body"><div class="bcard-meta"><span class="type-label">' + esc(c.products) + "</span></div>"
+        + '<div class="bcard-stat-line"><span class="bcard-stat">' + c.csat + '%</span><span class="bcard-stat-cap">CSAT · <b>' + c.calls + "</b> calls</span></div>"
+        + '<p class="pi-issue-name">' + esc(c.name) + "</p>"
+        + '<q class="pi-issue-quote">' + esc(c.quote ? c.quote.text : c.why) + "</q>"
+        + '<div class="aimy-done">' + healthPill(c) + '<span class="aimy-done-text"><span class="ins-sent ' + SENT_CLS[c.sentiment] + '">' + c.sentiment + "</span> · " + delta(c.csatDelta) + "</span></div>"
+        + "</div></div>";
+    }).join("");
+    return '<div class="pi-tiles"><div class="pi-mix">' + lead + tiles + "</div></div>";
   }
   function renderCI(part) {
     var host = $("#viewCustomerInsights");
     if (!host) return;
     if (!host.firstChild) {
-      host.innerHTML = '<div class="dashboard-section-head ins-head"><h2 id="ciPageTitle">Customer insights</h2><span>How each client is doing, what they call about, and what to do next</span></div>'
+      host.innerHTML = '<div class="dashboard-section-head ins-head"><h2 id="ciPageTitle">Customer insights</h2><span>Ranked by need for attention, then CSAT</span></div>'
         + '<p class="pi-scope ins-scope" data-ci-scope></p>'
         + '<p class="pi-mine-note" data-my-qa="only">Team-wide: client health does not change with Only my results.</p>'
         + '<div data-ins-part="stats"></div><div data-ins-part="body"></div>';
       part = "all";
     }
     paintCiScope();
-    if (part !== "body") $('[data-ins-part="stats"]', host).innerHTML = ciStats();
+    if (part !== "body") $('[data-ins-part="stats"]', host).innerHTML = ciTiles();
     var list = inScope().filter(function (c) { return state.ciShow === "all" || c.health === state.ciShow; });
     if (list.length && !list.some(function (c) { return c.id === state.ciClient; })) state.ciClient = list[0].id;
     var shows = {};

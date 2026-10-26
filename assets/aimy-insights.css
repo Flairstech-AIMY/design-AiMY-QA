@@ -22,7 +22,6 @@ html[data-ins-tab] .nav-role-switch { visibility: hidden; }
 .ins-head { margin-bottom: 0; flex-wrap: wrap; row-gap: 2px; }
 .ins-view .ins-scope { margin: -8px 0 0; }
 .ins-view .pi-mine-note { margin: -8px 0 0; font-size: 11px; color: var(--d400); }
-.ins-view .tier-1-grid { margin: 0; }
 
 /* ═══ 1. THE BRIEF ON HOME ═════════════════════════════════════════════════
    Two cards, each one link to its tab. */
@@ -47,7 +46,42 @@ html[data-ins-tab] .nav-role-switch { visibility: hidden; }
 .ins-health i.ins-h-watch { background: color-mix(in srgb, var(--warn) 55%, transparent); }
 .ins-health i.ins-h-healthy { background: color-mix(in srgb, var(--ok) 45%, transparent); }
 
-/* ═══ 2. THE TAB PAGES ═════════════════════════════════════════════════════ */
+/* ═══ 2. THE PRODUCT INSIGHTS TILES ════════════════════════════════════════
+   The four .bcard tiles the Dashboard carried before Home: the
+   recurring-issues tile leads, its bar split into the three issue tiles
+   beside it plus the rest, so the bar is their key. PROPOSED pieces: the
+   split bar, the faded preview of the rest, and the +N count. */
+.pi-tiles { container-type: inline-size; }
+.pi-mix { display: grid; grid-template-columns: minmax(230px, 1.15fr) repeat(3, minmax(0, 1fr)); gap: 12px; }
+/* Sized by the column, not the window: the rail and the canvas both change
+   how wide it is. */
+@container (max-width: 960px) { .pi-mix { grid-template-columns: repeat(3, minmax(0, 1fr)); } .pi-lead { grid-column: 1 / -1; } }
+@container (max-width: 640px) { .pi-mix { grid-template-columns: minmax(0, 1fr); } }
+.pi-mix .bcard { display: flex; flex-direction: column; cursor: pointer; }
+.pi-mix .bcard-body { flex: 1; display: flex; flex-direction: column; }
+.pi-mix .bcard-stat { white-space: nowrap; }
+.pi-mix .aimy-done { margin-top: auto; }
+.pi-mix .bcard:focus-visible { outline: 2px solid var(--qa-accent); outline-offset: 2px; }
+.pi-lead { border-color: rgba(var(--qa-accent-rgb), 0.24); }
+.pi-stack.is-lit i:not(.is-on) { opacity: 0.25; }
+.pi-stack.is-lit i.pi-rest.is-on { background: rgba(var(--qa-accent-rgb), 0.35); }
+.pi-peek { display: grid; gap: 5px; margin: 7px 0 12px;
+  -webkit-mask-image: linear-gradient(180deg, #000 40%, transparent); mask-image: linear-gradient(180deg, #000 40%, transparent); }
+.pi-peek > span { display: flex; justify-content: space-between; gap: 10px; font-size: 11.5px; font-weight: 500; color: var(--d200); }
+.pi-peek > span > span { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.pi-peek b { color: var(--d50); font-weight: 600; }
+.pi-count { display: inline-grid; place-items: center; min-width: 30px; height: 26px; padding: 0 7px; border-radius: 9999px; background: rgba(var(--qa-accent-rgb), 0.15); border: 1px solid rgba(var(--qa-accent-rgb), 0.24); color: var(--qa-accent); font-size: 12px; font-weight: 700; }
+.pi-ask { display: inline-flex; align-items: center; gap: 5px; }
+.pi-ask .pi-ask-mark { width: 13px; height: 14px; flex-shrink: 0; }
+.pi-lead:hover .pi-ask { background: rgba(111, 223, 226, 0.18); }
+/* Status and client count on one line in every tile: the shared footer
+   text asks for 130px, which a wider chip like Recommended leaves no room for. */
+.pi-tile-issue .aimy-done { flex-wrap: nowrap; }
+.pi-tile-issue .aimy-done-text { flex: 0 1 auto; white-space: nowrap; }
+.pi-issue-name { margin: 8px 0 0; font-size: 13px; font-weight: 600; line-height: 1.4; color: var(--d50); }
+.pi-issue-quote { display: block; margin: 8px 0 12px; padding-left: 10px; border-left: 2px solid rgba(var(--qa-accent-rgb), 0.45); font-size: 11.5px; line-height: 1.5; color: var(--d300); }
+
+/* ═══ 3. THE TAB PAGES ═════════════════════════════════════════════════════ */
 .pi-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 16px; }
 .pi-toolbar-group { display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--d400); }
 .ins-seg.content-view-toggle { margin: 0; }
@@ -68,6 +102,10 @@ html[data-ins-tab] .nav-role-switch { visibility: hidden; }
 .ins-more { margin: 8px 0 0; }
 
 .ins-detail .eval-header { gap: 12px; }
+/* The panel's own section leaves 4px at the foot, which put the last row of
+   actions on the edge. Same 20px as the sides, in both columns. */
+.ins-list .eval-products-section,
+.ins-detail .eval-products-section { padding-bottom: 20px; }
 .ins-detail .canvas-render.pi-ans { max-width: none; padding: 0; background: none; border: 0; box-shadow: none; }
 .ins-detail-actions { margin-top: 12px; }
 .ins-evidence { margin-bottom: 12px; }
@@ -82,11 +120,10 @@ html[data-ins-tab] .nav-role-switch { visibility: hidden; }
 .pi-queue-main b { font-size: 12.5px; color: var(--d50); }
 .pi-queue-main small { font-size: 11px; color: var(--d400); }
 
-/* Client health and sentiment are categories (README: never a bare number). */
-.ins-health-pill { display: inline-flex; align-items: center; padding: 1px 8px; border-radius: 999px; font-size: 9.5px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; border: 1px solid currentColor; }
-.ins-health-pill.err, .ins-sent.err { color: var(--err); }
-.ins-health-pill.warn, .ins-sent.warn { color: var(--warn); }
-.ins-health-pill.ok, .ins-sent.ok { color: var(--ok); }
+/* Sentiment is a category (README: never a bare number). */
+.ins-sent.err { color: var(--err); }
+.ins-sent.warn { color: var(--warn); }
+.ins-sent.ok { color: var(--ok); }
 .ins-sent { font-weight: 600; }
 
 /* A client's recurring issues, each a link to it in Product insights. */
