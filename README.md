@@ -153,6 +153,10 @@ The expected Node version is `v24.20.0`. The package manifest also declares the 
 
 ## Change Log
 
+### 2026-10-26
+
+- **AiMY conversations on the deployed site** stay with the page they were had on. The site serves pages without ".html" (`/agent-scorecards`), and every page took itself for the Dashboard: all page threads were stored as the Dashboard's, and picking a conversation from another page did not open that page. Each page now recognises itself with or without ".html", and conversations stored before the fix still open.
+
 ### 2026-10-23
 
 - **Product insights** joins the Dashboard (option A): a card under Audit performance by product that ranks the recurring customer issues by the support time they cost, with each issue's detail, quotes, related articles and a reviewed knowledge draft in AiMY. It shows for every client contract, follows the KPI row in Evaluation view, and is hidden while Only my results is on.
