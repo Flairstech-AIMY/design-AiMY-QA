@@ -33,12 +33,18 @@
              show (html.is-my-qa [data-my-qa]). */
           if (localStorage.getItem('aimy-qa-view-my-qa') === 'on') document.documentElement.classList.add('is-my-qa');
         } catch (e) {}
+
+        /* Which of Home's tabs is open (?tab=), pre-paint so Product insights
+           or Customer insights never flashes Home first. assets/aimy-insights.js
+           owns the switch after load. */
+        var tab = new URLSearchParams(location.search).get('tab');
+        if (tab === 'product-insights' || tab === 'customer-insights') document.documentElement.setAttribute('data-ins-tab', tab);
       })();
     </script>
 
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content" />
-    <title>AiMY QA · Dashboard</title>
+    <title>AiMY QA · Home</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
     <link
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
@@ -7537,48 +7543,17 @@
       .pi-ans .eval-bar-fill { background: rgba(var(--accent-rgb), 0.55); }
       .pi-card .eval-bar-avg,
       .pi-ans .eval-bar-avg { color: var(--d50); }
-      /* The section: four .bcard tiles in a row after the KPI row. The
-         recurring-issues tile leads; its bar is split into the issue cards
-         beside it plus the rest, so the bar is their key. PROPOSED pieces:
-         the split bar, the faded preview of the rest, and the +N count. */
+      /* The Insights brief on Home (assets/aimy-insights.css lays out its two
+         cards). Its split bar and badge are the Product insights pieces. */
       /* Same 16px the KPI row leaves before the next block, so the right
          column's first card does not sit flush under the section. */
       .pi-section { margin: 4px 0 16px; container-type: inline-size; }
       .pi-section .dashboard-section-head { flex-wrap: wrap; row-gap: 2px; }
       .pi-section .dashboard-section-head b { color: var(--d300); font-weight: 600; }
-      .pi-mix { display: grid; grid-template-columns: minmax(230px, 1.15fr) repeat(3, minmax(0, 1fr)); gap: 12px; }
-      /* Sized by the section, not the window: the rail and the canvas both
-         change how wide the dashboard column is. */
-      @container (max-width: 960px) { .pi-mix { grid-template-columns: repeat(3, minmax(0, 1fr)); } .pi-lead { grid-column: 1 / -1; } }
-      @container (max-width: 640px) { .pi-mix { grid-template-columns: minmax(0, 1fr); } }
-      .pi-mix .bcard-stat { white-space: nowrap; }
-      .pi-mix .bcard { display: flex; flex-direction: column; }
-      .pi-mix .bcard-body { flex: 1; display: flex; flex-direction: column; }
-      .pi-mix .aimy-done { margin-top: auto; }
-      .pi-mix .bcard:focus-visible { outline: 2px solid var(--qa-accent); outline-offset: 2px; }
-      .pi-lead { border-color: rgba(var(--qa-accent-rgb), 0.24); }
       .pi-badge { background: rgba(var(--qa-accent-rgb), 0.15); color: var(--qa-accent); border: 1px solid rgba(var(--qa-accent-rgb), 0.24); }
       .pi-stack { display: flex; gap: 2px; height: 6px; margin-top: 11px; border-radius: 3px; overflow: hidden; background: var(--wash-7); }
       .pi-stack i { display: block; height: 100%; background: rgba(var(--qa-accent-rgb), var(--o, 0.55)); transition: opacity var(--transition-fast); }
       .pi-stack i.pi-rest { background: transparent; }
-      .pi-stack.is-lit i:not(.is-on) { opacity: 0.25; }
-      .pi-stack.is-lit i.pi-rest.is-on { background: rgba(var(--qa-accent-rgb), 0.35); }
-      .pi-peek { display: grid; gap: 5px; margin: 7px 0 12px;
-        -webkit-mask-image: linear-gradient(180deg, #000 40%, transparent); mask-image: linear-gradient(180deg, #000 40%, transparent); }
-      .pi-peek > span { display: flex; justify-content: space-between; gap: 10px; font-size: 11.5px; font-weight: 500; color: var(--d200); }
-      .pi-peek > span > span { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-      .pi-peek b { color: var(--d50); font-weight: 600; }
-      .pi-count { display: inline-grid; place-items: center; min-width: 30px; height: 26px; padding: 0 7px; border-radius: 9999px; background: rgba(var(--qa-accent-rgb), 0.15); border: 1px solid rgba(var(--qa-accent-rgb), 0.24); color: var(--qa-accent); font-size: 12px; font-weight: 700; }
-      .pi-ask { display: inline-flex; align-items: center; gap: 5px; }
-      .pi-ask .pi-ask-mark { width: 13px; height: 14px; flex-shrink: 0; }
-      .pi-lead:hover .pi-ask { background: rgba(111, 223, 226, 0.18); }
-      /* Status and client count on one line in every card: the shared
-         footer text asks for 130px, which a wider chip like Recommended
-         leaves no room for. */
-      .pi-issue .aimy-done { flex-wrap: nowrap; }
-      .pi-issue .aimy-done-text { flex: 0 1 auto; white-space: nowrap; }
-      .pi-issue-name { margin: 8px 0 0; font-size: 13px; font-weight: 600; line-height: 1.4; color: var(--d50); }
-      .pi-issue-quote { display: block; margin: 8px 0 12px; padding-left: 10px; border-left: 2px solid rgba(var(--qa-accent-rgb), 0.45); font-size: 11.5px; line-height: 1.5; color: var(--d300); }
       .pi-section .pi-scope-note { display: inline; margin: 0 0 0 6px; }
       /* Audit health row: the four cards end on the same footer line. Each
          footer is pinned to the bottom of its card and laid out the same way,
@@ -7678,6 +7653,7 @@
     <link rel="stylesheet" href="assets/aimy-rail.css?v=9" />
     <link rel="stylesheet" href="assets/aimy-user-menu.css?v=26" />
     <link rel="stylesheet" href="assets/aimy-typography.css?v=1" />
+    <link rel="stylesheet" href="assets/aimy-insights.css?v=1" />
     <script src="assets/aimy-viewport.js?v=7"></script>
   </head>
   <body>
@@ -7864,13 +7840,16 @@
                 <div class="sidebar-nav">
           <div class="sidebar-section-label">Primary</div>
           <a class="nav-item active" href="index.html">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="3" y="3" width="7" height="7"></rect>
-              <rect x="14" y="3" width="7" height="7"></rect>
-              <rect x="14" y="14" width="7" height="7"></rect>
-              <rect x="3" y="14" width="7" height="7"></rect>
-            </svg>
-            Dashboard
+            <svg class="lucide lucide-house" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" /><path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /></svg>
+            Home
+          </a>
+          <a class="nav-item" href="index.html?tab=product-insights">
+            <svg class="lucide lucide-package-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22V12" /><path d="M20.27 18.27 22 20" /><path d="M21 10.498V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.729l7 4a2 2 0 0 0 2 .001l.98-.559" /><path d="M3.29 7 12 12l8.71-5" /><path d="m7.5 4.27 8.997 5.148" /><circle cx="18.5" cy="16.5" r="2.5" /></svg>
+            Product insights
+          </a>
+          <a class="nav-item" href="index.html?tab=customer-insights">
+            <svg class="lucide lucide-users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><path d="M16 3.128a4 4 0 0 1 0 7.744" /><path d="M22 21v-2a4 4 0 0 0-3-3.87" /><circle cx="9" cy="7" r="4" /></svg>
+            Customer insights
           </a>
           <a class="nav-item" href="agent-scorecards.html">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -9423,90 +9402,66 @@
                a second copy of that block. Removing it keeps the briefing at
                its block budget now that Product insights joins it (§5.3). -->
 
-          <!-- ════ PRODUCT INSIGHTS ════════════════════════════════════════
-               What customers keep calling about, from every analyzed call
-               (not the audited sample), ranked by the support time it costs.
-               Its own section after the KPI row, in both Audit and Evaluation
-               view, so it reads as its own topic rather than more audit data
-               (iteration 7, design-strategy/exports/product-insights-ui-iterations.html).
-
-               The recurring-issues tile leads: the total, and a bar split
-               into the three issue cards beside it plus the rest, so the bar
-               is the cards' key. The rest are previewed under the bar and wait
-               in AiMY. Every tile is a .bcard and asks AiMY about what it
-               shows. Team-level, so hidden while Only my results is on.
-               Answers, scope line and work-state changes are in the Product
-               insights script. Figures are prototype constants. -->
-          <section class="pi-section" id="productInsights" aria-labelledby="productInsightsTitle" data-my-qa="hide">
+          <!-- ════ INSIGHTS BRIEF ══════════════════════════════════════════
+               Home carries only a brief of each insights tab: the headline,
+               the top three, and the way in. The full data lives in its own
+               tab (index.html?tab=product-insights / ?tab=customer-insights,
+               drawn by assets/aimy-insights.js). Each card is one link to its
+               tab. Team-level, so hidden while Only my results is on.
+               Figures are prototype constants. -->
+          <section class="pi-section ins-brief" id="insightsBrief" aria-labelledby="insightsBriefTitle" data-my-qa="hide">
             <div class="dashboard-section-head">
-              <h2 id="productInsightsTitle">Product insights</h2>
-              <span data-pi-scope>What customers keep calling about · Based on <b>2,486 analyzed calls</b> · All clients · All products · 1 Jan 2026 – 15 Sep 2026</span>
+              <h2 id="insightsBriefTitle">Insights</h2>
+              <span>What customers keep calling about, and how each client is doing · from <b>2,486 analyzed calls</b></span>
             </div>
-            <div class="pi-mix">
-              <div class="bcard pi-lead" role="button" tabindex="0" data-pi-tile="rest"
-                   data-entry-mode="investigate" data-aimy-topic="pi-all" data-aimy-ask="Which recurring issues keep coming back, beyond the top three?"
-                   aria-label="Recurring issues: 36% of support time, 112 of 307 hours. Open the other 9 in AiMY">
+            <div class="ins-brief-grid">
+              <a class="bcard ins-brief-card" href="index.html?tab=product-insights" data-ins-go="product-insights"
+                 aria-label="Product insights: 12 recurring issues take 36% of support time. Open Product insights">
                 <div class="bcard-body">
                   <div class="bcard-meta">
-                    <span class="type-label">Recurring issues</span>
+                    <span class="type-label ins-brief-label"><svg class="lucide lucide-package-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22V12" /><path d="M20.27 18.27 22 20" /><path d="M21 10.498V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.729l7 4a2 2 0 0 0 2 .001l.98-.559" /><path d="M3.29 7 12 12l8.71-5" /><path d="m7.5 4.27 8.997 5.148" /><circle cx="18.5" cy="16.5" r="2.5" /></svg>Product insights</span>
                     <span class="priority-badge pi-badge">12 issues</span>
                   </div>
-                  <div class="bcard-stat-line"><span class="bcard-stat">36%</span><span class="bcard-stat-cap">of support time · <b>112</b> of 307 h</span></div>
+                  <div class="bcard-stat-line"><span class="bcard-stat">36%</span><span class="bcard-stat-cap">of support time on recurring issues · <b>112</b> of 307 h</span></div>
                   <div class="pi-stack" aria-hidden="true">
-                    <i data-seg="setup" style="flex:30;--o:.75"></i><i data-seg="invoice" style="flex:18;--o:.55"></i><i data-seg="login" style="flex:15;--o:.38"></i><i class="pi-rest" data-seg="rest" style="flex:49"></i>
+                    <i style="flex:30;--o:.75"></i><i style="flex:18;--o:.55"></i><i style="flex:15;--o:.38"></i><i class="pi-rest" style="flex:49"></i>
                   </div>
-                  <div class="pi-peek" aria-hidden="true">
-                    <span><span>Agent could not find the refund policy</span><b>12 h</b></span>
-                    <span><span>Export fails for large files</span><b>10 h</b></span>
-                  </div>
-                  <div class="aimy-done">
-                    <span class="pi-count">+9</span><span class="aimy-done-text">more in AiMY · 49 h</span>
-                    <span class="aimy-done-actions"><span class="aimy-done-link primary pi-ask"><svg class="pi-ask-mark" viewBox="0 0 18 20" aria-hidden="true"><use href="#aimy-logo-small"/></svg>Ask AiMY</span></span>
+                  <ul class="ins-brief-list" aria-label="Costliest recurring issues">
+                    <li><span>Setup instructions unclear</span><b>30 h</b></li>
+                    <li><span>Invoice total differs from quote</span><b>18 h</b></li>
+                    <li><span>Login code not received</span><b>15 h</b></li>
+                  </ul>
+                  <div class="aimy-done" data-pi-action="setup">
+                    <svg class="aimy-done-mark" viewBox="0 0 18 20" aria-hidden="true"><use href="#aimy-logo-small"/></svg>
+                    <span class="work-state ws-recommended" data-work-state="recommended"><span class="ws-dot"></span>Recommended</span><span class="aimy-done-text"><b>Setup article</b> needs numbered steps</span>
+                    <span class="aimy-done-actions"><span class="aimy-done-link primary ins-brief-go">Open Product insights<svg class="lucide lucide-arrow-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></svg></span></span>
                   </div>
                 </div>
-              </div>
+              </a>
 
-              <div class="bcard pi-issue" role="button" tabindex="0" data-pi-issue="setup" data-pi-tile="setup"
-                   data-entry-mode="investigate" data-aimy-topic="pi-issue-setup" data-aimy-ask="Why do customers keep calling about unclear setup instructions?"
-                   aria-label="Setup instructions unclear: 30 hours of support, 184 calls, 6 clients, Upland">
+              <a class="bcard ins-brief-card" href="index.html?tab=customer-insights" data-ins-go="customer-insights"
+                 aria-label="Customer insights: 2 of 6 clients need attention. Open Customer insights">
                 <div class="bcard-body">
-                  <div class="bcard-meta"><span class="type-label">Upland · Onboarding</span></div>
-                  <div class="bcard-stat-line"><span class="bcard-stat">30 h</span><span class="bcard-stat-cap">of support · <b>184</b> calls</span></div>
-                  <p class="pi-issue-name">Setup instructions unclear</p>
-                  <q class="pi-issue-quote">I did the first step and then nothing tells me what to do next.</q>
+                  <div class="bcard-meta">
+                    <span class="type-label ins-brief-label"><svg class="lucide lucide-users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><path d="M16 3.128a4 4 0 0 1 0 7.744" /><path d="M22 21v-2a4 4 0 0 0-3-3.87" /><circle cx="9" cy="7" r="4" /></svg>Customer insights</span>
+                    <span class="priority-badge pi-badge">6 clients</span>
+                  </div>
+                  <div class="bcard-stat-line"><span class="bcard-stat warn">2</span><span class="bcard-stat-cap">clients need attention · <b>Objectif Lune</b>, <b>RightAnswers</b></span></div>
+                  <div class="pi-stack ins-health" aria-hidden="true">
+                    <i class="ins-h-attention" style="flex:2"></i><i class="ins-h-watch" style="flex:2"></i><i class="ins-h-healthy" style="flex:2"></i>
+                  </div>
+                  <ul class="ins-brief-list" aria-label="Clients that need attention first">
+                    <li><span>Objectif Lune</span><b>Negative · CSAT 68%</b></li>
+                    <li><span>RightAnswers</span><b>Neutral · CSAT 74%</b></li>
+                    <li><span>Panviva</span><b>Neutral · CSAT 79%</b></li>
+                  </ul>
                   <div class="aimy-done">
-                    <span class="work-state ws-recommended" data-work-state="recommended"><span class="ws-dot"></span>Recommended</span><span class="aimy-done-text"><b>6</b> clients</span>
+                    <svg class="aimy-done-mark" viewBox="0 0 18 20" aria-hidden="true"><use href="#aimy-logo-small"/></svg>
+                    <span class="work-state ws-detected" data-work-state="detected"><span class="ws-dot"></span>Detected</span><span class="aimy-done-text"><b>Objectif Lune</b> CSAT down 6 pts</span>
+                    <span class="aimy-done-actions"><span class="aimy-done-link primary ins-brief-go">Open Customer insights<svg class="lucide lucide-arrow-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></svg></span></span>
                   </div>
                 </div>
-              </div>
-
-              <div class="bcard pi-issue" role="button" tabindex="0" data-pi-issue="invoice" data-pi-tile="invoice"
-                   data-entry-mode="investigate" data-aimy-topic="pi-issue-invoice" data-aimy-ask="Why do invoice totals differ from the quote?"
-                   aria-label="Invoice total differs from quote: 18 hours of support, 97 calls, 4 clients, Asteris">
-                <div class="bcard-body">
-                  <div class="bcard-meta"><span class="type-label">Asteris · Billing</span></div>
-                  <div class="bcard-stat-line"><span class="bcard-stat">18 h</span><span class="bcard-stat-cap">of support · <b>97</b> calls</span></div>
-                  <p class="pi-issue-name">Invoice total differs from quote</p>
-                  <q class="pi-issue-quote">The renewal invoice has a usage line nobody mentioned.</q>
-                  <div class="aimy-done">
-                    <span class="work-state ws-detected" data-work-state="detected"><span class="ws-dot"></span>Detected</span><span class="aimy-done-text"><b>4</b> clients</span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="bcard pi-issue" role="button" tabindex="0" data-pi-issue="login" data-pi-tile="login"
-                   data-entry-mode="investigate" data-aimy-topic="pi-issue-login" data-aimy-ask="What changed about login codes?"
-                   aria-label="Login code not received: 15 hours of support, 142 calls, 5 clients, Upland">
-                <div class="bcard-body">
-                  <div class="bcard-meta"><span class="type-label">Upland · Access</span></div>
-                  <div class="bcard-stat-line"><span class="bcard-stat">15 h</span><span class="bcard-stat-cap">of support · <b>142</b> calls</span></div>
-                  <p class="pi-issue-name">Login code not received</p>
-                  <q class="pi-issue-quote">The code goes to my old email since we changed domain.</q>
-                  <div class="aimy-done">
-                    <span class="work-state ws-detected" data-work-state="detected"><span class="ws-dot"></span>Detected</span><span class="aimy-done-text"><b>5</b> clients</span>
-                  </div>
-                </div>
-              </div>
+              </a>
             </div>
           </section>
 
@@ -10134,6 +10089,14 @@
                 </div>
 
             </div>
+
+            <!-- ════ HOME'S OTHER TABS ═══════════════════════════════════════
+                 Product insights and Customer insights, each a tab of Home
+                 (?tab=), with its own rail entry. Drawn by
+                 assets/aimy-insights.js from the Product insights data and the
+                 client data there. Figures are prototype constants. -->
+            <div class="dash-view ins-view" id="viewProductInsights" hidden aria-labelledby="piPageTitle"></div>
+            <div class="dash-view ins-view" id="viewCustomerInsights" hidden aria-labelledby="ciPageTitle"></div>
           </div>
         <!-- /dashboard-scroll -->
 
@@ -13016,12 +12979,17 @@
 
           window.AIMY_SURFACE = {
             initials: "EY",
-            SCALAR: ["view", "scenario", "chart", "interaction", "qa_filters", "qa_interaction", "qa_from", "qa_to", "qa_results_scope"].concat(DIMS.map(slug)),
+            SCALAR: ["view", "scenario", "chart", "interaction", "qa_filters", "qa_interaction", "qa_from", "qa_to", "qa_results_scope", "tab", "pi_view", "pi_group", "pi_issue", "ci_client"].concat(DIMS.map(slug)),
             MULTI: ["qa_client", "qa_product"],
-            DEFAULTS: { view: "manager", scenario: "critical", interaction: "all", qa_filters: "", qa_interaction: "all", qa_from: "2026-01-01", qa_to: "2026-09-15", qa_results_scope: "all" },
+            DEFAULTS: { view: "manager", scenario: "critical", interaction: "all", qa_filters: "", qa_interaction: "all", qa_from: "2026-01-01", qa_to: "2026-09-15", qa_results_scope: "all", tab: "home", pi_view: "issues", pi_group: "issue" },
 
             read: function () {
               var out = { scenario: activeScenario };
+              /* Home's tab and what is picked inside it (assets/aimy-insights.js). */
+              if (window.AIMY_INSIGHTS) {
+                var ins = window.AIMY_INSIGHTS.read();
+                Object.keys(ins).forEach(function (k) { out[k] = ins[k]; });
+              }
               out.qa_results_scope = window.AIMY_QA_RESULTS_SCOPE ? window.AIMY_QA_RESULTS_SCOPE.get() : 'all';
               /* Manager or Director. The tab owns the truth via aria-selected,
                  the same way the chart toggle does — reading the button rather
@@ -13091,6 +13059,8 @@
                   var open = tog.getAttribute("aria-expanded") === "true";
                   if (open !== (v.chart === "1")) toggleQualityChart(tog);
                 }
+
+                if (window.AIMY_INSIGHTS) window.AIMY_INSIGHTS.apply(v);
               } finally { APPLYING = false; }
             }
           };
@@ -16462,7 +16432,7 @@
         /* Issue rows are buttons to the keyboard too. */
         document.addEventListener("keydown", function (e) {
           if (e.key !== "Enter" && e.key !== " ") return;
-          var row = e.target.closest && e.target.closest('.eval-bar-row[role="button"][data-entry-mode], .pi-mix [role="button"][data-entry-mode]');
+          var row = e.target.closest && e.target.closest('.eval-bar-row[role="button"][data-entry-mode]');
           if (!row || row !== e.target) return;
           e.preventDefault();
           row.click();
@@ -16499,6 +16469,9 @@
               if (btn) { btn.textContent = "Draft the article update"; btn.setAttribute("data-entry-mode", "investigate"); btn.setAttribute("data-aimy-topic", "pi-issue-" + id); btn.setAttribute("data-aimy-ask", it.q); }
             }
           });
+          /* The Product insights tab redraws its counts and keeps the state
+             across Home's tabs. */
+          document.dispatchEvent(new CustomEvent("pi:state", { detail: { id: id, state: state } }));
         }
         /* Answers already in the thread follow the issue, so an earlier
            "Draft a knowledge article" does not stay on screen after it is sent. */
@@ -16563,25 +16536,22 @@
           }, 0);
         }, true);
 
-        /* ── A tile and its share of the bar light up together ─────────────── */
-        function lightSeg(tile, on) {
-          var stack = document.querySelector("#productInsights .pi-stack"), id = tile.getAttribute("data-pi-tile");
-          if (!stack) return;
-          stack.classList.toggle("is-lit", on);
-          stack.querySelectorAll("i").forEach(function (i) { i.classList.toggle("is-on", on && i.getAttribute("data-seg") === id); });
-        }
-        ["mouseover", "focusin"].forEach(function (ev) {
-          document.addEventListener(ev, function (e) { var t = e.target.closest && e.target.closest(".pi-mix [data-pi-tile]"); if (t) lightSeg(t, true); });
-        });
-        ["mouseout", "focusout"].forEach(function (ev) {
-          document.addEventListener(ev, function (e) { var t = e.target.closest && e.target.closest(".pi-mix [data-pi-tile]"); if (t && !t.contains(e.relatedTarget)) lightSeg(t, false); });
-        });
+        /* ── For the Product insights tab (assets/aimy-insights.js), which
+              draws the same issues with the same rows and answers. ───────── */
+        window.AIMY_PI = {
+          TOTAL: TOTAL, ISSUES: ISSUES, CLIENTS: CLIENTS, PRODUCTS: PRODUCTS, QUOTES: QUOTES, MORE: MORE,
+          byCost: byCost, issue: issue, esc: esc, ws: ws, em: em, pill: pill,
+          issueRow: issueRow, plainRow: plainRow, renderIssue: renderIssue,
+          scopeParts: scopeParts, paintScope: paintScope, paintBasis: paintBasis,
+          setIssueState: function (id, state) { setIssueState(id, state); refreshAnswers(id); }
+        };
         paintScope();
       })();
     </script>
+    <script src="assets/aimy-insights.js?v=1"></script>
     <script src="assets/aimy-scroll.js?v=3"></script>
-    <script src="assets/aimy-canvas.js?v=16"></script>
-    <script src="assets/aimy-rail.js?v=8"></script>
+    <script src="assets/aimy-canvas.js?v=17"></script>
+    <script src="assets/aimy-rail.js?v=9"></script>
     <script src="assets/aimy-user-menu.js?v=27"></script>
     <script>
       /* ONLY MY RESULTS, the dashboard scope.

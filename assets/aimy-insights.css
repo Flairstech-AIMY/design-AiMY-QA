@@ -1,0 +1,106 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   HOME'S TABS — Product insights and Customer insights (assets/aimy-insights.js)
+
+   Built from the page's own components (bcard, eval-panel, eval-bar-row,
+   content-view-toggle, pi-part, work-state, entry-action) and tokens. The
+   layout rules for the tab pages come from the option D mock
+   (design-strategy/product-insights/pi.css).
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ═══ 0. WHICH TAB IS ON SCREEN ════════════════════════════════════════════
+   <html data-ins-tab> is set pre-paint from ?tab=, so a tab never flashes
+   Home first. Manager and Director are Home's views; the role switch is a
+   demo control for them, so it steps aside on the other tabs. */
+html[data-ins-tab] #viewManager,
+html[data-ins-tab] #viewDirector { display: none !important; }
+html:not([data-ins-tab="product-insights"]) #viewProductInsights,
+html:not([data-ins-tab="customer-insights"]) #viewCustomerInsights { display: none !important; }
+html[data-ins-tab] .nav-role-switch { visibility: hidden; }
+
+.ins-view { display: grid; gap: 16px; padding-bottom: 96px; }
+.ins-view[hidden] { display: none; }
+.ins-head { margin-bottom: 0; flex-wrap: wrap; row-gap: 2px; }
+.ins-view .ins-scope { margin: -8px 0 0; }
+.ins-view .pi-mine-note { margin: -8px 0 0; font-size: 11px; color: var(--d400); }
+.ins-view .tier-1-grid { margin: 0; }
+
+/* ═══ 1. THE BRIEF ON HOME ═════════════════════════════════════════════════
+   Two cards, each one link to its tab. */
+.ins-brief-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+@container (max-width: 640px) { .ins-brief-grid { grid-template-columns: minmax(0, 1fr); } }
+.ins-brief-card { display: flex; flex-direction: column; color: inherit; text-decoration: none; cursor: pointer; }
+.ins-brief-card .bcard-body { flex: 1; display: flex; flex-direction: column; }
+.ins-brief-card .aimy-done { margin-top: auto; }
+.ins-brief-card:hover { border-color: rgba(var(--qa-accent-rgb), 0.4); }
+.ins-brief-card:focus-visible { outline: 2px solid var(--qa-accent); outline-offset: 2px; }
+.ins-brief-label { display: inline-flex; align-items: center; gap: 6px; }
+.ins-brief-label svg { width: 14px; height: 14px; flex-shrink: 0; }
+.ins-brief-list { list-style: none; display: grid; gap: 5px; margin: 10px 0 12px; padding: 0; }
+.ins-brief-list li { display: flex; justify-content: space-between; gap: 10px; font-size: 11.5px; font-weight: 500; color: var(--d200); }
+.ins-brief-list li > span { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.ins-brief-list b { flex-shrink: 0; color: var(--d50); font-weight: 600; }
+.ins-brief-go { display: inline-flex; align-items: center; gap: 5px; }
+.ins-brief-go svg { width: 14px; height: 14px; flex-shrink: 0; transition: transform var(--transition-fast, 150ms) ease; }
+.ins-brief-card:hover .ins-brief-go svg { transform: translateX(2px); }
+/* The client-health bar: how many clients are in each state. */
+.ins-health i.ins-h-attention { background: color-mix(in srgb, var(--err) 70%, transparent); }
+.ins-health i.ins-h-watch { background: color-mix(in srgb, var(--warn) 55%, transparent); }
+.ins-health i.ins-h-healthy { background: color-mix(in srgb, var(--ok) 45%, transparent); }
+
+/* ═══ 2. THE TAB PAGES ═════════════════════════════════════════════════════ */
+.pi-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 16px; }
+.pi-toolbar-group { display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--d400); }
+.ins-seg.content-view-toggle { margin: 0; }
+.pi-page-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 16px; align-items: start; }
+@media (max-width: 900px) { .pi-page-grid { grid-template-columns: minmax(0, 1fr); } }
+
+/* List rows are options: the picked one is tinted, never coloured by severity. */
+.ins-list .eval-bars { display: grid; gap: 4px; }
+.ins-list .eval-bar-row { cursor: pointer; border-radius: var(--r-md); padding: 8px 10px; transition: background-color var(--transition-fast, 150ms) ease; }
+.ins-list .eval-bar-row:hover { background: var(--wash-3); }
+.ins-list .eval-bar-row[aria-selected="true"] { background: rgba(var(--accent-rgb), 0.08); box-shadow: inset 0 0 0 1px rgba(var(--accent-rgb), 0.3); }
+.ins-list .eval-bar-row:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.ins-list .eval-bar-top { flex-wrap: wrap; row-gap: 2px; }
+.ins-list .eval-bar-right { margin-left: auto; }
+.ins-list .eval-bar-fill { background: rgba(var(--accent-rgb), 0.55); }
+.ins-list .eval-bar-avg { color: var(--d50); }
+.ins-link-row { display: block; color: inherit; text-decoration: none; }
+.ins-more { margin: 8px 0 0; }
+
+.ins-detail .eval-header { gap: 12px; }
+.ins-detail .canvas-render.pi-ans { max-width: none; padding: 0; background: none; border: 0; box-shadow: none; }
+.ins-detail-actions { margin-top: 12px; }
+.ins-evidence { margin-bottom: 12px; }
+.ins-who { margin: 0 0 10px; font-size: 12px; color: var(--d300); }
+.ins-who a { color: var(--text-link, var(--ai-text)); text-decoration: none; font-weight: 600; }
+.ins-who a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+/* The knowledge review queue. */
+.pi-queue-row { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-top: 1px solid var(--card-border); }
+.pi-queue-row:first-child { border-top: 0; }
+.pi-queue-main { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.pi-queue-main b { font-size: 12.5px; color: var(--d50); }
+.pi-queue-main small { font-size: 11px; color: var(--d400); }
+
+/* Client health and sentiment are categories (README: never a bare number). */
+.ins-health-pill { display: inline-flex; align-items: center; padding: 1px 8px; border-radius: 999px; font-size: 9.5px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; border: 1px solid currentColor; }
+.ins-health-pill.err, .ins-sent.err { color: var(--err); }
+.ins-health-pill.warn, .ins-sent.warn { color: var(--warn); }
+.ins-health-pill.ok, .ins-sent.ok { color: var(--ok); }
+.ins-sent { font-weight: 600; }
+
+/* A client's recurring issues, each a link to it in Product insights. */
+.ins-issue-links { display: grid; gap: 6px; }
+.ins-detail .pi-ans > * { min-width: 0; }
+.ins-issue-link { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; padding: 8px 10px; border-radius: var(--r-md); border: 1px solid var(--card-border); color: inherit; text-decoration: none; transition: background-color var(--transition-fast, 150ms) ease; }
+.ins-issue-link:hover { background: var(--wash-3); }
+.ins-issue-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.ins-issue-name { flex: 1; min-width: 0; font-size: 12.5px; font-weight: 600; color: var(--d50); }
+.ins-issue-meta { font-size: 11px; color: var(--d400); white-space: nowrap; }
+.ins-issue-link svg { width: 14px; height: 14px; flex-shrink: 0; color: var(--d400); }
+.ins-issue-link .work-state { font-size: 9.5px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ins-brief-go svg, .ins-list .eval-bar-row, .ins-issue-link { transition: none; }
+  .ins-brief-card:hover .ins-brief-go svg { transform: none; }
+}
