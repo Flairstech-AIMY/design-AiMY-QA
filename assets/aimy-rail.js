@@ -30,7 +30,9 @@
 
    IN A REAL BUILD THE FIGURES ARE DERIVED, NOT AUTHORED. Each constant below
    names where its number lives so the wiring is a lookup, not a rewrite:
-     Dashboard   SLA 29pts under the 90% target · index.html
+     Home        SLA 29pts under the 90% target · index.html
+     Product insights   TOTAL.recurring in the Product insights script · index.html
+     Customer insights  clients marked "attention" · assets/aimy-insights.js
      Reviews     window.__evalReviewSummary / __evalJustifies · agent-scorecards.html
      My Profile  fb-201 escalates to the Feedback Manager in 3 days · my-profile.html
      Goal Hub    `pendingCount` is 2 in the Governance tab · goal-browser.html
@@ -77,6 +79,8 @@
      rail can fit in a 64px column; `tip` is the sentence its tooltip reads. */
   var PAGES = {
     "index": { value: "29", text: "points below target", badge: "29", tip: "29 points below target" },
+    "product-insights": { value: "12", text: "recurring customer issues", badge: "12", tip: "12 recurring customer issues" },
+    "customer-insights": { value: "2", text: "clients need attention", badge: "2", tip: "2 clients need attention" },
     "my-profile": { value: "3d", text: "until escalation", badge: "3d", tip: "Feedback escalates in 3 days" },
     "goal-browser": { value: "2", text: "pending goal changes", badge: "2", tip: "2 pending goal changes" },
     "data-ingestion": { value: "3", text: "ingestion failures in 24h", badge: "3", tip: "3 ingestion failures in 24 hours" },
@@ -138,11 +142,20 @@
      Basename with any extension and trailing slash removed, lowercased.
      Cloudflare's asset handling serves `/agent-scorecards` without ".html", so
      keying off the extension made every deployed page think it was the
-     Dashboard. `/`, `/index.html`, `/index` all resolve to "index". */
+     Dashboard. `/`, `/index.html`, `/index` all resolve to "index".
+
+     Home carries two more tabs as `?tab=`, so `index.html?tab=product-insights`
+     is the page "product-insights". Every other query key is surface state
+     and does not change which page this is. */
+  var INDEX_TABS = { "product-insights": 1, "customer-insights": 1 };
   function pageKey(urlOrHref) {
-    var s = String(urlOrHref || "").split("#")[0].split("?")[0].replace(/\/+$/, "");
+    var raw = String(urlOrHref || "").split("#")[0];
+    var s = raw.split("?")[0].replace(/\/+$/, "");
     var last = s.split("/").pop().replace(/\.[a-z0-9]+$/i, "");
-    return last ? last.toLowerCase() : "index";
+    var key = last ? last.toLowerCase() : "index";
+    var tab = /[?&]tab=([a-z-]+)/i.exec(raw);
+    if (key === "index" && tab && INDEX_TABS[tab[1].toLowerCase()]) return tab[1].toLowerCase();
+    return key;
   }
 
   /* The label is a BARE TEXT NODE in all six pages' markup. */
@@ -461,26 +474,38 @@
     if (!sidebar.id) sidebar.id = "appSidebar";
     sidebar.setAttribute("aria-label", "AiMY insights");
 
-    current = pageKey(location.pathname);
+    current = pageKey(location.pathname + location.search);
     $$(".nav-item", nav).forEach(function (a) {
       /* My Profile ships pinned to the foot of the column with an inline style.
          Both views now read in one fixed order, so the pin comes off. */
       a.style.order = "";
       a.style.marginTop = "";
-      if (pageKey(a.getAttribute("href")) === current) {
-        a.classList.add("active");
-        a.setAttribute("aria-current", "page");
-      } else {
-        a.classList.remove("active");
-        a.removeAttribute("aria-current");
-      }
     });
+    markCurrent();
 
     var controls = mountChrome();
     paint();
     mountState(controls);
     nav.addEventListener("click", travel);
   }
+
+  function markCurrent() {
+    $$(".nav-item", nav).forEach(function (a) {
+      var on = pageKey(a.getAttribute("href")) === current;
+      a.classList.toggle("active", on);
+      if (on) a.setAttribute("aria-current", "page");
+      else a.removeAttribute("aria-current");
+    });
+  }
+
+  /* Home switches between its tabs in place when a stored conversation is
+     restored, so the page this is can change without a load. */
+  window.aimyRailSetCurrent = function (key) {
+    if (!nav || !key || key === current) return;
+    current = key;
+    markCurrent();
+    paint();
+  };
 
   /* ═══ PICKING A PAGE — the rail reorders, then the page changes ══════════
      The page you are on leads the rail in both views, so picking another one
