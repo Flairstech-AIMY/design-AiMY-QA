@@ -1,8 +1,10 @@
 /* ═══════════════════════════════════════════════════════════════════════════
    AIMY SCROLL DOT — styles for assets/aimy-scroll.js
 
-   Every vertical scroller in the product shows this in place of the native
-   bar: a translucent accent dot with no visible track, by decision — the dot
+   Each page’s main scroller shows this in place of the native bar (the
+   document, or a surface most of the window wide and tall, plus any surface
+   that asks for it, the chat’s thread): a translucent accent dot with no
+   visible track, by decision — the dot
    alone says "there is more, and you are here". While a surface moves the
    dot trails a flame sized by speed; when it stops the flame pulls back in
    and the dot lands with a squash-and-settle.
@@ -13,7 +15,8 @@
    except on surfaces that ask for a clickable track (the chat), so content
    under the right edge of an ordinary scroller stays clickable.
 
-   Surfaces the script skips (two-axis scrollers, text fields, anything under
+   Surfaces the script skips (anything smaller than a main surface, the left
+   navigation, a filter, a drawer; two-axis scrollers, text fields, anything under
    [data-scroll-dot="off"]) keep the shared native bar from
    aimy-responsive.css §9.
    ═══════════════════════════════════════════════════════════════════════════ */
