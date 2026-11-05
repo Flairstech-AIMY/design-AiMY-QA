@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════════════════
-   AIMY SCROLL DOT — ONE SCROLL INDICATOR, EVERY VERTICAL SCROLLER
+   AIMY SCROLL DOT — ONE SCROLL INDICATOR, ON EACH PAGE'S MAIN SCROLLER
 
    Replaces the native vertical scrollbar with a translucent accent dot (styles
    in assets/aimy-scroll.css). While a surface scrolls the dot trails a flame
@@ -9,8 +9,9 @@
    FOUND, NOT REMEMBERED. Like the shared scrollbar in aimy-responsive.css §9,
    a surface gets this by existing: the document is scanned on load, after
    DOM insertions, after clicks and transitions (which is how drawers and
-   overlays open), and any element that scrolls is picked up on its first
-   scroll event regardless. Opt a subtree out with data-scroll-dot="off".
+   overlays open), and any element that scrolls is checked again on its
+   first scroll event. Only a main surface qualifies (see MAIN SURFACES
+   ONLY); attach() opts one in. Opt a subtree out with data-scroll-dot="off".
 
    NOT COVERED, ON PURPOSE: surfaces that scroll on both axes (tables) keep
    the native bars, because a dot cannot say where you are horizontally; and
@@ -75,6 +76,29 @@
     var x = getComputedStyle(el).overflowX;
     return x === "auto" || x === "scroll" || x === "overlay";
   }
+  /* MAIN SURFACES ONLY (Engy, 5 Nov: "only on the main pages, not in the
+     small scroll things"; the same rule as AiMY Talent's copy). Found on
+     its own, the dot goes on a page's own scroller and nothing smaller: the
+     document, or an element at least MAIN_W of the window's width and
+     MAIN_H of its height that is not inside a drawer. The left navigation,
+     a filter's menu, a list inside a card, a popover, a drawer over the
+     page all keep the shared native bar. A surface that wants the dot
+     anyway asks with attach(), as the chat's thread does (aimy-canvas.js). */
+  var MAIN_W = 0.45, MAIN_H = 0.6;
+  /* A drawer, sheet or popover is fixed and narrower than the window; an
+     app shell pinned over the whole window is not one. */
+  function inDrawer(el) {
+    for (var a = el; a && a !== document.body; a = a.parentElement) {
+      if (getComputedStyle(a).position === "fixed" && a.getBoundingClientRect().width < window.innerWidth * 0.95) return true;
+    }
+    return false;
+  }
+  function isMain(el) {
+    if (isRoot(el)) return true;
+    var b = el.getBoundingClientRect();
+    if (b.width < window.innerWidth * MAIN_W || b.height < window.innerHeight * MAIN_H) return false;
+    return !inDrawer(el);
+  }
   function eligible(el) {
     if (!el || el.nodeType !== 1 || railOf(el)) return false;
     if (/^(TEXTAREA|SELECT|INPUT|IFRAME|HEAD|SCRIPT|STYLE)$/.test(el.tagName)) return false;
@@ -82,7 +106,7 @@
     if (el.clientHeight < MIN_H || el.scrollHeight - el.clientHeight < MIN_ROOM) return false;
     if (el.closest && el.closest('[data-scroll-dot="off"]')) return false;
     if (!scrollsY(el) || scrollsBothWays(el)) return false;
-    return true;
+    return isMain(el);
   }
 
   /* ── ONE RAIL ── */
