@@ -16,3 +16,8 @@ storybook-static/
 agent-skills/
 custom-icons-skill/
 ui-ux-pro-max-skill/
+
+# Local Obsidian vault (repo root) and its knowledge map. Kept out of git,
+# and so out of the Cloudflare deploy, which publishes the repo root.
+.obsidian/
+knowledge-vault/

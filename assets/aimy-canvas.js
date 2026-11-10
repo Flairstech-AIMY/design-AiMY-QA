@@ -37,7 +37,7 @@
      way a record does in Sales — a name taken from the thing is better than
      anything the first question would have produced. */
   var PAGE_NAME = {
-    "index.html": "The QA dashboard",
+    "index.html": "Home",
     "agent-scorecards.html": "Agent scorecards",
     "goal-browser.html": "The goal browser",
     "data-ingestion.html": "Data ingestion",
