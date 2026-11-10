@@ -128,6 +128,7 @@ Evaluation content is grouped under the feedback loop and evaluation client lens
 - Actions should name the decision or next step, for example `Review the fail-rate trend` or `Approve the response-time fix`.
 - AiMY can provide deeper charts and drill-downs, but the dashboard should show the key trend or comparison directly when that trend is central to the user’s decision.
 - **Demo controls.** The prototype's own switches (Manager/Director and Audit/Evaluation view on the Dashboard, Supervisor/Feedback Manager on Reviews) live in a floating dock in the bottom-right corner, styled after the Sales prototype's prototype controls: a quiet 32px button with a dashed edge that opens a dashed **Demo controls** panel upward, with a **Prototype only** tag. They are not product features. The page's own elements are moved there at load, so their scripts keep working. Pages without demo controls show no dock. The button stays in its corner and only moves up when the Ask AiMY bar or filter tray reaches it (narrow screens); the panel lifts itself clear of the bar. The profile menu keeps only the **Only my results** switch.
+- **The Ask AiMY composer is Sales' composer.** Every composer (the floating bar and the canvas input) carries an attach clip, a dictate mic and a round button that starts a voice conversation while the field is empty and sends once there is text, as in AiMY Sales and Knowledge. [`assets/aimy-voice.js`](assets/aimy-voice.js) and [`assets/aimy-voice.css`](assets/aimy-voice.css) are Sales' `voice.js` and `voice.css`, ported verbatim; keep them identical to Sales. QA glue lives in [`assets/aimy-composer.js`](assets/aimy-composer.js) and [`assets/aimy-composer.css`](assets/aimy-composer.css). Attaching names the file and says **not uploaded**; dictation and voice use the browser's own speech recognition and say so in words when the microphone is blocked or the browser cannot do it. The "Enter to send" hint is gone from the bar. Above the bar, a **welcome card** greets the signed-in person ("Welcome, Engy. How can I help you today?"); pressing it opens the canvas, its handle tucks it behind the bar (asking something tucks it too), and × dismisses it for the browser session. While it is up, the Continue pill and the Product insights nudge step aside. Prototype state only (sessionStorage).
 - Manager and Director views share information. Their difference is emphasis and available actions, not hidden data.
 
 ## Storybook
@@ -167,6 +168,10 @@ npm.cmd install
 The expected Node version is `v24.20.0`. The package manifest also declares the supported range as `>=24.20.0 <25`.
 
 ## Change Log
+
+### 2026-11-10
+
+- **The Ask AiMY bar matches AiMY Sales**: attach, dictate and voice in every composer, and a welcome card above the bar that tucks behind it or dismisses. Sales' voice module is ported verbatim; the Demo controls dock clears the card on narrow screens.
 
 ### 2026-10-26
 

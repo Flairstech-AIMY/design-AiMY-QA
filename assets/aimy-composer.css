@@ -1,0 +1,189 @@
+/* ══ THE COMPOSER, AS SALES HAS IT ═════════════════════════════════════════
+   Two things AiMY Sales' command bar has that QA's did not:
+
+     1. The tools: attach, dictate, and an empty bar's send that starts a
+        voice conversation. Painted by assets/aimy-voice.js and styled by
+        assets/aimy-voice.css, both ported verbatim from Sales. This file
+        only supplies the tokens that stylesheet reads and QA never defined.
+     2. The peek: the card above the bar that says hello ("Welcome, Engy.
+        How can I help you today?"), tucks behind the bar from its handle,
+        and opens the canvas when pressed. Sales' `.b-peek` (bdr.css), with
+        the drag gesture left out: a press on the handle tucks and untucks.
+
+   Loaded after the page's own inline styles and aimy-voice.css. */
+
+/* ── Tokens aimy-voice.css and the peek read, at QA's type scale ────────── */
+:root {
+  --ty-micro: 12px;
+  --ty-meta: 13px;
+  --ty-body: 15px;
+  --fw-medium: 500;
+  --t-press: 90ms;
+  --t-panel: 400ms;
+  --t-stagger: 40ms;
+  --brand-rgb: 51, 105, 255;
+  /* The bar's own material, so the card above it reads as the top of the
+     same object rather than a notification that floated in. */
+  --composer-skin: #1e2428;
+  --composer-edge: var(--wash-8, rgba(255, 255, 255, 0.08));
+}
+:root[data-theme="light"] {
+  --composer-skin: #ffffff;
+  --composer-edge: rgba(16, 24, 40, 0.14);
+}
+
+/* ── Through the "Only mine" capsule ───────────────────────────────────────
+   aimy-voice.css swaps send's two faces with `.vx-empty > .aimy-float-send`,
+   but QA's send sits one level down, inside the `.myr-cap` capsule that
+   aimy-user-menu.js builds. The same rules, reaching through it. */
+.vx-empty > .myr-cap > .overlay-send > .vx-i-send,
+.vx-empty > .myr-cap > .aimy-float-send > .vx-i-send {
+  opacity: 0; transform: scale(0.5); filter: blur(2px);
+}
+.vx-empty > .myr-cap > .overlay-send > .vx-i-voice,
+.vx-empty > .myr-cap > .aimy-float-send > .vx-i-voice {
+  opacity: 1; transform: none; filter: none;
+}
+/* The voice glyph is drawn white on QA's purple send, like Sales'. */
+.myr-cap > .overlay-send > svg.vx-i-voice,
+.myr-cap > .aimy-float-send > svg.vx-i-voice { width: 18px; height: 18px; stroke: #fff; }
+/* While dictating, the waveform takes the row; the capsule steps aside with
+   the send it holds, as Sales' send does. */
+[data-vx] > .myr-cap { display: none; }
+
+/* Sales' bar carries no "Enter to send" hint: with the tools in the bar the
+   round button is the cue, and the hint only crowds the field. */
+.aimy-float-bar:has(.vx-tools) .aimy-float-hint { display: none; }
+
+/* The bar is the drawer front, so it is in front of the card. */
+.aimy-float-bar { position: relative; z-index: 3; }
+
+/* ══ THE PEEK ══════════════════════════════════════════════════════════════
+   Absolute above the bar inside the fixed wrap, so it takes no layout room
+   and needs no bar height. Clipped at its own bottom edge (plus the tuck) so
+   that, shut, the part that slid down behind the bar is not drawn. */
+.aimy-peek {
+  position: absolute; bottom: calc(100% + 6px); left: 0; right: 0;
+  display: flex; justify-content: center;
+  pointer-events: none;
+  z-index: 1;
+  --peek-tuck: 14px;
+  --peek-lip: 40px;
+  clip-path: inset(-64px -64px calc(-1 * var(--peek-tuck)) -64px);
+}
+.aimy-peek[hidden] { display: none; }
+/* The canvas open hides the bar; the card goes with it. */
+.aimy-float-wrap:has(.aimy-float-bar.hidden) .aimy-peek { display: none; }
+
+/* One card above the bar at a time: while the greeting is up, the resume
+   pill, the customer-issues nudge and the filter hint step aside. */
+.aimy-float-wrap.has-peek .overlay-resume,
+.aimy-float-wrap.has-peek .filter-tray[data-hint] { display: none !important; }
+
+.aimy-peek-card {
+  pointer-events: all; position: relative;
+  width: 100%; max-width: 760px;
+  display: flex; flex-direction: column;
+  padding: 5px; border-radius: 24px;
+  background: var(--composer-skin);
+  border: 1px solid var(--composer-edge);
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.34),
+    0 0 0 1px rgba(0, 0, 0, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  transition: transform var(--t-panel) var(--ease-out),
+              max-width var(--t-base) var(--ease-out);
+  animation: aimy-peek-in var(--t-panel) var(--ease-out);
+}
+:root[data-theme="light"] .aimy-peek-card {
+  box-shadow:
+    0 4px 16px rgba(16, 24, 40, 0.09),
+    0 0 0 1px rgba(16, 24, 40, 0.03);
+}
+@keyframes aimy-peek-in {
+  from { opacity: 0; transform: translate3d(0, 10px, 0) scale(0.985); filter: blur(6px); }
+  to { opacity: 1; transform: none; filter: blur(0); }
+}
+
+/* The lip: drawn across the top of the open card, a full row when shut. */
+.aimy-peek-lip {
+  position: absolute; top: 0; left: 0; right: 0; height: 14px;
+  z-index: 1;
+}
+.aimy-peek.is-shut .aimy-peek-lip {
+  top: 5px; left: 5px; right: 5px; height: 26px;
+  display: flex; align-items: center; justify-content: flex-end;
+}
+.aimy-peek-grip {
+  position: absolute; inset: 0;
+  display: grid; place-items: center;
+  padding: 0; border: 0; border-radius: 23px 23px 0 0;
+  background: none; cursor: pointer;
+  transition: background-color var(--t-fast);
+}
+.aimy-peek.is-shut .aimy-peek-grip { border-radius: 19px 19px 0 0; }
+.aimy-peek-grip:hover { background: rgba(var(--accent-rgb), 0.07); }
+.aimy-peek-grip:focus-visible { outline: 2px solid var(--brand); outline-offset: -2px; }
+.aimy-peek-grip-bar {
+  width: 36px; height: 4px; border-radius: 2px;
+  background: var(--d400);
+  transition: transform var(--t-fast) var(--ease-out), background-color var(--t-fast);
+}
+/* Grows from 36 to 48px on hover, as Sales' handle does, by scale rather
+   than width so nothing is laid out again. */
+.aimy-peek-grip:hover .aimy-peek-grip-bar { transform: scaleX(1.3333); background: var(--d300); }
+
+.aimy-peek-x {
+  position: absolute; top: 6px; right: 6px; z-index: 2;
+  display: grid; place-items: center; width: 26px; height: 26px;
+  padding: 0; border: 0; border-radius: 50%; background: none; color: var(--ink-muted);
+  cursor: pointer; transition: color var(--t-fast), background-color var(--t-fast);
+}
+.aimy-peek.is-shut .aimy-peek-x { top: 0; right: 2px; }
+.aimy-peek-x::after {
+  content: ''; position: absolute; top: 50%; left: 50%;
+  width: 44px; height: 44px; transform: translate(-50%, -50%);
+}
+.aimy-peek-x svg { width: 14px; height: 14px; }
+.aimy-peek-x:hover { color: var(--ink-primary); background: var(--card-bg); }
+.aimy-peek-x:focus-visible { outline: 2px solid var(--brand); outline-offset: -2px; }
+
+/* Shut: down by its own height less the lip, and narrower than the bar so
+   it reads as a tab tucked behind it rather than a second bar. */
+.aimy-peek.is-shut .aimy-peek-card {
+  transform: translate3d(0, calc(100% - var(--peek-lip) + var(--peek-tuck)), 0);
+  max-width: min(608px, 80%);
+}
+.aimy-peek-main { flex: 1 1 auto; min-width: 0; transition: opacity var(--t-fast) var(--ease-out) 160ms; }
+.aimy-peek.is-shut .aimy-peek-main { opacity: 0; transition-delay: 0s; }
+
+/* The whole sentence is the press that opens the canvas. */
+.aimy-peek-open {
+  display: grid; width: 100%;
+  padding: 12px 44px 12px 16px; border: 0; border-radius: 20px;
+  background: none; font-family: inherit; text-align: left; cursor: pointer;
+  transition: background-color var(--t-fast), transform 120ms var(--ease-out);
+}
+.aimy-peek-open:hover { background: rgba(var(--accent-rgb), 0.07); }
+.aimy-peek-open:active { transform: translateY(1px); }
+.aimy-peek-open:focus-visible { outline: 2px solid var(--brand); outline-offset: -2px; }
+.aimy-peek-body {
+  display: block;
+  font-size: 15px; line-height: 1.55; font-weight: 500;
+  color: var(--d100); text-wrap: pretty;
+}
+.aimy-peek-body b { color: var(--d50); font-weight: 700; }
+:root[data-theme="light"] .aimy-peek-body { color: var(--ink-secondary, #344054); }
+:root[data-theme="light"] .aimy-peek-body b { color: var(--ink-primary, #101828); }
+
+.aimy-peek-sr {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aimy-peek-card { animation: none; transition: none; }
+  .aimy-peek-main { transition: none; }
+  .aimy-peek-open:active { transform: none; }
+  .aimy-peek-grip-bar { transition: background-color var(--t-fast); }
+}

@@ -380,7 +380,8 @@
     var lastBottom = null, lastLift = null;
     function clearance(width) {
       var need = 0, edge = window.innerWidth - 16 - width - 8;
-      ["#aimyFloatBar", "#filterTray", ".aimy-overlay.open .overlay-input-bar"].forEach(function (sel) {
+      /* The welcome card over the bar (assets/aimy-composer.js) counts too. */
+      ["#aimyFloatBar", "#filterTray", ".aimy-overlay.open .overlay-input-bar", ".aimy-float-wrap:not(:has(.aimy-float-bar.hidden)) .aimy-peek-card"].forEach(function (sel) {
         var el = document.querySelector(sel);
         if (!el) return;
         var r = el.getBoundingClientRect();
